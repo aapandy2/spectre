@@ -1,0 +1,34 @@
+# Distributed under the MIT License.
+# See LICENSE.txt for details.
+
+set(LIBRARY BurgersVariantSolutions)
+
+add_spectre_library(${LIBRARY})
+
+spectre_target_sources(
+  ${LIBRARY}
+  PRIVATE
+  Bump.cpp
+  Linear.cpp
+  Step.cpp
+  )
+
+spectre_target_headers(
+  ${LIBRARY}
+  INCLUDE_DIRECTORY ${CMAKE_SOURCE_DIR}/src
+  HEADERS
+  Bump.hpp
+  Factory.hpp
+  Linear.hpp
+  Solutions.hpp
+  Step.hpp
+  )
+
+target_link_libraries(
+  ${LIBRARY}
+  PUBLIC
+  DataStructures
+  Serialization
+  INTERFACE
+  ErrorHandling
+  )
