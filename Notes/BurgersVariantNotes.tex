@@ -1,0 +1,167 @@
+%// Distributed under the MIT License.
+%// See LICENSE.txt for details.
+
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{braket}
+\usepackage{bm}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{listings}
+
+\allowdisplaybreaks
+\numberwithin{equation}{section}
+
+\interfootnotelinepenalty=10000
+
+\usepackage{calligra}
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=violet}
+
+\DeclareMathAlphabet{\mathcalligra}{T1}{calligra}{m}{n}
+\DeclareFontShape{T1}{calligra}{m}{n}{<->s*[2.2]callig15}{}
+\newcommand{\scriptr}{\mathcalligra{r}\,}
+\newcommand{\boldscriptr}{\pmb{\mathcalligra{r}}\,}
+
+\newcommand{\Lagr}{\mathcal{L}}
+\newcommand{\Hami}{\mathcal{H}}
+\newcommand{\reals}{\rm I\!R}
+\newcommand{\order}{\mathcal{O}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bp}{\mathbf{p}}
+\newcommand{\bq}{\mathbf{q}}
+\newcommand{\redtext}[1]{\textcolor{red}{#1}}
+\newcommand{\pvec}[1]{\vec{#1}\mkern2mu\vphantom{#1}}
+\newcommand{\mA}{\mathcal{A}}
+
+%\setcounter{section}{-1}
+
+\begin{document}
+\title{Implementing the Burgers equation variant}
+\author{Alex Pandya}
+\date{\today}
+\maketitle
+%\tableofcontents
+%\clearpage
+
+\section{Burgers equation}
+
+A common test of shock-capturing methods is the inviscid Burgers equation,
+\begin{equation} \label{eq:Burgers_PDE}
+0 = \partial_t U + \partial_x \Big( \frac{1}{2} U^2 \Big)
+\end{equation}
+which has characteristics given by the trajectories
+\begin{equation}
+x(t) = U \big( t, x(t) \big)
+\end{equation}
+(see \cite{LeVeque92} equation 3.17 for a derivation).
+One can see that if $\partial_x U < 0$ in the initial data, then
+characteristics will cross at some later time and a shock will form.
+
+Shocks are commonly handled by solving the weak formulation of Burgers
+equation rather than directly solving the PDE (\ref{eq:Burgers_PDE}).
+The weak formulation is obtained by multiplying by a smooth,
+compactly-supported test function $\phi(t,x)$, integrating over the
+domain, and integrating by parts to move derivatives from $U$ onto $\phi$:
+\begin{equation} \label{eq:Burgers_weak}
+0 = \int_{0}^{\infty} dt \, \int_{-\infty}^{\infty} dx \,
+    \big[ U \partial_t \phi + \frac{1}{2} U^2 \partial_x \phi \big]
+    + \int_{-\infty}^{\infty} dx \, \phi(x, 0) U(x, 0)
+\end{equation}
+which does not run into any issues when $U$ is discontinuous, as is the
+case when a shock forms.
+
+The speed at which the shock propagates is given by the Rankine-Hugoniot
+condition,
+\begin{equation} \label{eq:Burgers_speed}
+\begin{aligned}
+s_{B} &= \frac{f(U_L) - f(U_R)}{U_L - U_R} \\
+&= \frac{\frac{1}{2} U_L^2 - \frac{1}{2} U_R^2}{U_L - U_R} \\
+&= \frac{1}{2} (U_L + U_R) \\
+\end{aligned}
+\end{equation}
+where we have used that $f(U) = \frac{1}{2} U^2$ for Burgers equation to obtain
+the second equality.
+
+\section{Variant of Burgers equation}
+
+LeVeque also provides a variant of Burgers equation (\cite{LeVeque92} equation
+3.41) which is obtained by multiplying (\ref{eq:Burgers_PDE}) through by $2 U$
+and rearranging, which yields
+\begin{equation} \label{eq:Burgers_Variant_PDE}
+0 = \partial_t (U^2) + \partial_x \Big( \frac{2}{3} U^3 \Big).
+\end{equation}
+If we choose data such that $U \neq 0$, then solutions to the PDEs
+(\ref{eq:Burgers_PDE}) and (\ref{eq:Burgers_Variant_PDE}) should be equivalent,
+since we can just cancel off the factor of $2 U$.
+
+Crucially, the weak formulation of Burgers equation, (\ref{eq:Burgers_weak})
+has different \textit{discontinuous} solutions from that of the variant
+equation, whose weak solutions satisfy
+\begin{equation}
+\begin{aligned}
+0 &= \int_{0}^{\infty} dt \, \int_{-\infty}^{\infty} dx \,
+    \phi \partial_t (U^2) + \int_{0}^{\infty} dt \, \int_{-\infty}^{\infty} dx
+    \, \phi \partial_x \Big( \frac{2}{3} U^3 \Big) \\
+&= \int_{0}^{\infty} dt \, \int_{-\infty}^{\infty} dx \,
+    \Big[ U^2 \partial_t \phi + \frac{2}{3} U^3 \partial_x \phi \Big]
+    + \int_{-\infty}^{\infty} dx \, U^2(0, x) \phi(0, x) \\
+\end{aligned}
+\end{equation}
+which is not a multiple of (\ref{eq:Burgers_weak}).
+
+A clear indication of the difference between the two sets of weak solutions
+can be seen through the shock speed, which for the variant equation is:
+\begin{equation} \label{eq:Burgers_variant_speed}
+\begin{aligned}
+s_{BV} &= \frac{f(U_L) - f(U_R)}{U_L^2 - U_R^2} \\
+&= \frac{2}{3} \frac{U_L^3 - U_R^3}{U_L^2 - U_R^2} \\
+\end{aligned}
+\end{equation}
+which differs from (\ref{eq:Burgers_speed}).
+
+\subsection{Characteristic speeds for the variant equation}
+
+It will be useful to begin by defining
+\begin{equation}
+V \equiv U^2
+\end{equation}
+so that we can rewrite (\ref{eq:Burgers_Variant_PDE}) as
+\begin{equation} \label{eq:Burgers_variant_V}
+0 = \partial_t V + \partial_x \Big( \frac{2}{3} V^{3/2} \Big).
+\end{equation}
+
+We will apply the method of characteristics to find the characteristic curves,
+which are defined to be curves $x(t)$ along which the solution does not change
+($\frac{d V}{d t} = 0$):
+\begin{equation}
+\begin{aligned}
+0 &= \frac{d}{d t} V \big( t, x(t) \big)\\
+&= \frac{\partial V}{\partial t} \frac{\partial t}{\partial t}
+    + \frac{\partial V}{\partial x} \frac{\partial x(t)}{\partial t} \\
+&= \partial_t V + x'(t) \partial_x V \\
+\end{aligned}
+\end{equation}
+and we see that the last line can be made equal to
+(\ref{eq:Burgers_variant_V}) if we have
+\begin{equation}
+x'(t) = V^{1/2}(t, x)
+\end{equation}
+which is the same characteristic speed we found for the original Burgers
+equation if we undo the variable change $V = U^2$ (which makes sense,
+since smooth solutions are identical between the two and should propagate
+at the characteristic speed).
+
+\clearpage
+
+\begin{thebibliography}{10}
+\bibitem{LeVeque92} LeVeque, R. J.,
+    \textit{Numerical Methods for Conservation Laws} (1992)
+\end{thebibliography}
+
+\end{document}
