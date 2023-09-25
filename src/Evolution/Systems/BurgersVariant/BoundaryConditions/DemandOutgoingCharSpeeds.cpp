@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "Evolution/Systems/Burgers/BoundaryConditions/DemandOutgoingCharSpeeds.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryConditions/DemandOutgoingCharSpeeds.hpp"
 
 #include <cstddef>
 #include <limits>
@@ -11,13 +11,13 @@
 #include "DataStructures/Tensor/Tensor.hpp"
 #include "DataStructures/Variables.hpp"
 #include "Domain/Structure/DirectionMap.hpp"
-#include "Evolution/Systems/Burgers/Fluxes.hpp"
+#include "Evolution/Systems/BurgersVariant/Fluxes.hpp"
 #include "NumericalAlgorithms/Spectral/Mesh.hpp"
 #include "Utilities/ErrorHandling/Error.hpp"
 #include "Utilities/Gsl.hpp"
 #include "Utilities/MakeString.hpp"
 
-namespace Burgers::BoundaryConditions {
+namespace BurgersVariant::BoundaryConditions {
 DemandOutgoingCharSpeeds::DemandOutgoingCharSpeeds(CkMigrateMessage* const msg)
     : BoundaryCondition(msg) {}
 
@@ -96,4 +96,4 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
 
 // NOLINTNEXTLINE
 PUP::able::PUP_ID DemandOutgoingCharSpeeds::my_PUP_ID = 0;
-}  // namespace Burgers::BoundaryConditions
+}  // namespace BurgersVariant::BoundaryConditions

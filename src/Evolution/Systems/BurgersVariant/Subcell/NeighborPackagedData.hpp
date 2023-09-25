@@ -28,19 +28,19 @@
 #include "Evolution/DgSubcell/Tags/OnSubcellFaces.hpp"
 #include "Evolution/DiscontinuousGalerkin/Actions/PackageDataImpl.hpp"
 #include "Evolution/DiscontinuousGalerkin/NormalVectorTags.hpp"
-#include "Evolution/Systems/Burgers/BoundaryCorrections/BoundaryCorrection.hpp"
-#include "Evolution/Systems/Burgers/BoundaryCorrections/Factory.hpp"
-#include "Evolution/Systems/Burgers/FiniteDifference/Reconstructor.hpp"
-#include "Evolution/Systems/Burgers/FiniteDifference/Tags.hpp"
-#include "Evolution/Systems/Burgers/Fluxes.hpp"
-#include "Evolution/Systems/Burgers/Subcell/ComputeFluxes.hpp"
-#include "Evolution/Systems/Burgers/System.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryCorrections/BoundaryCorrection.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryCorrections/Factory.hpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/Reconstructor.hpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/Fluxes.hpp"
+#include "Evolution/Systems/BurgersVariant/Subcell/ComputeFluxes.hpp"
+#include "Evolution/Systems/BurgersVariant/System.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "NumericalAlgorithms/Spectral/Mesh.hpp"
 #include "Utilities/CallWithDynamicType.hpp"
 #include "Utilities/TMPL.hpp"
 
-namespace Burgers::subcell {
+namespace BurgersVariant::subcell {
 /*!
  * \brief On elements using DG, reconstructs the interface data from a
  * neighboring element doing subcell.
@@ -94,8 +94,8 @@ struct NeighborPackagedData {
         db::get<evolution::dg::subcell::Tags::GhostDataForReconstruction<1>>(
             box);
 
-    const Burgers::fd::Reconstructor& recons =
-        db::get<Burgers::fd::Tags::Reconstructor>(box);
+    const BurgersVariant::fd::Reconstructor& recons =
+        db::get<BurgersVariant::fd::Tags::Reconstructor>(box);
 
     const auto& boundary_correction =
         db::get<evolution::Tags::BoundaryCorrection<System>>(box);
@@ -127,7 +127,8 @@ struct NeighborPackagedData {
 
           // Reconstruct field variables on faces
           call_with_dynamic_type<
-              void, typename Burgers::fd::Reconstructor::creatable_classes>(
+              void, typename BurgersVariant::fd::Reconstructor::
+              creatable_classes>(
               &recons,
               [&element, &mortar_id, &ghost_subcell_data, &subcell_mesh,
                &vars_on_face, &volume_vars_subcell](const auto& reconstructor) {
@@ -137,7 +138,7 @@ struct NeighborPackagedData {
               });
 
           // Compute fluxes
-          Burgers::subcell::compute_fluxes(make_not_null(&vars_on_face));
+          BurgersVariant::subcell::compute_fluxes(make_not_null(&vars_on_face));
 
           tnsr::i<DataVector, 1, Frame::Inertial> normal_covector =
               get<evolution::dg::Tags::NormalCovector<1>>(
@@ -170,4 +171,4 @@ struct NeighborPackagedData {
     return neighbor_package_data;
   }
 };
-}  // namespace Burgers::subcell
+}  // namespace BurgersVariant::subcell

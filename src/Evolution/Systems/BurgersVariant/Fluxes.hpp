@@ -10,18 +10,18 @@
 /// \cond
 class DataVector;
 // IWYU pragma: no_forward_declare Tensor
-namespace Burgers {
+namespace BurgersVariant {
 namespace Tags {
 struct U;
 }  // namespace Tags
-}  // namespace Burgers
+}  // namespace BurgersVariant
 namespace gsl {
 template <typename T>
 class not_null;
 }  // namespace gsl
 /// \endcond
 
-namespace Burgers {
+namespace BurgersVariant {
 /// The flux of \f$U\f$ is \f$\frac{1}{2} U^2\f$.
 struct Fluxes {
   using argument_tags = tmpl::list<Tags::U>;
@@ -30,4 +30,4 @@ struct Fluxes {
   static void apply(gsl::not_null<tnsr::I<DataVector, 1>*> flux,
                     const Scalar<DataVector>& u);
 };
-}  // namespace Burgers
+}  // namespace BurgersVariant

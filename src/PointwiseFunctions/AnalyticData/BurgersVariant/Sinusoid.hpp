@@ -5,7 +5,7 @@
 
 #include "DataStructures/DataBox/Prefixes.hpp"  // IWYU pragma: keep
 #include "DataStructures/Tensor/TypeAliases.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"  // IWYU pragma: keep
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"  // IWYU pragma: keep
 #include "Options/String.hpp"
 #include "PointwiseFunctions/AnalyticData/AnalyticData.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/InitialData.hpp"
@@ -21,7 +21,7 @@ class er;
 }  // namespace PUP
 /// \endcond
 
-namespace Burgers::AnalyticData {
+namespace BurgersVariant::AnalyticData {
 /*!
  * \brief Analytic data (with an "exact" solution known) that is periodic over
  * the interval \f$[0,2\pi]\f$.
@@ -126,4 +126,4 @@ class Sinusoid : public evolution::initial_data::InitialData,
 bool operator==(const Sinusoid& /*lhs*/, const Sinusoid& /*rhs*/);
 
 bool operator!=(const Sinusoid& lhs, const Sinusoid& rhs);
-}  // namespace Burgers::AnalyticData
+}  // namespace BurgersVariant::AnalyticData

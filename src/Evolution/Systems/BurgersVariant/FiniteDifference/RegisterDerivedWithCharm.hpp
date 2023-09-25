@@ -3,6 +3,6 @@
 
 #pragma once
 
-namespace Burgers::fd {
+namespace BurgersVariant::fd {
 void register_derived_with_charm();
-}  // namespace Burgers::fd
+}  // namespace BurgersVariant::fd

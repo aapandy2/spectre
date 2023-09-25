@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "Evolution/Systems/Burgers/FiniteDifference/MonotonisedCentral.hpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/MonotonisedCentral.hpp"
 
 #include <array>
 #include <boost/functional/hash.hpp>
@@ -22,16 +22,16 @@
 #include "Domain/Structure/MaxNumberOfNeighbors.hpp"
 #include "Domain/Structure/Side.hpp"
 #include "Evolution/DgSubcell/GhostData.hpp"
-#include "Evolution/Systems/Burgers/FiniteDifference/ReconstructWork.tpp"
-#include "Evolution/Systems/Burgers/FiniteDifference/Reconstructor.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/ReconstructWork.tpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/Reconstructor.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "NumericalAlgorithms/FiniteDifference/MonotonisedCentral.hpp"
 #include "NumericalAlgorithms/Spectral/Mesh.hpp"
 #include "Utilities/GenerateInstantiations.hpp"
 #include "Utilities/Gsl.hpp"
 #include "Utilities/TMPL.hpp"
 
-namespace Burgers::fd {
+namespace BurgersVariant::fd {
 MonotonisedCentral::MonotonisedCentral(CkMigrateMessage* const msg)
     : Reconstructor(msg) {}
 
@@ -48,7 +48,7 @@ void MonotonisedCentral::reconstruct(
         vars_on_lower_face,
     const gsl::not_null<std::array<Variables<face_vars_tags>, 1>*>
         vars_on_upper_face,
-    const Variables<tmpl::list<Burgers::Tags::U>>& volume_vars,
+    const Variables<tmpl::list<BurgersVariant::Tags::U>>& volume_vars,
     const Element<1>& element,
     const FixedHashMap<
         maximum_number_of_neighbors(1), std::pair<Direction<1>, ElementId<1>>,
@@ -114,4 +114,4 @@ bool operator==(const MonotonisedCentral& /*lhs*/,
 bool operator!=(const MonotonisedCentral& lhs, const MonotonisedCentral& rhs) {
   return not(lhs == rhs);
 }
-}  // namespace Burgers::fd
+}  // namespace BurgersVariant::fd

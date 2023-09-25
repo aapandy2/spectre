@@ -29,10 +29,10 @@
 #include "Evolution/DgSubcell/Tags/GhostDataForReconstruction.hpp"
 #include "Evolution/DgSubcell/Tags/Mesh.hpp"
 #include "Evolution/DiscontinuousGalerkin/NormalVectorTags.hpp"
-#include "Evolution/Systems/Burgers/BoundaryConditions/BoundaryCondition.hpp"
-#include "Evolution/Systems/Burgers/FiniteDifference/Reconstructor.hpp"
-#include "Evolution/Systems/Burgers/System.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryConditions/BoundaryCondition.hpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/Reconstructor.hpp"
+#include "Evolution/Systems/BurgersVariant/System.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "NumericalAlgorithms/Spectral/Mesh.hpp"
 #include "Parallel/Tags/Metavariables.hpp"
 #include "Utilities/CallWithDynamicType.hpp"
@@ -41,7 +41,7 @@
 #include "Utilities/PrettyType.hpp"
 #include "Utilities/TMPL.hpp"
 
-namespace Burgers::fd {
+namespace BurgersVariant::fd {
 /*!
  * \brief Computes finite difference ghost data for external boundary
  * conditions.
@@ -51,15 +51,15 @@ namespace Burgers::fd {
  * ElementId::external_boundary_id()} as the mortar_id key.
  *
  * \note Subcell needs to be enabled for boundary elements (see
- * Burgers::subcell::TimeDerivative). Otherwise this function would be never
- * called.
+ * BurgersVariant::subcell::TimeDerivative). Otherwise this function would be
+ * never called.
  *
  */
 struct BoundaryConditionGhostData {
   template <typename DbTagsList>
   static void apply(const gsl::not_null<db::DataBox<DbTagsList>*> box,
                     const Element<1>& element,
-                    const Burgers::fd::Reconstructor& reconstructor);
+                    const BurgersVariant::fd::Reconstructor& reconstructor);
 
  private:
   template <typename FdBoundaryConditionHelper, typename DbTagsList,
@@ -78,7 +78,7 @@ template <typename DbTagsList>
 void BoundaryConditionGhostData::apply(
     const gsl::not_null<db::DataBox<DbTagsList>*> box,
     const Element<1>& element,
-    const Burgers::fd::Reconstructor& reconstructor) {
+    const BurgersVariant::fd::Reconstructor& reconstructor) {
   const auto& external_boundary_condition =
       db::get<domain::Tags::ExternalBoundaryConditions<1>>(*box).at(
           element.id().block_id());
@@ -103,7 +103,8 @@ void BoundaryConditionGhostData::apply(
         subcell_mesh.extents().slice_away(direction.dimension()).product()};
 
     // a Variables object to store the computed FD ghost data
-    Variables<tmpl::list<Burgers::Tags::U>> ghost_data_vars{ghost_zone_size *
+    Variables<tmpl::list<BurgersVariant::Tags::
+        U>> ghost_data_vars{ghost_zone_size *
                                                             num_face_pts};
 
     // We don't need to care about boundary ghost data when using the periodic
@@ -113,7 +114,7 @@ void BoundaryConditionGhostData::apply(
             *box))>::factory_creation::factory_classes;
     using derived_boundary_conditions_for_subcell = tmpl::remove_if<
         tmpl::at<factory_classes,
-                 typename Burgers::System::boundary_conditions_base>,
+                 typename BurgersVariant::System::boundary_conditions_base>,
         tmpl::or_<
             std::is_base_of<domain::BoundaryConditions::MarkAsPeriodic,
                             tmpl::_1>,
@@ -143,7 +144,8 @@ void BoundaryConditionGhostData::apply(
                  &ghost_data_vars](const auto&... boundary_ghost_data_args) {
                   (*boundary_condition)
                       .fd_ghost(make_not_null(
-                                    &get<Burgers::Tags::U>(ghost_data_vars)),
+                                    &get<BurgersVariant::Tags::
+                                    U>(ghost_data_vars)),
                                 direction, boundary_ghost_data_args...);
                 };
             apply_subcell_boundary_condition_impl(apply_fd_ghost, box,
@@ -174,7 +176,7 @@ void BoundaryConditionGhostData::apply(
                   return (*boundary_condition)
                       .fd_demand_outgoing_char_speeds(
                           make_not_null(
-                              &get<Burgers::Tags::U>(ghost_data_vars)),
+                              &get<BurgersVariant::Tags::U>(ghost_data_vars)),
                           direction, face_mesh_velocity,
                           outward_directed_normal_covector,
                           boundary_ghost_data_args...);
@@ -202,11 +204,11 @@ void BoundaryConditionGhostData::apply(
               ghost_data_ptr->at(mortar_id)
                   .neighbor_ghost_data_for_reconstruction();
           neighbor_data.destructive_resize(ghost_data_vars.size());
-          std::copy(get(get<Burgers::Tags::U>(ghost_data_vars)).begin(),
-                    get(get<Burgers::Tags::U>(ghost_data_vars)).end(),
+          std::copy(get(get<BurgersVariant::Tags::U>(ghost_data_vars)).begin(),
+                    get(get<BurgersVariant::Tags::U>(ghost_data_vars)).end(),
                     neighbor_data.begin());
         },
         box);
   }
 }
-}  // namespace Burgers::fd
+}  // namespace BurgersVariant::fd

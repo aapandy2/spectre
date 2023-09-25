@@ -1,17 +1,17 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "Evolution/Systems/Burgers/TimeDerivativeTerms.hpp"
+#include "Evolution/Systems/BurgersVariant/TimeDerivativeTerms.hpp"
 
 #include "DataStructures/DataVector.hpp"
 #include "DataStructures/Tensor/Tensor.hpp"
 #include "Utilities/Gsl.hpp"
 
-namespace Burgers {
+namespace BurgersVariant {
 void TimeDerivativeTerms::apply(
     const gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_vars*/,
     const gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux_u,
     const Scalar<DataVector>& u) {
   get<0>(*flux_u) = 0.5 * square(get(u));
 }
-}  // namespace Burgers
+}  // namespace BurgersVariant

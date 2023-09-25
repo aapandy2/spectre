@@ -12,8 +12,8 @@
 #include "DataStructures/Tensor/TypeAliases.hpp"
 #include "Domain/BoundaryConditions/BoundaryCondition.hpp"
 #include "Evolution/BoundaryConditions/Type.hpp"
-#include "Evolution/Systems/Burgers/BoundaryConditions/BoundaryCondition.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryConditions/BoundaryCondition.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "Options/String.hpp"
 #include "Utilities/Gsl.hpp"
 #include "Utilities/Serialization/CharmPupable.hpp"
@@ -30,7 +30,7 @@ template <typename>
 class Variables;
 /// \endcond
 
-namespace Burgers::BoundaryConditions {
+namespace BurgersVariant::BoundaryConditions {
 /*
  * \brief Dirichlet boundary condition setting the value of U to a
  * time-independent constant.
@@ -38,7 +38,7 @@ namespace Burgers::BoundaryConditions {
 class Dirichlet final : public BoundaryCondition {
  private:
   using flux_tag =
-      ::Tags::Flux<Burgers::Tags::U, tmpl::size_t<1>, Frame::Inertial>;
+      ::Tags::Flux<BurgersVariant::Tags::U, tmpl::size_t<1>, Frame::Inertial>;
 
  public:
   struct U {
@@ -97,4 +97,4 @@ class Dirichlet final : public BoundaryCondition {
 
   double u_value_ = std::numeric_limits<double>::signaling_NaN();
 };
-}  // namespace Burgers::BoundaryConditions
+}  // namespace BurgersVariant::BoundaryConditions

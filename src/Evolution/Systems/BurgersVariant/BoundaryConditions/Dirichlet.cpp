@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "Evolution/Systems/Burgers/BoundaryConditions/Dirichlet.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryConditions/Dirichlet.hpp"
 
 #include <memory>
 #include <optional>
@@ -10,10 +10,10 @@
 #include "DataStructures/DataVector.hpp"
 #include "DataStructures/Tensor/Tensor.hpp"
 #include "Domain/BoundaryConditions/BoundaryCondition.hpp"
-#include "Evolution/Systems/Burgers/Fluxes.hpp"
+#include "Evolution/Systems/BurgersVariant/Fluxes.hpp"
 #include "Utilities/Gsl.hpp"
 
-namespace Burgers::BoundaryConditions {
+namespace BurgersVariant::BoundaryConditions {
 Dirichlet::Dirichlet(const double u_value) : u_value_(u_value) {}
 
 Dirichlet::Dirichlet(CkMigrateMessage* const msg) : BoundaryCondition(msg) {}
@@ -35,7 +35,7 @@ std::optional<std::string> Dirichlet::dg_ghost(
         tnsr::I<DataVector, 1, Frame::Inertial>>& /*face_mesh_velocity*/,
     const tnsr::i<DataVector, 1, Frame::Inertial>& /*normal_covector*/) const {
   get(*u) = u_value_;
-  Burgers::Fluxes::apply(flux_u, *u);
+  BurgersVariant::Fluxes::apply(flux_u, *u);
   return {};
 }
 
@@ -46,4 +46,4 @@ void Dirichlet::fd_ghost(const gsl::not_null<Scalar<DataVector>*> u,
 
 // NOLINTNEXTLINE
 PUP::able::PUP_ID Dirichlet::my_PUP_ID = 0;
-}  // namespace Burgers::BoundaryConditions
+}  // namespace BurgersVariant::BoundaryConditions

@@ -12,7 +12,7 @@
 #include "Evolution/DgSubcell/Tags/DataForRdmpTci.hpp"
 #include "Evolution/DgSubcell/Tags/Mesh.hpp"
 #include "Evolution/DgSubcell/Tags/SubcellOptions.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "Utilities/TMPL.hpp"
 
 /// \cond
@@ -21,7 +21,7 @@ template <size_t Dim>
 class Mesh;
 /// \endcond
 
-namespace Burgers::subcell {
+namespace BurgersVariant::subcell {
 /*!
  * \brief Troubled-cell indicator applied to the finite difference subcell
  * solution to check if the corresponding DG solution is admissible.
@@ -31,7 +31,7 @@ namespace Burgers::subcell {
 struct TciOnFdGrid {
   using return_tags = tmpl::list<>;
   using argument_tags =
-      tmpl::list<Burgers::Tags::U, ::domain::Tags::Mesh<1>,
+      tmpl::list<BurgersVariant::Tags::U, ::domain::Tags::Mesh<1>,
                  evolution::dg::subcell::Tags::Mesh<1>,
                  evolution::dg::subcell::Tags::DataForRdmpTci,
                  evolution::dg::subcell::Tags::SubcellOptions<1>>;
@@ -43,4 +43,4 @@ struct TciOnFdGrid {
       const evolution::dg::subcell::SubcellOptions& subcell_options,
       double persson_exponent, bool need_rdmp_data_only);
 };
-}  // namespace Burgers::subcell
+}  // namespace BurgersVariant::subcell

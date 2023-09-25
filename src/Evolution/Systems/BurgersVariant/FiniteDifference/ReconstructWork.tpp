@@ -18,13 +18,13 @@
 #include "Domain/Structure/ElementId.hpp"
 #include "Domain/Structure/MaxNumberOfNeighbors.hpp"
 #include "Evolution/DgSubcell/GhostData.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "NumericalAlgorithms/Spectral/Mesh.hpp"
 #include "Utilities/ErrorHandling/Assert.hpp"
 #include "Utilities/Gsl.hpp"
 #include "Utilities/TMPL.hpp"
 
-namespace Burgers::fd {
+namespace BurgersVariant::fd {
 template <typename TagsList, typename Reconstructor>
 void reconstruct_work(
     const gsl::not_null<std::array<Variables<TagsList>, 1>*> vars_on_lower_face,
@@ -160,4 +160,4 @@ void reconstruct_fd_neighbor_work(
     }
   }
 }
-}  // namespace Burgers::fd
+}  // namespace BurgersVariant::fd

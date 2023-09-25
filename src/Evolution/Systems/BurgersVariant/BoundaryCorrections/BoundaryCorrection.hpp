@@ -10,7 +10,7 @@
 #include "Utilities/TMPL.hpp"
 
 /// Boundary corrections/numerical fluxes
-namespace Burgers::BoundaryCorrections {
+namespace BurgersVariant::BoundaryCorrections {
 /// \cond
 class Hll;
 class Rusanov;
@@ -39,4 +39,4 @@ class BoundaryCorrection : public PUP::able {
 
   virtual std::unique_ptr<BoundaryCorrection> get_clone() const = 0;
 };
-}  // namespace Burgers::BoundaryCorrections
+}  // namespace BurgersVariant::BoundaryCorrections

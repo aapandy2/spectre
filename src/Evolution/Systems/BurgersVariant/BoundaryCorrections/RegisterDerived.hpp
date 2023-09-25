@@ -3,6 +3,6 @@
 
 #pragma once
 
-namespace Burgers::BoundaryCorrections {
+namespace BurgersVariant::BoundaryCorrections {
 void register_derived_with_charm();
-}  // namespace Burgers::BoundaryCorrections
+}  // namespace BurgersVariant::BoundaryCorrections

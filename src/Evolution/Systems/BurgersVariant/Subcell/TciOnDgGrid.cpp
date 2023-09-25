@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "Evolution/Systems/Burgers/Subcell/TciOnDgGrid.hpp"
+#include "Evolution/Systems/BurgersVariant/Subcell/TciOnDgGrid.hpp"
 
 #include <algorithm>
 
@@ -11,7 +11,7 @@
 #include "Evolution/DgSubcell/Projection.hpp"
 #include "Evolution/DgSubcell/RdmpTci.hpp"
 
-namespace Burgers::subcell {
+namespace BurgersVariant::subcell {
 std::tuple<bool, evolution::dg::subcell::RdmpTciData> TciOnDgGrid::apply(
     const Scalar<DataVector>& dg_u, const Mesh<1>& dg_mesh,
     const Mesh<1>& subcell_mesh,
@@ -40,4 +40,4 @@ std::tuple<bool, evolution::dg::subcell::RdmpTciData> TciOnDgGrid::apply(
 
   return {cell_is_troubled, std::move(rdmp_tci_data)};
 }
-}  // namespace Burgers::subcell
+}  // namespace BurgersVariant::subcell

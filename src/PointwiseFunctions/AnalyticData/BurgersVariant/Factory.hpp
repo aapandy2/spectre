@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include "PointwiseFunctions/AnalyticData/Burgers/Sinusoid.hpp"
+#include "PointwiseFunctions/AnalyticData/BurgersVariant/Sinusoid.hpp"
 #include "Utilities/TMPL.hpp"
 
-namespace Burgers::AnalyticData {
+namespace BurgersVariant::AnalyticData {
 /// \brief List of all analytic data
 using all_data = tmpl::list<Sinusoid>;
-}  // namespace Burgers::AnalyticData
+}  // namespace BurgersVariant::AnalyticData

@@ -3,9 +3,10 @@
 
 #pragma once
 
-namespace Burgers {
+namespace BurgersVariant {
 /*!
- * \brief Code required by the DG-subcell/FD hybrid solver for Burgers system
+ * \brief Code required by the DG-subcell/FD hybrid solver for
+ * BurgersVariant system
  */
 namespace subcell {}
-}  // namespace Burgers
+}  // namespace BurgersVariant

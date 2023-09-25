@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "Evolution/Systems/Burgers/Subcell/TciOnFdGrid.hpp"
+#include "Evolution/Systems/BurgersVariant/Subcell/TciOnFdGrid.hpp"
 
 #include <algorithm>
 
@@ -12,7 +12,7 @@
 #include "Evolution/DgSubcell/Reconstruction.hpp"
 #include "NumericalAlgorithms/Spectral/Mesh.hpp"
 
-namespace Burgers::subcell {
+namespace BurgersVariant::subcell {
 std::tuple<bool, evolution::dg::subcell::RdmpTciData> TciOnFdGrid::apply(
     const Scalar<DataVector>& subcell_u, const Mesh<1>& dg_mesh,
     const Mesh<1>& subcell_mesh,
@@ -45,4 +45,4 @@ std::tuple<bool, evolution::dg::subcell::RdmpTciData> TciOnFdGrid::apply(
                                   dg_u, dg_mesh, persson_exponent),
           {{max(get(subcell_u))}, {min(get(subcell_u))}}};
 }
-}  // namespace Burgers::subcell
+}  // namespace BurgersVariant::subcell

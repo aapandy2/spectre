@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "PointwiseFunctions/AnalyticData/Burgers/Sinusoid.hpp"
+#include "PointwiseFunctions/AnalyticData/BurgersVariant/Sinusoid.hpp"
 
 #include <array>
 #include <cmath>
@@ -14,7 +14,7 @@
 
 // IWYU pragma: no_forward_declare Tensor
 
-namespace Burgers::AnalyticData {
+namespace BurgersVariant::AnalyticData {
 template <typename T>
 Scalar<T> Sinusoid::u(const tnsr::I<T, 1>& x) const {
   return Scalar<T>{sin(get<0>(x))};
@@ -43,12 +43,12 @@ bool operator==(const Sinusoid& /*lhs*/, const Sinusoid& /*rhs*/) {
 bool operator!=(const Sinusoid& lhs, const Sinusoid& rhs) {
   return not(lhs == rhs);
 }
-}  // namespace Burgers::AnalyticData
+}  // namespace BurgersVariant::AnalyticData
 
 #define DTYPE(data) BOOST_PP_TUPLE_ELEM(0, data)
 
 #define INSTANTIATE(_, data)                                       \
-  template Scalar<DTYPE(data)> Burgers::AnalyticData::Sinusoid::u( \
+  template Scalar<DTYPE(data)> BurgersVariant::AnalyticData::Sinusoid::u( \
       const tnsr::I<DTYPE(data), 1>& x) const;
 
 GENERATE_INSTANTIATIONS(INSTANTIATE, (double, DataVector))

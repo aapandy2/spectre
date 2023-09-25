@@ -26,12 +26,12 @@
 #include "Evolution/DgSubcell/Tags/Mesh.hpp"
 #include "Evolution/DiscontinuousGalerkin/Actions/PackageDataImpl.hpp"
 #include "Evolution/DiscontinuousGalerkin/MortarTags.hpp"
-#include "Evolution/Systems/Burgers/FiniteDifference/BoundaryConditionGhostData.hpp"
-#include "Evolution/Systems/Burgers/FiniteDifference/Reconstructor.hpp"
-#include "Evolution/Systems/Burgers/FiniteDifference/Tags.hpp"
-#include "Evolution/Systems/Burgers/Fluxes.hpp"
-#include "Evolution/Systems/Burgers/Subcell/ComputeFluxes.hpp"
-#include "Evolution/Systems/Burgers/System.hpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/BoundaryConditionGhostData.hpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/Reconstructor.hpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/Fluxes.hpp"
+#include "Evolution/Systems/BurgersVariant/Subcell/ComputeFluxes.hpp"
+#include "Evolution/Systems/BurgersVariant/System.hpp"
 #include "NumericalAlgorithms/Spectral/Mesh.hpp"
 #include "Parallel/Tags/Metavariables.hpp"
 #include "Utilities/CallWithDynamicType.hpp"
@@ -39,7 +39,7 @@
 #include "Utilities/Gsl.hpp"
 #include "Utilities/MakeArray.hpp"
 
-namespace Burgers::subcell {
+namespace BurgersVariant::subcell {
 /*!
  * \brief Compute the time derivative on the subcell grid using FD
  * reconstruction.
@@ -78,8 +78,8 @@ struct TimeDerivative {
     const size_t num_reconstructed_pts =
         subcell_mesh.number_of_grid_points() + 1;
 
-    const Burgers::fd::Reconstructor& recons =
-        db::get<Burgers::fd::Tags::Reconstructor>(*box);
+    const BurgersVariant::fd::Reconstructor& recons =
+        db::get<BurgersVariant::fd::Tags::Reconstructor>(*box);
 
     const auto& boundary_correction =
         db::get<evolution::Tags::BoundaryCorrection<System>>(*box);
@@ -119,7 +119,8 @@ struct TimeDerivative {
 
             // Reconstruct the fields on interfaces
             call_with_dynamic_type<
-                void, typename Burgers::fd::Reconstructor::creatable_classes>(
+                void, typename BurgersVariant::fd::Reconstructor::
+                creatable_classes>(
                 &recons,
                 [&box, &package_data_argvars_lower_face,
                  &package_data_argvars_upper_face](const auto& reconstructor) {
@@ -147,8 +148,10 @@ struct TimeDerivative {
             auto& vars_lower_face = gsl::at(package_data_argvars_lower_face, 0);
 
             // Compute fluxes on each faces
-            Burgers::subcell::compute_fluxes(make_not_null(&vars_upper_face));
-            Burgers::subcell::compute_fluxes(make_not_null(&vars_lower_face));
+            BurgersVariant::subcell::
+                compute_fluxes(make_not_null(&vars_upper_face));
+            BurgersVariant::subcell::
+                compute_fluxes(make_not_null(&vars_lower_face));
 
             // Note that we use the sign convention on the normal vectors to
             // be compatible with DG.
@@ -218,10 +221,11 @@ struct TimeDerivative {
                                   Frame::Grid>&
                 cell_centered_logical_to_grid_inv_jacobian) {
           dt_vars_ptr->initialize(num_pts, 0.0);
-          auto& dt_u = get<::Tags::dt<::Burgers::Tags::U>>(*dt_vars_ptr);
+          auto& dt_u = get<::Tags::dt<::BurgersVariant::Tags::U>>(*dt_vars_ptr);
 
           Scalar<DataVector>& u_correction =
-              get<::Burgers::Tags::U>(gsl::at(fd_boundary_corrections, 0));
+              get<::BurgersVariant::Tags::
+              U>(gsl::at(fd_boundary_corrections, 0));
           evolution::dg::subcell::add_cartesian_flux_divergence(
               make_not_null(&get(dt_u)), gsl::at(one_over_delta_xi, 0),
               cell_centered_logical_to_grid_inv_jacobian.get(0, 0),
@@ -233,4 +237,4 @@ struct TimeDerivative {
             *box));
   }
 };
-}  // namespace Burgers::subcell
+}  // namespace BurgersVariant::subcell

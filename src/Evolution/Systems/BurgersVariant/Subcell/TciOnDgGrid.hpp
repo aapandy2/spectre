@@ -12,7 +12,7 @@
 #include "Evolution/DgSubcell/Tags/DataForRdmpTci.hpp"
 #include "Evolution/DgSubcell/Tags/Mesh.hpp"
 #include "Evolution/DgSubcell/Tags/SubcellOptions.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "Utilities/TMPL.hpp"
 
 /// \cond
@@ -21,7 +21,7 @@ template <size_t Dim>
 class Mesh;
 /// \endcond
 
-namespace Burgers::subcell {
+namespace BurgersVariant::subcell {
 /*!
  * \brief The troubled-cell indicator run on the DG grid to check if the
  * solution is admissible.
@@ -32,7 +32,7 @@ struct TciOnDgGrid {
  public:
   using return_tags = tmpl::list<>;
   using argument_tags =
-      tmpl::list<Burgers::Tags::U, domain::Tags::Mesh<1>,
+      tmpl::list<BurgersVariant::Tags::U, domain::Tags::Mesh<1>,
                  evolution::dg::subcell::Tags::Mesh<1>,
                  evolution::dg::subcell::Tags::DataForRdmpTci,
                  evolution::dg::subcell::Tags::SubcellOptions<1>>;
@@ -44,4 +44,4 @@ struct TciOnDgGrid {
       const evolution::dg::subcell::SubcellOptions& subcell_options,
       double persson_exponent, bool element_stays_on_dg);
 };
-}  // namespace Burgers::subcell
+}  // namespace BurgersVariant::subcell

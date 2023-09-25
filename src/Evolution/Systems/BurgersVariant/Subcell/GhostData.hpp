@@ -5,7 +5,7 @@
 
 #include <cstddef>
 
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "Utilities/TMPL.hpp"
 
 /// \cond
@@ -17,7 +17,7 @@ struct Variables;
 }  // namespace Tags
 /// \endcond
 
-namespace Burgers::subcell {
+namespace BurgersVariant::subcell {
 /*!
  * \brief Returns \f$U\f$, the variables needed for reconstruction.
  *
@@ -28,9 +28,10 @@ class GhostVariables {
  public:
   using return_tags = tmpl::list<>;
   using argument_tags =
-      tmpl::list<::Tags::Variables<tmpl::list<Burgers::Tags::U>>>;
+      tmpl::list<::Tags::Variables<tmpl::list<BurgersVariant::Tags::U>>>;
 
-  static DataVector apply(const Variables<tmpl::list<Burgers::Tags::U>>& vars,
+  static DataVector apply(const Variables<tmpl::list<BurgersVariant::
+          Tags::U>>& vars,
                           size_t rdmp_size);
 };
-}  // namespace Burgers::subcell
+}  // namespace BurgersVariant::subcell

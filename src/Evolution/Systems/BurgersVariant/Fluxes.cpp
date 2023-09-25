@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "Evolution/Systems/Burgers/Fluxes.hpp"
+#include "Evolution/Systems/BurgersVariant/Fluxes.hpp"
 
 #include <array>
 
@@ -13,9 +13,9 @@
 
 // IWYU pragma: no_forward_declare Tensor
 
-namespace Burgers {
+namespace BurgersVariant {
 void Fluxes::apply(const gsl::not_null<tnsr::I<DataVector, 1>*> flux,
                    const Scalar<DataVector>& u) {
   get<0>(*flux) = 0.5 * square(get(u));
 }
-}  // namespace Burgers
+}  // namespace BurgersVariant

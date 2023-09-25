@@ -9,7 +9,7 @@
 #include "DataStructures/DataVector.hpp"  // IWYU pragma: keep
 #include "DataStructures/Tensor/TypeAliases.hpp"
 
-namespace Burgers {
+namespace BurgersVariant {
 namespace Tags {
 struct U : db::SimpleTag {
   using type = Scalar<DataVector>;
@@ -20,4 +20,4 @@ struct CharacteristicSpeeds : db::SimpleTag {
   using type = std::array<DataVector, 1>;
 };
 }  // namespace Tags
-}  // namespace Burgers
+}  // namespace BurgersVariant

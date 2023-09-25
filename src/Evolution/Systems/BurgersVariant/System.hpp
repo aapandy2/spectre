@@ -6,20 +6,20 @@
 #include <cstddef>
 
 #include "DataStructures/VariablesTag.hpp"
-#include "Evolution/Systems/Burgers/BoundaryConditions/BoundaryCondition.hpp"
-#include "Evolution/Systems/Burgers/BoundaryCorrections/BoundaryCorrection.hpp"
-#include "Evolution/Systems/Burgers/Characteristics.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"  // IWYU pragma: keep
-#include "Evolution/Systems/Burgers/TimeDerivativeTerms.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryConditions/BoundaryCondition.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryCorrections/BoundaryCorrection.hpp"
+#include "Evolution/Systems/BurgersVariant/Characteristics.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"  // IWYU pragma: keep
+#include "Evolution/Systems/BurgersVariant/TimeDerivativeTerms.hpp"
 #include "Utilities/TMPL.hpp"
 
 /// \ingroup EvolutionSystemsGroup
-/// \brief Items related to evolving the %Burgers equation
+/// \brief Items related to evolving the %BurgersVariant equation
 /// \f$0 = \partial_t U + \partial_x\left(U^2/2\right)\f$.
 ///
 /// \note For this definition (i.e., with the factor of one half in the flux)
-/// of the Burgers system, the local characteristic speed is \f$U\f$.
-namespace Burgers {
+/// of the BurgersVariant system, the local characteristic speed is \f$U\f$.
+namespace BurgersVariant {
 struct System {
   static constexpr bool is_in_flux_conservative_form = true;
   static constexpr bool has_primitive_and_conservative_vars = false;
@@ -37,4 +37,4 @@ struct System {
   using compute_largest_characteristic_speed =
       Tags::ComputeLargestCharacteristicSpeed;
 };
-}  // namespace Burgers
+}  // namespace BurgersVariant

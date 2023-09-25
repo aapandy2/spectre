@@ -8,8 +8,8 @@
 
 #include "DataStructures/DataBox/Prefixes.hpp"
 #include "DataStructures/Tensor/TypeAliases.hpp"
-#include "Evolution/Systems/Burgers/BoundaryCorrections/BoundaryCorrection.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryCorrections/BoundaryCorrection.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "NumericalAlgorithms/DiscontinuousGalerkin/Formulation.hpp"
 #include "Options/String.hpp"
 #include "Utilities/Serialization/CharmPupable.hpp"
@@ -26,7 +26,7 @@ class er;
 }  // namespace PUP
 /// \endcond
 
-namespace Burgers::BoundaryCorrections {
+namespace BurgersVariant::BoundaryCorrections {
 /*!
  * \brief An HLL (Harten-Lax-van Leer) Riemann solver
  *
@@ -72,7 +72,7 @@ class Hll final : public BoundaryCorrection {
  public:
   using options = tmpl::list<>;
   static constexpr Options::String help = {
-      "Computes the HLL boundary correction term for the Burgers system."};
+  "Computes the HLL boundary correction term for the BurgersVariant system."};
 
   Hll() = default;
   Hll(const Hll&) = default;
@@ -116,4 +116,4 @@ class Hll final : public BoundaryCorrection {
       const Scalar<DataVector>& abs_char_speed_ext,
       dg::Formulation dg_formulation);
 };
-}  // namespace Burgers::BoundaryCorrections
+}  // namespace BurgersVariant::BoundaryCorrections

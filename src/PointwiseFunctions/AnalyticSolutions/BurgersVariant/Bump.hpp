@@ -7,7 +7,7 @@
 
 #include "DataStructures/DataBox/Prefixes.hpp"  // IWYU pragma: keep
 #include "DataStructures/Tensor/TypeAliases.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"  // IWYU pragma: keep
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"  // IWYU pragma: keep
 #include "Options/String.hpp"
 #include "PointwiseFunctions/AnalyticSolutions/AnalyticSolution.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/InitialData.hpp"
@@ -23,7 +23,7 @@ class er;
 }  // namespace PUP
 /// \endcond
 
-namespace Burgers::Solutions {
+namespace BurgersVariant::Solutions {
 /*!
  * \brief A solution resembling a bump.
  *
@@ -87,7 +87,7 @@ class Bump : public evolution::initial_data::InitialData,
                                          double t,
                                          tmpl::list<Tags::U> /*meta*/) const;
 
-  tuples::TaggedTuple<::Tags::dt<Burgers::Tags::U>> variables(
+  tuples::TaggedTuple<::Tags::dt<BurgersVariant::Tags::U>> variables(
       const tnsr::I<DataVector, 1>& x, double t,
       tmpl::list<::Tags::dt<Tags::U>> /*meta*/) const;
 
@@ -99,4 +99,4 @@ class Bump : public evolution::initial_data::InitialData,
   double height_ = std::numeric_limits<double>::signaling_NaN();
   double center_ = std::numeric_limits<double>::signaling_NaN();
 };
-}  // namespace Burgers::Solutions
+}  // namespace BurgersVariant::Solutions

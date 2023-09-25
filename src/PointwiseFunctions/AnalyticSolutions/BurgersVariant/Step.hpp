@@ -7,7 +7,7 @@
 
 #include "DataStructures/DataBox/Prefixes.hpp"  // IWYU pragma: keep
 #include "DataStructures/Tensor/TypeAliases.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"  // IWYU pragma: keep
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"  // IWYU pragma: keep
 #include "Options/Context.hpp"
 #include "Options/String.hpp"
 #include "PointwiseFunctions/AnalyticSolutions/AnalyticSolution.hpp"
@@ -24,7 +24,7 @@ class er;
 }  // namespace PUP
 /// \endcond
 
-namespace Burgers::Solutions {
+namespace BurgersVariant::Solutions {
 /// \brief A propagating shock between two constant states
 ///
 /// The shock propagates left-to-right, with profile
@@ -100,4 +100,4 @@ class Step : public evolution::initial_data::InitialData,
   double right_value_ = std::numeric_limits<double>::signaling_NaN();
   double initial_shock_position_ = std::numeric_limits<double>::signaling_NaN();
 };
-}  // namespace Burgers::Solutions
+}  // namespace BurgersVariant::Solutions

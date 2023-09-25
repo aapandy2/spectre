@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "Evolution/Systems/Burgers/BoundaryConditions/DirichletAnalytic.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryConditions/DirichletAnalytic.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -9,12 +9,12 @@
 
 #include "DataStructures/DataVector.hpp"
 #include "DataStructures/Tensor/Tensor.hpp"
-#include "Evolution/Systems/Burgers/Fluxes.hpp"
-#include "PointwiseFunctions/AnalyticData/Burgers/Factory.hpp"
-#include "PointwiseFunctions/AnalyticSolutions/Burgers/Factory.hpp"
+#include "Evolution/Systems/BurgersVariant/Fluxes.hpp"
+#include "PointwiseFunctions/AnalyticData/BurgersVariant/Factory.hpp"
+#include "PointwiseFunctions/AnalyticSolutions/BurgersVariant/Factory.hpp"
 #include "Utilities/CallWithDynamicType.hpp"
 
-namespace Burgers::BoundaryConditions {
+namespace BurgersVariant::BoundaryConditions {
 DirichletAnalytic::DirichletAnalytic(const DirichletAnalytic& rhs)
     : BoundaryCondition{dynamic_cast<const BoundaryCondition&>(rhs)},
       analytic_prescription_(rhs.analytic_prescription_->get_clone()) {}
@@ -47,17 +47,20 @@ std::optional<std::string> DirichletAnalytic::dg_ghost(
     const tnsr::i<DataVector, 1, Frame::Inertial>& /*normal_covector*/,
     const tnsr::I<DataVector, 1, Frame::Inertial>& coords,
     [[maybe_unused]] const double time) const {
-  call_with_dynamic_type<void, tmpl::append<Burgers::Solutions::all_solutions,
-                                            Burgers::AnalyticData::all_data>>(
+  call_with_dynamic_type<void, tmpl::append<BurgersVariant::Solutions::
+                                     all_solutions,
+                               BurgersVariant::AnalyticData::all_data>>(
       analytic_prescription_.get(),
       [&coords, &time, &u](const auto* const analytic_solution_or_data) {
         if constexpr (is_analytic_solution_v<
                           std::decay_t<decltype(*analytic_solution_or_data)>>) {
-          *u = get<Burgers::Tags::U>(analytic_solution_or_data->variables(
-              coords, time, tmpl::list<Burgers::Tags::U>{}));
+          *u = get<BurgersVariant::Tags::
+               U>(analytic_solution_or_data->variables(
+              coords, time, tmpl::list<BurgersVariant::Tags::U>{}));
         } else {
-          *u = get<Burgers::Tags::U>(analytic_solution_or_data->variables(
-              coords, tmpl::list<Burgers::Tags::U>{}));
+          *u = get<BurgersVariant::Tags::
+               U>(analytic_solution_or_data->variables(
+              coords, tmpl::list<BurgersVariant::Tags::U>{}));
           (void)time;
         }
       });
@@ -84,18 +87,22 @@ void DirichletAnalytic::fd_ghost(
   const auto ghost_inertial_coords = grid_to_inertial_map(
       logical_to_grid_map(ghost_logical_coords), time, functions_of_time);
 
-  call_with_dynamic_type<void, tmpl::append<Burgers::Solutions::all_solutions,
-                                            Burgers::AnalyticData::all_data>>(
+  call_with_dynamic_type<void, tmpl::append<BurgersVariant::
+                                    Solutions::all_solutions,
+                                BurgersVariant::AnalyticData::all_data>>(
       analytic_prescription_.get(),
       [&ghost_inertial_coords, &time,
        &u](const auto* const analytic_solution_or_data) {
         if constexpr (is_analytic_solution_v<
                           std::decay_t<decltype(*analytic_solution_or_data)>>) {
-          *u = get<Burgers::Tags::U>(analytic_solution_or_data->variables(
-              ghost_inertial_coords, time, tmpl::list<Burgers::Tags::U>{}));
+          *u = get<BurgersVariant::Tags::
+          U>(analytic_solution_or_data->variables(
+              ghost_inertial_coords, time, tmpl::
+              list<BurgersVariant::Tags::U>{}));
         } else {
-          *u = get<Burgers::Tags::U>(analytic_solution_or_data->variables(
-              ghost_inertial_coords, tmpl::list<Burgers::Tags::U>{}));
+          *u = get<BurgersVariant::Tags::
+          U>(analytic_solution_or_data->variables(
+              ghost_inertial_coords, tmpl::list<BurgersVariant::Tags::U>{}));
           (void)time;
         }
       });
@@ -109,9 +116,9 @@ void DirichletAnalytic::pup(PUP::er& p) {
 void DirichletAnalytic::flux_impl(
     const gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux,
     const Scalar<DataVector>& u_analytic) {
-  Burgers::Fluxes::apply(flux, u_analytic);
+  BurgersVariant::Fluxes::apply(flux, u_analytic);
 }
 
 // NOLINTNEXTLINE
 PUP::able::PUP_ID DirichletAnalytic::my_PUP_ID = 0;
-}  // namespace Burgers::BoundaryConditions
+}  // namespace BurgersVariant::BoundaryConditions

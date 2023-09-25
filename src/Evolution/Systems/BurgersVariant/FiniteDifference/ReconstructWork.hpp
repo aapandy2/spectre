@@ -10,7 +10,7 @@
 
 #include "DataStructures/FixedHashMap.hpp"
 #include "Domain/Structure/MaxNumberOfNeighbors.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "Utilities/TMPL.hpp"
 
 /// \cond
@@ -34,7 +34,7 @@ class GhostData;
 }  // namespace evolution::dg::subcell
 /// \endcond
 
-namespace Burgers::fd {
+namespace BurgersVariant::fd {
 /*!
  * \brief Reconstructs \f$U\f$. All results are written into
  * `vars_on_lower_face` and `vars_on_upper_face`.
@@ -71,4 +71,4 @@ void reconstruct_fd_neighbor_work(
         boost::hash<std::pair<Direction<1>, ElementId<1>>>>& ghost_data,
     const Mesh<1>& subcell_mesh, const Direction<1>& direction_to_reconstruct,
     const size_t ghost_zone_size);
-}  // namespace Burgers::fd
+}  // namespace BurgersVariant::fd

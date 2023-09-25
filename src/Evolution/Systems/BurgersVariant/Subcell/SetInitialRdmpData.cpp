@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "Evolution/Systems/Burgers/Subcell/SetInitialRdmpData.hpp"
+#include "Evolution/Systems/BurgersVariant/Subcell/SetInitialRdmpData.hpp"
 
 #include "DataStructures/DataVector.hpp"
 #include "DataStructures/Tensor/Tensor.hpp"
@@ -13,7 +13,7 @@
 #include "NumericalAlgorithms/Spectral/Mesh.hpp"
 #include "Utilities/Gsl.hpp"
 
-namespace Burgers::subcell {
+namespace BurgersVariant::subcell {
 void SetInitialRdmpData::apply(
     const gsl::not_null<evolution::dg::subcell::RdmpTciData*> rdmp_tci_data,
     const Scalar<DataVector>& u,
@@ -31,4 +31,4 @@ void SetInitialRdmpData::apply(
                       {min(min(get(u)), min(subcell_u))}};
   }
 }
-}  // namespace Burgers::subcell
+}  // namespace BurgersVariant::subcell

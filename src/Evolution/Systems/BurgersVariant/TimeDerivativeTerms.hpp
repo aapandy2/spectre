@@ -10,11 +10,11 @@
 /// \cond
 class DataVector;
 // IWYU pragma: no_forward_declare Tensor
-namespace Burgers {
+namespace BurgersVariant {
 namespace Tags {
 struct U;
 }  // namespace Tags
-}  // namespace Burgers
+}  // namespace BurgersVariant
 namespace gsl {
 template <typename T>
 class not_null;
@@ -23,9 +23,9 @@ class not_null;
 class DataVector;
 /// \endcond
 
-namespace Burgers {
-/// Computes the time derivative terms needed for the Burgers system, which are
-/// just the fluxes.
+namespace BurgersVariant {
+/// Computes the time derivative terms needed for the BurgersVariant system,
+// which are just the fluxes.
 struct TimeDerivativeTerms {
   using temporary_tags = tmpl::list<>;
   using argument_tags = tmpl::list<Tags::U>;
@@ -43,4 +43,4 @@ struct TimeDerivativeTerms {
       // Arguments listed in argument_tags above
       const Scalar<DataVector>& u);
 };
-}  // namespace Burgers
+}  // namespace BurgersVariant

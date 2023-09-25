@@ -7,7 +7,7 @@
 
 #include "DataStructures/DataBox/Prefixes.hpp"  // IWYU pragma: keep
 #include "DataStructures/Tensor/TypeAliases.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"  // IWYU pragma: keep
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"  // IWYU pragma: keep
 #include "Options/String.hpp"
 #include "PointwiseFunctions/AnalyticSolutions/AnalyticSolution.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/InitialData.hpp"
@@ -23,7 +23,7 @@ class er;
 }  // namespace PUP
 /// \endcond
 
-namespace Burgers::Solutions {
+namespace BurgersVariant::Solutions {
 /// A solution that is linear in space at all times.
 ///
 /// \f$u(x, t) = x / (t - t_0)\f$ where \f$t_0\f$ is the shock time.
@@ -76,4 +76,4 @@ class Linear : public evolution::initial_data::InitialData,
  private:
   double shock_time_ = std::numeric_limits<double>::signaling_NaN();
 };
-}  // namespace Burgers::Solutions
+}  // namespace BurgersVariant::Solutions

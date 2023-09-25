@@ -8,8 +8,8 @@
 
 #include "DataStructures/DataBox/Prefixes.hpp"
 #include "DataStructures/Tensor/TypeAliases.hpp"
-#include "Evolution/Systems/Burgers/BoundaryCorrections/BoundaryCorrection.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryCorrections/BoundaryCorrection.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "NumericalAlgorithms/DiscontinuousGalerkin/Formulation.hpp"
 #include "Options/String.hpp"
 #include "Utilities/Serialization/CharmPupable.hpp"
@@ -26,7 +26,7 @@ class er;
 }  // namespace PUP
 /// \endcond
 
-namespace Burgers::BoundaryCorrections {
+namespace BurgersVariant::BoundaryCorrections {
 /*!
  * \brief A Rusanov/local Lax-Friedrichs Riemann solver
  *
@@ -58,7 +58,7 @@ class Rusanov final : public BoundaryCorrection {
   using options = tmpl::list<>;
   static constexpr Options::String help = {
       "Computes the Rusanov or local Lax-Friedrichs boundary correction term "
-      "for the Burgers system."};
+      "for the BurgersVariant system."};
 
   Rusanov() = default;
   Rusanov(const Rusanov&) = default;
@@ -102,4 +102,4 @@ class Rusanov final : public BoundaryCorrection {
       const Scalar<DataVector>& abs_char_speed_ext,
       dg::Formulation dg_formulation);
 };
-}  // namespace Burgers::BoundaryCorrections
+}  // namespace BurgersVariant::BoundaryCorrections

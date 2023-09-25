@@ -26,11 +26,11 @@
 #include "Evolution/DgSubcell/GhostZoneLogicalCoordinates.hpp"
 #include "Evolution/DgSubcell/Tags/Coordinates.hpp"
 #include "Evolution/DgSubcell/Tags/Mesh.hpp"
-#include "Evolution/Systems/Burgers/BoundaryConditions/BoundaryCondition.hpp"
-#include "Evolution/Systems/Burgers/FiniteDifference/Factory.hpp"
-#include "Evolution/Systems/Burgers/FiniteDifference/Reconstructor.hpp"
-#include "Evolution/Systems/Burgers/FiniteDifference/Tags.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryConditions/BoundaryCondition.hpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/Factory.hpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/Reconstructor.hpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "Evolution/TypeTraits.hpp"
 #include "NumericalAlgorithms/Spectral/Mesh.hpp"
 #include "Options/String.hpp"
@@ -47,7 +47,7 @@ struct Time;
 }  // namespace Tags
 /// \endcond
 
-namespace Burgers::BoundaryConditions {
+namespace BurgersVariant::BoundaryConditions {
 /*!
  * \brief Sets Dirichlet boundary conditions using the analytic solution or
  * analytic data.
@@ -55,7 +55,7 @@ namespace Burgers::BoundaryConditions {
 class DirichletAnalytic final : public BoundaryCondition {
  private:
   using flux_tag =
-      ::Tags::Flux<Burgers::Tags::U, tmpl::size_t<1>, Frame::Inertial>;
+      ::Tags::Flux<BurgersVariant::Tags::U, tmpl::size_t<1>, Frame::Inertial>;
 
  public:
   /// \brief What analytic solution/data to prescribe.
@@ -137,4 +137,4 @@ class DirichletAnalytic final : public BoundaryCondition {
 
   std::unique_ptr<evolution::initial_data::InitialData> analytic_prescription_;
 };
-}  // namespace Burgers::BoundaryConditions
+}  // namespace BurgersVariant::BoundaryConditions

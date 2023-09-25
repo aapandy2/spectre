@@ -3,9 +3,9 @@
 
 #pragma once
 
-namespace Burgers {
+namespace BurgersVariant {
 /*!
  * \brief Finite difference functionality for Burgers system
  */
 namespace fd {}
-}  // namespace Burgers
+}  // namespace BurgersVariant

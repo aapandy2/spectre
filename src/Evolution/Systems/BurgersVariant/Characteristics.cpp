@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "Evolution/Systems/Burgers/Characteristics.hpp"
+#include "Evolution/Systems/BurgersVariant/Characteristics.hpp"
 
 #include <array>
 #include <ostream>
@@ -12,7 +12,7 @@
 
 // IWYU pragma: no_forward_declare Tensor
 
-namespace Burgers::Tags {
+namespace BurgersVariant::Tags {
 void CharacteristicSpeedsCompute::function(
     const gsl::not_null<return_type*> result, const Scalar<DataVector>& u,
     const tnsr::i<DataVector, 1>& normal) {
@@ -27,4 +27,4 @@ void ComputeLargestCharacteristicSpeed::function(
     const gsl::not_null<double*> speed, const Scalar<DataVector>& u) {
   *speed = max(abs(get(u)));
 }
-}  // namespace Burgers::Tags
+}  // namespace BurgersVariant::Tags

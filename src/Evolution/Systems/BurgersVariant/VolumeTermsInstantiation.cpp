@@ -4,33 +4,35 @@
 #include "DataStructures/DataBox/PrefixHelpers.hpp"
 #include "DataStructures/DataBox/Prefixes.hpp"
 #include "Evolution/DiscontinuousGalerkin/Actions/VolumeTermsImpl.tpp"
-#include "Evolution/Systems/Burgers/System.hpp"
-#include "Evolution/Systems/Burgers/TimeDerivativeTerms.hpp"
+#include "Evolution/Systems/BurgersVariant/System.hpp"
+#include "Evolution/Systems/BurgersVariant/TimeDerivativeTerms.hpp"
 
 namespace evolution::dg::Actions::detail {
-template void volume_terms<::Burgers::TimeDerivativeTerms>(
+template void volume_terms<::BurgersVariant::TimeDerivativeTerms>(
     const gsl::not_null<Variables<db::wrap_tags_in<
-        ::Tags::dt, typename ::Burgers::System::variables_tag::tags_list>>*>
+        ::Tags::dt, typename ::BurgersVariant::System::
+        variables_tag::tags_list>>*>
         dt_vars_ptr,
     const gsl::not_null<Variables<db::wrap_tags_in<
-        ::Tags::Flux, typename ::Burgers::System::flux_variables,
+        ::Tags::Flux, typename ::BurgersVariant::System::flux_variables,
         tmpl::size_t<1>, Frame::Inertial>>*>
         volume_fluxes,
     const gsl::not_null<Variables<db::wrap_tags_in<
-        ::Tags::deriv, typename ::Burgers::System::gradient_variables,
+        ::Tags::deriv, typename ::BurgersVariant::System::gradient_variables,
         tmpl::size_t<1>, Frame::Inertial>>*>
         partial_derivs,
     const gsl::not_null<
-        Variables<typename ::Burgers::System::
+        Variables<typename ::BurgersVariant::System::
                       compute_volume_time_derivative_terms::temporary_tags>*>
         temporaries,
     const gsl::not_null<Variables<db::wrap_tags_in<
         ::Tags::div,
         db::wrap_tags_in<::Tags::Flux,
-                         typename ::Burgers::System::flux_variables,
+                         typename ::BurgersVariant::System::flux_variables,
                          tmpl::size_t<1>, Frame::Inertial>>>*>
         div_fluxes,
-    const Variables<typename ::Burgers::System::variables_tag::tags_list>&
+    const Variables<typename ::BurgersVariant::System::
+        variables_tag::tags_list>&
         evolved_vars,
     const ::dg::Formulation dg_formulation, const Mesh<1>& mesh,
     [[maybe_unused]] const tnsr::I<DataVector, 1, Frame::Inertial>&

@@ -9,21 +9,21 @@
 #include "DataStructures/DataBox/Tag.hpp"
 #include "DataStructures/Tensor/Tensor.hpp"
 #include "Domain/FaceNormal.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "Utilities/Gsl.hpp"
 #include "Utilities/TMPL.hpp"
 
 /// \cond
 class DataVector;
 // IWYU pragma: no_forward_declare Tensor
-namespace Burgers {
+namespace BurgersVariant {
 namespace Tags {
 struct U;
 }  // namespace Tags
-}  // namespace Burgers
+}  // namespace BurgersVariant
 /// \endcond
 
-namespace Burgers::Tags {
+namespace BurgersVariant::Tags {
 /// Computes the characteristic speeds
 struct CharacteristicSpeedsCompute : CharacteristicSpeeds, db::ComputeTag {
   using base = CharacteristicSpeeds;
@@ -47,4 +47,4 @@ struct ComputeLargestCharacteristicSpeed : LargestCharacteristicSpeed,
   static void function(const gsl::not_null<double*> speed,
                        const Scalar<DataVector>& u);
 };
-}  // namespace Burgers::Tags
+}  // namespace BurgersVariant::Tags

@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "PointwiseFunctions/AnalyticSolutions/Burgers/Bump.hpp"
+#include "PointwiseFunctions/AnalyticSolutions/BurgersVariant/Bump.hpp"
 
 #include <cmath>
 #include <pup.h>
@@ -13,7 +13,7 @@
 
 // IWYU pragma: no_forward_declare Tensor
 
-namespace Burgers::Solutions {
+namespace BurgersVariant::Solutions {
 
 Bump::Bump(const double half_width, const double height, const double center)
     : half_width_(half_width), height_(height), center_(center) {}
@@ -76,14 +76,14 @@ void Bump::pup(PUP::er& p) {
 }
 
 PUP::able::PUP_ID Bump::my_PUP_ID = 0;
-}  // namespace Burgers::Solutions
+}  // namespace BurgersVariant::Solutions
 
 #define DTYPE(data) BOOST_PP_TUPLE_ELEM(0, data)
 
 #define INSTANTIATE(_, data)                                    \
-  template Scalar<DTYPE(data)> Burgers::Solutions::Bump::u(     \
+  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Bump::u(     \
       const tnsr::I<DTYPE(data), 1>& x, double t) const;        \
-  template Scalar<DTYPE(data)> Burgers::Solutions::Bump::du_dt( \
+  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Bump::du_dt( \
       const tnsr::I<DTYPE(data), 1>& x, double t) const;
 
 GENERATE_INSTANTIATIONS(INSTANTIATE, (double, DataVector))

@@ -14,8 +14,8 @@
 #include "DataStructures/Tensor/Tensor.hpp"
 #include "Evolution/BoundaryConditions/Type.hpp"
 #include "Evolution/DgSubcell/Tags/Mesh.hpp"
-#include "Evolution/Systems/Burgers/BoundaryConditions/BoundaryCondition.hpp"
-#include "Evolution/Systems/Burgers/Tags.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryConditions/BoundaryCondition.hpp"
+#include "Evolution/Systems/BurgersVariant/Tags.hpp"
 #include "Options/String.hpp"
 #include "Utilities/Gsl.hpp"
 #include "Utilities/Serialization/CharmPupable.hpp"
@@ -28,7 +28,7 @@ template <size_t Dim>
 class Mesh;
 /// \endcond
 
-namespace Burgers::BoundaryConditions {
+namespace BurgersVariant::BoundaryConditions {
 /*!
  * \brief A boundary condition that only verifies that all characteristic speeds
  * are directed out of the domain; no boundary data is altered by this boundary
@@ -86,4 +86,4 @@ class DemandOutgoingCharSpeeds final : public BoundaryCondition {
           outward_directed_normal_covector,
       const Scalar<DataVector>& u_interior, const Mesh<1>& subcell_mesh);
 };
-}  // namespace Burgers::BoundaryConditions
+}  // namespace BurgersVariant::BoundaryConditions

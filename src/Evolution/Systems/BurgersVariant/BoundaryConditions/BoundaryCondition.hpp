@@ -7,8 +7,8 @@
 
 #include "Domain/BoundaryConditions/BoundaryCondition.hpp"
 
-namespace Burgers {
-/// \brief Boundary conditions for the Burgers system
+namespace BurgersVariant {
+/// \brief Boundary conditions for the BurgersVariant system
 namespace BoundaryConditions {
 /// \brief The base class off of which all boundary conditions must inherit
 class BoundaryCondition : public domain::BoundaryConditions::BoundaryCondition {
@@ -25,4 +25,4 @@ class BoundaryCondition : public domain::BoundaryConditions::BoundaryCondition {
   void pup(PUP::er& p) override;
 };
 }  // namespace BoundaryConditions
-}  // namespace Burgers
+}  // namespace BurgersVariant

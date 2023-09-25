@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "Evolution/Systems/Burgers/BoundaryCorrections/Hll.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryCorrections/Hll.hpp"
 
 #include <memory>
 #include <optional>
@@ -15,7 +15,7 @@
 #include "NumericalAlgorithms/DiscontinuousGalerkin/NormalDotFlux.hpp"
 #include "Utilities/Gsl.hpp"
 
-namespace Burgers::BoundaryCorrections {
+namespace BurgersVariant::BoundaryCorrections {
 Hll::Hll(CkMigrateMessage* msg) : BoundaryCorrection(msg) {}
 
 std::unique_ptr<BoundaryCorrection> Hll::get_clone() const {
@@ -69,7 +69,7 @@ void Hll::dg_boundary_terms(
     get(*boundary_correction_u) -= get(normal_dot_flux_u_int);
   }
 }
-}  // namespace Burgers::BoundaryCorrections
+}  // namespace BurgersVariant::BoundaryCorrections
 
 // NOLINTNEXTLINE
-PUP::able::PUP_ID Burgers::BoundaryCorrections::Hll::my_PUP_ID = 0;
+PUP::able::PUP_ID BurgersVariant::BoundaryCorrections::Hll::my_PUP_ID = 0;

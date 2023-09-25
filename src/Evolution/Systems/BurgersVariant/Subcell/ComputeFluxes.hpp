@@ -4,14 +4,14 @@
 #pragma once
 
 #include "DataStructures/Variables.hpp"
-#include "Evolution/Systems/Burgers/Fluxes.hpp"
+#include "Evolution/Systems/BurgersVariant/Fluxes.hpp"
 #include "Utilities/Gsl.hpp"
 #include "Utilities/TMPL.hpp"
 
-namespace Burgers::subcell {
+namespace BurgersVariant::subcell {
 namespace detail {
 /*!
- * \brief Helper function that calls `Burgers::Fluxes::apply` by
+ * \brief Helper function that calls `BurgersVariant::Fluxes::apply` by
  * retrieving the return and argument tags from the Variables object `vars`.
  */
 template <typename TagsList, typename... ReturnTags, typename... ArgumentTags>
@@ -31,4 +31,4 @@ void compute_fluxes(const gsl::not_null<Variables<TagsList>*> vars) {
   detail::compute_fluxes_impl(vars, typename Fluxes::return_tags{},
                               typename Fluxes::argument_tags{});
 }
-}  // namespace Burgers::subcell
+}  // namespace BurgersVariant::subcell

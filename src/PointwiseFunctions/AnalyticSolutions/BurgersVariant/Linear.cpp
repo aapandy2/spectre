@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "PointwiseFunctions/AnalyticSolutions/Burgers/Linear.hpp"
+#include "PointwiseFunctions/AnalyticSolutions/BurgersVariant/Linear.hpp"
 
 #include <pup.h>
 
@@ -12,7 +12,7 @@
 
 // IWYU pragma: no_forward_declare Tensor
 
-namespace Burgers::Solutions {
+namespace BurgersVariant::Solutions {
 
 Linear::Linear(const double shock_time) : shock_time_(shock_time) {}
 
@@ -55,14 +55,14 @@ void Linear::pup(PUP::er& p) {
 }
 
 PUP::able::PUP_ID Linear::my_PUP_ID = 0;
-}  // namespace Burgers::Solutions
+}  // namespace BurgersVariant::Solutions
 
 #define DTYPE(data) BOOST_PP_TUPLE_ELEM(0, data)
 
 #define INSTANTIATE(_, data)                                      \
-  template Scalar<DTYPE(data)> Burgers::Solutions::Linear::u(     \
+  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Linear::u(     \
       const tnsr::I<DTYPE(data), 1>& x, double t) const;          \
-  template Scalar<DTYPE(data)> Burgers::Solutions::Linear::du_dt( \
+  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Linear::du_dt( \
       const tnsr::I<DTYPE(data), 1>& x, double t) const;
 
 GENERATE_INSTANTIATIONS(INSTANTIATE, (double, DataVector))

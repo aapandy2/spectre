@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "Evolution/Systems/Burgers/BoundaryCorrections/Rusanov.hpp"
+#include "Evolution/Systems/BurgersVariant/BoundaryCorrections/Rusanov.hpp"
 
 #include <memory>
 #include <optional>
@@ -13,7 +13,7 @@
 #include "NumericalAlgorithms/DiscontinuousGalerkin/NormalDotFlux.hpp"
 #include "Utilities/Gsl.hpp"
 
-namespace Burgers::BoundaryCorrections {
+namespace BurgersVariant::BoundaryCorrections {
 Rusanov::Rusanov(CkMigrateMessage* msg) : BoundaryCorrection(msg) {}
 
 std::unique_ptr<BoundaryCorrection> Rusanov::get_clone() const {
@@ -64,7 +64,7 @@ void Rusanov::dg_boundary_terms(
             (get(u_ext) - get(u_int));
   }
 }
-}  // namespace Burgers::BoundaryCorrections
+}  // namespace BurgersVariant::BoundaryCorrections
 
 // NOLINTNEXTLINE
-PUP::able::PUP_ID Burgers::BoundaryCorrections::Rusanov::my_PUP_ID = 0;
+PUP::able::PUP_ID BurgersVariant::BoundaryCorrections::Rusanov::my_PUP_ID = 0;

@@ -10,7 +10,7 @@
 #include "Utilities/Serialization/CharmPupable.hpp"
 #include "Utilities/TMPL.hpp"
 
-namespace Burgers::fd {
+namespace BurgersVariant::fd {
 /// \cond
 class MonotonisedCentral;
 /// \endcond
@@ -41,4 +41,4 @@ class Reconstructor : public PUP::able {
 
   virtual size_t ghost_zone_size() const = 0;
 };
-}  // namespace Burgers::fd
+}  // namespace BurgersVariant::fd

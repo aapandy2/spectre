@@ -8,11 +8,11 @@
 
 #include "DataStructures/DataBox/Tag.hpp"
 #include "Evolution/DgSubcell/Tags/SubcellSolver.hpp"
-#include "Evolution/Systems/Burgers/FiniteDifference/Reconstructor.hpp"
+#include "Evolution/Systems/BurgersVariant/FiniteDifference/Reconstructor.hpp"
 #include "Options/String.hpp"
 #include "Utilities/TMPL.hpp"
 
-namespace Burgers::fd {
+namespace BurgersVariant::fd {
 namespace OptionTags {
 /*!
  * \brief Holds the subcell reconstructor in the input file
@@ -39,4 +39,4 @@ struct Reconstructor : db::SimpleTag {
   }
 };
 }  // namespace Tags
-}  // namespace Burgers::fd
+}  // namespace BurgersVariant::fd

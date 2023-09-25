@@ -3,10 +3,10 @@
 
 #pragma once
 
-namespace Burgers {
+namespace BurgersVariant {
 /*!
  * \ingroup AnalyticDataGroup
- * \brief Holds classes implementing analytic data for Burgers equation.
+ * \brief Holds classes implementing analytic data for BurgersVariant equation.
  */
 namespace AnalyticData {}
-}  // namespace Burgers
+}  // namespace BurgersVariant

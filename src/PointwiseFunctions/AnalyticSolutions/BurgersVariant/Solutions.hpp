@@ -2,15 +2,15 @@
 // See LICENSE.txt for details.
 
 /// \file
-/// Defines Burgers::Solutions
+/// Defines BurgersVariant::Solutions
 
 #pragma once
 
-namespace Burgers {
+namespace BurgersVariant {
 /*!
  * \ingroup AnalyticSolutionsGroup
- * \brief Holds classes implementing a solution to the Burgers equation
+ * \brief Holds classes implementing a solution to the BurgersVariant equation
  * \f$0 = \partial_t U + \partial_x\left(U^2/2\right)\f$.
  */
 namespace Solutions {}
-}  // namespace Burgers
+}  // namespace BurgersVariant

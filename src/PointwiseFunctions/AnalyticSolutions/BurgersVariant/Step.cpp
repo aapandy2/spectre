@@ -1,7 +1,7 @@
 // Distributed under the MIT License.
 // See LICENSE.txt for details.
 
-#include "PointwiseFunctions/AnalyticSolutions/Burgers/Step.hpp"
+#include "PointwiseFunctions/AnalyticSolutions/BurgersVariant/Step.hpp"
 
 #include <pup.h>
 
@@ -14,7 +14,7 @@
 
 // IWYU pragma: no_forward_declare Tensor
 
-namespace Burgers::Solutions {
+namespace BurgersVariant::Solutions {
 
 Step::Step(const double left_value, const double right_value,
            const double initial_shock_position, const Options::Context& context)
@@ -66,14 +66,14 @@ void Step::pup(PUP::er& p) {
 }
 
 PUP::able::PUP_ID Step::my_PUP_ID = 0;
-}  // namespace Burgers::Solutions
+}  // namespace BurgersVariant::Solutions
 
 #define DTYPE(data) BOOST_PP_TUPLE_ELEM(0, data)
 
 #define INSTANTIATE(_, data)                                    \
-  template Scalar<DTYPE(data)> Burgers::Solutions::Step::u(     \
+  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Step::u(     \
       const tnsr::I<DTYPE(data), 1>& x, double t) const;        \
-  template Scalar<DTYPE(data)> Burgers::Solutions::Step::du_dt( \
+  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Step::du_dt( \
       const tnsr::I<DTYPE(data), 1>& x, double t) const;
 
 GENERATE_INSTANTIATIONS(INSTANTIATE, (double, DataVector))
