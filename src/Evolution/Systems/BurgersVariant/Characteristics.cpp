@@ -25,6 +25,6 @@ void CharacteristicSpeedsCompute::function(
 
 void ComputeLargestCharacteristicSpeed::function(
     const gsl::not_null<double*> speed, const Scalar<DataVector>& u) {
-  *speed = max(abs(get(u)));
+  *speed = max(sqrt(abs(get(u))));
 }
 }  // namespace BurgersVariant::Tags
