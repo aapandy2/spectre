@@ -8,6 +8,7 @@ add_spectre_library(${LIBRARY})
 spectre_target_sources(
   ${LIBRARY}
   PRIVATE
+  Gaussian.cpp
   Sinusoid.cpp
   )
 
@@ -17,6 +18,7 @@ spectre_target_headers(
   HEADERS
   AnalyticData.hpp
   Factory.hpp
+  Gaussian.hpp
   Sinusoid.hpp
   )
 

@@ -21,6 +21,7 @@ set(SPECTRE_FORMALINE_LOCATIONS
   external
   LICENSE.txt
   Metadata.yaml
+  Notes
   pyproject.toml
   README.md
   setup.cfg

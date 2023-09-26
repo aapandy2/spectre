@@ -4,9 +4,10 @@
 #pragma once
 
 #include "PointwiseFunctions/AnalyticData/Burgers/Sinusoid.hpp"
+#include "PointwiseFunctions/AnalyticData/Burgers/Gaussian.hpp"
 #include "Utilities/TMPL.hpp"
 
 namespace Burgers::AnalyticData {
 /// \brief List of all analytic data
-using all_data = tmpl::list<Sinusoid>;
+using all_data = tmpl::list<Sinusoid, Gaussian>;
 }  // namespace Burgers::AnalyticData
