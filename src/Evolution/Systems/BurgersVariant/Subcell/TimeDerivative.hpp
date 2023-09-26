@@ -221,15 +221,15 @@ struct TimeDerivative {
                                   Frame::Grid>&
                 cell_centered_logical_to_grid_inv_jacobian) {
           dt_vars_ptr->initialize(num_pts, 0.0);
-          auto& dt_u = get<::Tags::dt<::BurgersVariant::Tags::U>>(*dt_vars_ptr);
+          auto& dt_v = get<::Tags::dt<::BurgersVariant::Tags::V>>(*dt_vars_ptr);
 
-          Scalar<DataVector>& u_correction =
+          Scalar<DataVector>& v_correction =
               get<::BurgersVariant::Tags::
-              U>(gsl::at(fd_boundary_corrections, 0));
+              V>(gsl::at(fd_boundary_corrections, 0));
           evolution::dg::subcell::add_cartesian_flux_divergence(
-              make_not_null(&get(dt_u)), gsl::at(one_over_delta_xi, 0),
+              make_not_null(&get(dt_v)), gsl::at(one_over_delta_xi, 0),
               cell_centered_logical_to_grid_inv_jacobian.get(0, 0),
-              get(u_correction), subcell_mesh.extents(), 0);
+              get(v_correction), subcell_mesh.extents(), 0);
         },
         box,
         db::get<

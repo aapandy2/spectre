@@ -62,7 +62,7 @@ class DemandOutgoingCharSpeeds final : public BoundaryCondition {
 
   void pup(PUP::er& p) override;
 
-  using dg_interior_evolved_variables_tags = tmpl::list<Tags::U>;
+  using dg_interior_evolved_variables_tags = tmpl::list<Tags::V>;
   using dg_interior_temporary_tags = tmpl::list<>;
   using dg_gridless_tags = tmpl::list<>;
 
@@ -71,19 +71,19 @@ class DemandOutgoingCharSpeeds final : public BoundaryCondition {
           face_mesh_velocity,
       const tnsr::i<DataVector, 1, Frame::Inertial>&
           outward_directed_normal_covector,
-      const Scalar<DataVector>& u);
+      const Scalar<DataVector>& v);
 
-  using fd_interior_evolved_variables_tags = tmpl::list<Tags::U>;
+  using fd_interior_evolved_variables_tags = tmpl::list<Tags::V>;
   using fd_interior_temporary_tags =
       tmpl::list<evolution::dg::subcell::Tags::Mesh<1>>;
   using fd_gridless_tags = tmpl::list<>;
 
   static void fd_demand_outgoing_char_speeds(
-      gsl::not_null<Scalar<DataVector>*> u, const Direction<1>& direction,
+      gsl::not_null<Scalar<DataVector>*> v, const Direction<1>& direction,
       const std::optional<tnsr::I<DataVector, 1, Frame::Inertial>>&
           face_mesh_velocity,
       const tnsr::i<DataVector, 1, Frame::Inertial>&
           outward_directed_normal_covector,
-      const Scalar<DataVector>& u_interior, const Mesh<1>& subcell_mesh);
+      const Scalar<DataVector>& v_interior, const Mesh<1>& subcell_mesh);
 };
 }  // namespace BurgersVariant::BoundaryConditions

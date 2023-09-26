@@ -44,7 +44,7 @@ void reconstruct_work(
     gsl::not_null<std::array<Variables<TagsList>, 1>*> vars_on_lower_face,
     gsl::not_null<std::array<Variables<TagsList>, 1>*> vars_on_upper_face,
     const Reconstructor& reconstruct,
-    const Variables<tmpl::list<Tags::U>> volume_vars, const Element<1>& element,
+    const Variables<tmpl::list<Tags::V>> volume_vars, const Element<1>& element,
     const FixedHashMap<
         maximum_number_of_neighbors(1), std::pair<Direction<1>, ElementId<1>>,
         evolution::dg::subcell::GhostData,
@@ -63,7 +63,7 @@ void reconstruct_fd_neighbor_work(
     gsl::not_null<Variables<TagsList>*> vars_on_face,
     const ReconstructLower& reconstruct_lower_neighbor,
     const ReconstructUpper& reconstruct_upper_neighbor,
-    const Variables<tmpl::list<Tags::U>>& subcell_volume_vars,
+    const Variables<tmpl::list<Tags::V>>& subcell_volume_vars,
     const Element<1>& element,
     const FixedHashMap<
         maximum_number_of_neighbors(1), std::pair<Direction<1>, ElementId<1>>,

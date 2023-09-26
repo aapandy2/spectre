@@ -114,10 +114,10 @@ class Sinusoid : public evolution::initial_data::InitialData,
   /// \endcond
 
   template <typename T>
-  Scalar<T> u(const tnsr::I<T, 1>& x) const;
+  Scalar<T> v(const tnsr::I<T, 1>& x) const;
 
-  tuples::TaggedTuple<Tags::U> variables(const tnsr::I<DataVector, 1>& x,
-                                         tmpl::list<Tags::U> /*meta*/) const;
+  tuples::TaggedTuple<Tags::V> variables(const tnsr::I<DataVector, 1>& x,
+                                         tmpl::list<Tags::V> /*meta*/) const;
 
   // NOLINTNEXTLINE(google-runtime-references)
   void pup(PUP::er& p) override;

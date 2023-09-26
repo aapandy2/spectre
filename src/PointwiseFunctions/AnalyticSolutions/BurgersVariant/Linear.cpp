@@ -24,29 +24,29 @@ std::unique_ptr<evolution::initial_data::InitialData> Linear::get_clone()
 Linear::Linear(CkMigrateMessage* msg) : InitialData(msg) {}
 
 template <typename T>
-Scalar<T> Linear::u(const tnsr::I<T, 1>& x, double t) const {
+Scalar<T> Linear::v(const tnsr::I<T, 1>& x, double t) const {
   Scalar<T> result(get<0>(x));
   get(result) /= (t - shock_time_);
   return result;
 }
 
 template <typename T>
-Scalar<T> Linear::du_dt(const tnsr::I<T, 1>& x, double t) const {
+Scalar<T> Linear::dv_dt(const tnsr::I<T, 1>& x, double t) const {
   Scalar<T> result(get<0>(x));
   get(result) /= -square(t - shock_time_);
   return result;
 }
 
-tuples::TaggedTuple<Tags::U> Linear::variables(
+tuples::TaggedTuple<Tags::V> Linear::variables(
     const tnsr::I<DataVector, 1>& x, double t,
-    tmpl::list<Tags::U> /*meta*/) const {
-  return {u(x, t)};
+    tmpl::list<Tags::V> /*meta*/) const {
+  return {v(x, t)};
 }
 
-tuples::TaggedTuple<::Tags::dt<Tags::U>> Linear::variables(
+tuples::TaggedTuple<::Tags::dt<Tags::V>> Linear::variables(
     const tnsr::I<DataVector, 1>& x, double t,
-    tmpl::list<::Tags::dt<Tags::U>> /*meta*/) const {
-  return {du_dt(x, t)};
+    tmpl::list<::Tags::dt<Tags::V>> /*meta*/) const {
+  return {dv_dt(x, t)};
 }
 
 void Linear::pup(PUP::er& p) {
@@ -60,9 +60,9 @@ PUP::able::PUP_ID Linear::my_PUP_ID = 0;
 #define DTYPE(data) BOOST_PP_TUPLE_ELEM(0, data)
 
 #define INSTANTIATE(_, data)                                      \
-  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Linear::u(     \
+  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Linear::v(     \
       const tnsr::I<DTYPE(data), 1>& x, double t) const;          \
-  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Linear::du_dt( \
+  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Linear::dv_dt( \
       const tnsr::I<DTYPE(data), 1>& x, double t) const;
 
 GENERATE_INSTANTIATIONS(INSTANTIATE, (double, DataVector))

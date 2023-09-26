@@ -40,8 +40,8 @@ DirichletAnalytic::get_clone() const {
 }
 
 std::optional<std::string> DirichletAnalytic::dg_ghost(
-    const gsl::not_null<Scalar<DataVector>*> u,
-    const gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux_u,
+    const gsl::not_null<Scalar<DataVector>*> v,
+    const gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux_v,
     const std::optional<
         tnsr::I<DataVector, 1, Frame::Inertial>>& /*face_mesh_velocity*/,
     const tnsr::i<DataVector, 1, Frame::Inertial>& /*normal_covector*/,
@@ -51,25 +51,25 @@ std::optional<std::string> DirichletAnalytic::dg_ghost(
                                      all_solutions,
                                BurgersVariant::AnalyticData::all_data>>(
       analytic_prescription_.get(),
-      [&coords, &time, &u](const auto* const analytic_solution_or_data) {
+      [&coords, &time, &v](const auto* const analytic_solution_or_data) {
         if constexpr (is_analytic_solution_v<
                           std::decay_t<decltype(*analytic_solution_or_data)>>) {
-          *u = get<BurgersVariant::Tags::
-               U>(analytic_solution_or_data->variables(
-              coords, time, tmpl::list<BurgersVariant::Tags::U>{}));
+          *v = get<BurgersVariant::Tags::
+               V>(analytic_solution_or_data->variables(
+              coords, time, tmpl::list<BurgersVariant::Tags::V>{}));
         } else {
-          *u = get<BurgersVariant::Tags::
-               U>(analytic_solution_or_data->variables(
-              coords, tmpl::list<BurgersVariant::Tags::U>{}));
+          *v = get<BurgersVariant::Tags::
+               V>(analytic_solution_or_data->variables(
+              coords, tmpl::list<BurgersVariant::Tags::V>{}));
           (void)time;
         }
       });
-  flux_impl(flux_u, *u);
+  flux_impl(flux_v, *v);
   return {};
 }
 
 void DirichletAnalytic::fd_ghost(
-    const gsl::not_null<Scalar<DataVector>*> u, const Direction<1>& direction,
+    const gsl::not_null<Scalar<DataVector>*> v, const Direction<1>& direction,
     const Mesh<1> subcell_mesh, const double time,
     const std::unordered_map<
         std::string, std::unique_ptr<domain::FunctionsOfTime::FunctionOfTime>>&
@@ -92,17 +92,17 @@ void DirichletAnalytic::fd_ghost(
                                 BurgersVariant::AnalyticData::all_data>>(
       analytic_prescription_.get(),
       [&ghost_inertial_coords, &time,
-       &u](const auto* const analytic_solution_or_data) {
+       &v](const auto* const analytic_solution_or_data) {
         if constexpr (is_analytic_solution_v<
                           std::decay_t<decltype(*analytic_solution_or_data)>>) {
-          *u = get<BurgersVariant::Tags::
-          U>(analytic_solution_or_data->variables(
+          *v = get<BurgersVariant::Tags::
+          V>(analytic_solution_or_data->variables(
               ghost_inertial_coords, time, tmpl::
-              list<BurgersVariant::Tags::U>{}));
+              list<BurgersVariant::Tags::V>{}));
         } else {
-          *u = get<BurgersVariant::Tags::
-          U>(analytic_solution_or_data->variables(
-              ghost_inertial_coords, tmpl::list<BurgersVariant::Tags::U>{}));
+          *v = get<BurgersVariant::Tags::
+          V>(analytic_solution_or_data->variables(
+              ghost_inertial_coords, tmpl::list<BurgersVariant::Tags::V>{}));
           (void)time;
         }
       });
@@ -115,8 +115,8 @@ void DirichletAnalytic::pup(PUP::er& p) {
 
 void DirichletAnalytic::flux_impl(
     const gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux,
-    const Scalar<DataVector>& u_analytic) {
-  BurgersVariant::Fluxes::apply(flux, u_analytic);
+    const Scalar<DataVector>& v_analytic) {
+  BurgersVariant::Fluxes::apply(flux, v_analytic);
 }
 
 // NOLINTNEXTLINE

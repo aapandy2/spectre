@@ -34,52 +34,52 @@ DemandOutgoingCharSpeeds::dg_demand_outgoing_char_speeds(
         face_mesh_velocity,
     const tnsr::i<DataVector, 1, Frame::Inertial>&
         outward_directed_normal_covector,
-    const Scalar<DataVector>& u) {
+    const Scalar<DataVector>& v) {
   double min_speed = std::numeric_limits<double>::signaling_NaN();
   if (face_mesh_velocity.has_value()) {
     min_speed = min(get<0>(outward_directed_normal_covector) *
-                    (get(u) - get<0>(*face_mesh_velocity)));
+                    (get(v) - get<0>(*face_mesh_velocity)));
   } else {
-    min_speed = min(get<0>(outward_directed_normal_covector) * get(u));
+    min_speed = min(get<0>(outward_directed_normal_covector) * get(v));
   }
   if (min_speed < 0.0) {
     return {MakeString{} << "DemandOutgoingCharSpeeds boundary condition "
-                            "violated with speed U ingoing: "
-                         << min_speed << "\nU: " << u << "\nn_i: "
+                            "violated with speed V ingoing: "
+                         << min_speed << "\nV: " << v << "\nn_i: "
                          << outward_directed_normal_covector << "\n"};
   }
   return std::nullopt;
 }
 
 void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
-    const gsl::not_null<Scalar<DataVector>*> u, const Direction<1>& direction,
+    const gsl::not_null<Scalar<DataVector>*> v, const Direction<1>& direction,
     const std::optional<tnsr::I<DataVector, 1, Frame::Inertial>>&
         face_mesh_velocity,
     const tnsr::i<DataVector, 1, Frame::Inertial>&
         outward_directed_normal_covector,
-    const Scalar<DataVector>& u_interior, const Mesh<1>& subcell_mesh) {
+    const Scalar<DataVector>& v_interior, const Mesh<1>& subcell_mesh) {
   // The boundary condition here simply uses the outermost values on
   // cell-centered FD grid points to compute face values on the external
   // boundary. This is equivalent to adopting the piecewise constant FD
   // reconstruction for FD cells at the external boundaries.
   //
-  const double u_val_at_boundary = get(
-      u_interior)[direction.side() == Side::Upper ? subcell_mesh.extents(0) - 1
+  const double v_val_at_boundary = get(
+      v_interior)[direction.side() == Side::Upper ? subcell_mesh.extents(0) - 1
                                                   : 0];
 
   double min_char_speed = std::numeric_limits<double>::signaling_NaN();
   if (face_mesh_velocity.has_value()) {
     min_char_speed = min(get<0>(outward_directed_normal_covector) *
-                         (u_val_at_boundary - get<0>(*face_mesh_velocity)));
+                         (v_val_at_boundary - get<0>(*face_mesh_velocity)));
   } else {
     min_char_speed =
-        min(get<0>(outward_directed_normal_covector) * u_val_at_boundary);
+        min(get<0>(outward_directed_normal_covector) * v_val_at_boundary);
   }
   if (min_char_speed < 0.0) {
     ERROR(
         "DemandOutgoingCharSpeeds boundary condition (subcell) violated with "
-        "speed U ingoing:"
-        << min_char_speed << "\nU: " << u_val_at_boundary
+        "speed V ingoing:"
+        << min_char_speed << "\nU: " << v_val_at_boundary
         << "\nn_i: " << outward_directed_normal_covector << "\n");
   } else {
     // Once the DemandOutgoingCharSpeeds condition has been checked, we fill the
@@ -90,7 +90,7 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
     // being raised while computing the subcell time derivative because of NaN
     // or uninitialized values in ghost data.
 
-    get(*u) = u_val_at_boundary;
+    get(*v) = v_val_at_boundary;
   }
 }
 

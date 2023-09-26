@@ -29,7 +29,7 @@ namespace BurgersVariant::subcell {
 /// Used on the subcells after the TCI marked the DG solution as inadmissible.
 struct SetInitialRdmpData {
   using argument_tags =
-      tmpl::list<BurgersVariant::Tags::U, evolution::dg::subcell::
+      tmpl::list<BurgersVariant::Tags::V, evolution::dg::subcell::
       Tags::ActiveGrid,
                  ::domain::Tags::Mesh<1>,
                  evolution::dg::subcell::Tags::Mesh<1>>;

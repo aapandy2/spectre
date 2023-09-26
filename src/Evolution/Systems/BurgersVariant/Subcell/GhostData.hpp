@@ -28,10 +28,10 @@ class GhostVariables {
  public:
   using return_tags = tmpl::list<>;
   using argument_tags =
-      tmpl::list<::Tags::Variables<tmpl::list<BurgersVariant::Tags::U>>>;
+      tmpl::list<::Tags::Variables<tmpl::list<BurgersVariant::Tags::V>>>;
 
   static DataVector apply(const Variables<tmpl::list<BurgersVariant::
-          Tags::U>>& vars,
+          Tags::V>>& vars,
                           size_t rdmp_size);
 };
 }  // namespace BurgersVariant::subcell

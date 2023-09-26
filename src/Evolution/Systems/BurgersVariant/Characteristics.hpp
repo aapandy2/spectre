@@ -18,7 +18,7 @@ class DataVector;
 // IWYU pragma: no_forward_declare Tensor
 namespace BurgersVariant {
 namespace Tags {
-struct U;
+struct V;
 }  // namespace Tags
 }  // namespace BurgersVariant
 /// \endcond
@@ -28,10 +28,10 @@ namespace BurgersVariant::Tags {
 struct CharacteristicSpeedsCompute : CharacteristicSpeeds, db::ComputeTag {
   using base = CharacteristicSpeeds;
   using argument_tags =
-      tmpl::list<Tags::U, domain::Tags::UnnormalizedFaceNormal<1>>;
+      tmpl::list<Tags::V, domain::Tags::UnnormalizedFaceNormal<1>>;
   using return_type = std::array<DataVector, 1>;
   static void function(gsl::not_null<return_type*> result,
-                       const Scalar<DataVector>& u,
+                       const Scalar<DataVector>& v,
                        const tnsr::i<DataVector, 1>& normal);
 };
 
@@ -41,10 +41,10 @@ struct LargestCharacteristicSpeed : db::SimpleTag {
 
 struct ComputeLargestCharacteristicSpeed : LargestCharacteristicSpeed,
                                            db::ComputeTag {
-  using argument_tags = tmpl::list<Tags::U>;
+  using argument_tags = tmpl::list<Tags::V>;
   using return_type = double;
   using base = LargestCharacteristicSpeed;
   static void function(const gsl::not_null<double*> speed,
-                       const Scalar<DataVector>& u);
+                       const Scalar<DataVector>& V);
 };
 }  // namespace BurgersVariant::Tags

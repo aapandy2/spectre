@@ -23,45 +23,45 @@ std::unique_ptr<BoundaryCorrection> Rusanov::get_clone() const {
 void Rusanov::pup(PUP::er& p) { BoundaryCorrection::pup(p); }
 
 double Rusanov::dg_package_data(
-    const gsl::not_null<Scalar<DataVector>*> packaged_u,
-    const gsl::not_null<Scalar<DataVector>*> packaged_normal_dot_flux_u,
+    const gsl::not_null<Scalar<DataVector>*> packaged_v,
+    const gsl::not_null<Scalar<DataVector>*> packaged_normal_dot_flux_v,
     const gsl::not_null<Scalar<DataVector>*> packaged_abs_char_speed,
-    const Scalar<DataVector>& u,
-    const tnsr::I<DataVector, 1, Frame::Inertial>& flux_u,
+    const Scalar<DataVector>& v,
+    const tnsr::I<DataVector, 1, Frame::Inertial>& flux_v,
     const tnsr::i<DataVector, 1, Frame::Inertial>& normal_covector,
     const std::optional<tnsr::I<DataVector, 1, Frame::Inertial>>&
     /*mesh_velocity*/,
     const std::optional<Scalar<DataVector>>& normal_dot_mesh_velocity) {
   if (normal_dot_mesh_velocity.has_value()) {
     get(*packaged_abs_char_speed) =
-        abs(get(u) - get(*normal_dot_mesh_velocity));
+        abs(get(v) - get(*normal_dot_mesh_velocity));
   } else {
-    get(*packaged_abs_char_speed) = abs(get(u));
+    get(*packaged_abs_char_speed) = abs(get(v));
   }
-  *packaged_u = u;
-  normal_dot_flux(packaged_normal_dot_flux_u, normal_covector, flux_u);
+  *packaged_v = v;
+  normal_dot_flux(packaged_normal_dot_flux_v, normal_covector, flux_v);
   return max(get(*packaged_abs_char_speed));
 }
 
 void Rusanov::dg_boundary_terms(
-    const gsl::not_null<Scalar<DataVector>*> boundary_correction_u,
-    const Scalar<DataVector>& u_int,
-    const Scalar<DataVector>& normal_dot_flux_u_int,
+    const gsl::not_null<Scalar<DataVector>*> boundary_correction_v,
+    const Scalar<DataVector>& v_int,
+    const Scalar<DataVector>& normal_dot_flux_v_int,
     const Scalar<DataVector>& abs_char_speed_int,
-    const Scalar<DataVector>& u_ext,
-    const Scalar<DataVector>& normal_dot_flux_u_ext,
+    const Scalar<DataVector>& v_ext,
+    const Scalar<DataVector>& normal_dot_flux_v_ext,
     const Scalar<DataVector>& abs_char_speed_ext,
     const dg::Formulation dg_formulation) {
   if (dg_formulation == dg::Formulation::WeakInertial) {
-    get(*boundary_correction_u) =
-        0.5 * (get(normal_dot_flux_u_int) - get(normal_dot_flux_u_ext)) -
+    get(*boundary_correction_v) =
+        0.5 * (get(normal_dot_flux_v_int) - get(normal_dot_flux_v_ext)) -
         0.5 * max(get(abs_char_speed_int), get(abs_char_speed_ext)) *
-            (get(u_ext) - get(u_int));
+            (get(v_ext) - get(v_int));
   } else {
-    get(*boundary_correction_u) =
-        -0.5 * (get(normal_dot_flux_u_int) + get(normal_dot_flux_u_ext)) -
+    get(*boundary_correction_v) =
+        -0.5 * (get(normal_dot_flux_v_int) + get(normal_dot_flux_v_ext)) -
         0.5 * max(get(abs_char_speed_int), get(abs_char_speed_ext)) *
-            (get(u_ext) - get(u_int));
+            (get(v_ext) - get(v_int));
   }
 }
 }  // namespace BurgersVariant::BoundaryCorrections

@@ -32,26 +32,26 @@ class Variables;
 
 namespace BurgersVariant::BoundaryConditions {
 /*
- * \brief Dirichlet boundary condition setting the value of U to a
+ * \brief Dirichlet boundary condition setting the value of V to a
  * time-independent constant.
  */
 class Dirichlet final : public BoundaryCondition {
  private:
   using flux_tag =
-      ::Tags::Flux<BurgersVariant::Tags::U, tmpl::size_t<1>, Frame::Inertial>;
+      ::Tags::Flux<BurgersVariant::Tags::V, tmpl::size_t<1>, Frame::Inertial>;
 
  public:
-  struct U {
+  struct V {
     using type = double;
-    static constexpr Options::String help{"The value for U on the boundary"};
+    static constexpr Options::String help{"The value for V on the boundary"};
   };
 
-  using options = tmpl::list<U>;
+  using options = tmpl::list<V>;
   static constexpr Options::String help{
-      "Dirichlet boundary condition setting the value of U to "
+      "Dirichlet boundary condition setting the value of V to "
       "a time-independent constant."};
 
-  Dirichlet(double u_value);
+  Dirichlet(double v_value);
 
   Dirichlet() = default;
   Dirichlet(Dirichlet&&) = default;
@@ -77,8 +77,8 @@ class Dirichlet final : public BoundaryCondition {
   using dg_gridless_tags = tmpl::list<>;
 
   std::optional<std::string> dg_ghost(
-      gsl::not_null<Scalar<DataVector>*> u,
-      gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux_u,
+      gsl::not_null<Scalar<DataVector>*> v,
+      gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux_v,
       const std::optional<
           tnsr::I<DataVector, 1, Frame::Inertial>>& /*face_mesh_velocity*/,
       const tnsr::i<DataVector, 1, Frame::Inertial>& /*normal_covector*/) const;
@@ -87,14 +87,14 @@ class Dirichlet final : public BoundaryCondition {
   using fd_interior_temporary_tags = tmpl::list<>;
   using fd_gridless_tags = tmpl::list<>;
 
-  void fd_ghost(gsl::not_null<Scalar<DataVector>*> u,
+  void fd_ghost(gsl::not_null<Scalar<DataVector>*> v,
                 const Direction<1>& /*direction*/) const;
 
  private:
   void dg_ghost_impl(
       gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux,
-      gsl::not_null<Scalar<DataVector>*> u) const;
+      gsl::not_null<Scalar<DataVector>*> v) const;
 
-  double u_value_ = std::numeric_limits<double>::signaling_NaN();
+  double v_value_ = std::numeric_limits<double>::signaling_NaN();
 };
 }  // namespace BurgersVariant::BoundaryConditions

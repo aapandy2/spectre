@@ -11,7 +11,7 @@
 
 namespace BurgersVariant {
 namespace Tags {
-struct U : db::SimpleTag {
+struct V : db::SimpleTag {
   using type = Scalar<DataVector>;
 };
 

@@ -14,7 +14,7 @@
 #include "Utilities/Gsl.hpp"
 
 namespace BurgersVariant::BoundaryConditions {
-Dirichlet::Dirichlet(const double u_value) : u_value_(u_value) {}
+Dirichlet::Dirichlet(const double v_value) : v_value_(v_value) {}
 
 Dirichlet::Dirichlet(CkMigrateMessage* const msg) : BoundaryCondition(msg) {}
 
@@ -25,23 +25,23 @@ Dirichlet::get_clone() const {
 
 void Dirichlet::pup(PUP::er& p) {
   BoundaryCondition::pup(p);
-  p | u_value_;
+  p | v_value_;
 }
 
 std::optional<std::string> Dirichlet::dg_ghost(
-    const gsl::not_null<Scalar<DataVector>*> u,
-    const gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux_u,
+    const gsl::not_null<Scalar<DataVector>*> v,
+    const gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux_v,
     const std::optional<
         tnsr::I<DataVector, 1, Frame::Inertial>>& /*face_mesh_velocity*/,
     const tnsr::i<DataVector, 1, Frame::Inertial>& /*normal_covector*/) const {
-  get(*u) = u_value_;
-  BurgersVariant::Fluxes::apply(flux_u, *u);
+  get(*v) = v_value_;
+  BurgersVariant::Fluxes::apply(flux_v, *v);
   return {};
 }
 
-void Dirichlet::fd_ghost(const gsl::not_null<Scalar<DataVector>*> u,
+void Dirichlet::fd_ghost(const gsl::not_null<Scalar<DataVector>*> v,
                          const Direction<1>& /*direction*/) const {
-  get(*u) = u_value_;
+  get(*v) = v_value_;
 }
 
 // NOLINTNEXTLINE

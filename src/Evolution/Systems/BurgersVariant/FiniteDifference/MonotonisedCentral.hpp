@@ -55,9 +55,9 @@ namespace BurgersVariant::fd {
 class MonotonisedCentral : public Reconstructor {
  private:
   using face_vars_tags = tmpl::list<
-      BurgersVariant::Tags::U,
-      ::Tags::Flux<BurgersVariant::Tags::U, tmpl::size_t<1>, Frame::Inertial>>;
-  using volume_vars_tags = tmpl::list<BurgersVariant::Tags::U>;
+      BurgersVariant::Tags::V,
+      ::Tags::Flux<BurgersVariant::Tags::V, tmpl::size_t<1>, Frame::Inertial>>;
+  using volume_vars_tags = tmpl::list<BurgersVariant::Tags::V>;
 
  public:
   using options = tmpl::list<>;
@@ -92,7 +92,7 @@ class MonotonisedCentral : public Reconstructor {
           vars_on_lower_face,
       gsl::not_null<std::array<Variables<face_vars_tags>, 1>*>
           vars_on_upper_face,
-      const Variables<tmpl::list<BurgersVariant::Tags::U>>& volume_vars,
+      const Variables<tmpl::list<BurgersVariant::Tags::V>>& volume_vars,
       const Element<1>& element,
       const FixedHashMap<
           maximum_number_of_neighbors(1), std::pair<Direction<1>, ElementId<1>>,

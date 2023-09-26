@@ -16,7 +16,7 @@
 
 namespace BurgersVariant::AnalyticData {
 template <typename T>
-Scalar<T> Sinusoid::u(const tnsr::I<T, 1>& x) const {
+Scalar<T> Sinusoid::v(const tnsr::I<T, 1>& x) const {
   return Scalar<T>{sin(get<0>(x))};
 }
 
@@ -27,9 +27,9 @@ std::unique_ptr<evolution::initial_data::InitialData> Sinusoid::get_clone()
 
 Sinusoid::Sinusoid(CkMigrateMessage* msg) : InitialData(msg) {}
 
-tuples::TaggedTuple<Tags::U> Sinusoid::variables(
-    const tnsr::I<DataVector, 1>& x, tmpl::list<Tags::U> /*meta*/) const {
-  return {u(x)};
+tuples::TaggedTuple<Tags::V> Sinusoid::variables(
+    const tnsr::I<DataVector, 1>& x, tmpl::list<Tags::V> /*meta*/) const {
+  return {v(x)};
 }
 
 void Sinusoid::pup(PUP::er& p) { InitialData::pup(p); }
@@ -48,7 +48,7 @@ bool operator!=(const Sinusoid& lhs, const Sinusoid& rhs) {
 #define DTYPE(data) BOOST_PP_TUPLE_ELEM(0, data)
 
 #define INSTANTIATE(_, data)                                       \
-  template Scalar<DTYPE(data)> BurgersVariant::AnalyticData::Sinusoid::u( \
+  template Scalar<DTYPE(data)> BurgersVariant::AnalyticData::Sinusoid::v( \
       const tnsr::I<DTYPE(data), 1>& x) const;
 
 GENERATE_INSTANTIATIONS(INSTANTIATE, (double, DataVector))

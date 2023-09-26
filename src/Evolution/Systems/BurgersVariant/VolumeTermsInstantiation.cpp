@@ -43,5 +43,5 @@ template void volume_terms<::BurgersVariant::TimeDerivativeTerms>(
     [[maybe_unused]] const Scalar<DataVector>* const det_inverse_jacobian,
     const std::optional<tnsr::I<DataVector, 1, Frame::Inertial>>& mesh_velocity,
     const std::optional<Scalar<DataVector>>& div_mesh_velocity,
-    const Scalar<DataVector>& u);
+    const Scalar<DataVector>& v);
 }  // namespace evolution::dg::Actions::detail

@@ -8,11 +8,11 @@
 
 template Variables<tmpl::list<
     Tags::div<Tags::Flux<BurgersVariant::
-    Tags::U, tmpl::size_t<1>, Frame::Inertial>>>>
+    Tags::V, tmpl::size_t<1>, Frame::Inertial>>>>
 divergence(
     const Variables<tmpl::list<
         Tags::Flux<BurgersVariant::
-        Tags::U, tmpl::size_t<1>, Frame::Inertial>>>& F,
+        Tags::V, tmpl::size_t<1>, Frame::Inertial>>>& F,
     const Mesh<1>& mesh,
     const InverseJacobian<DataVector, 1, Frame::ElementLogical,
                           Frame::Inertial>& inverse_jacobian);

@@ -33,7 +33,7 @@ std::unique_ptr<evolution::initial_data::InitialData> Step::get_clone() const {
 }
 
 template <typename T>
-Scalar<T> Step::u(const tnsr::I<T, 1>& x, const double t) const {
+Scalar<T> Step::v(const tnsr::I<T, 1>& x, const double t) const {
   const double current_shock_position =
       initial_shock_position_ + 0.5 * (left_value_ + right_value_) * t;
   return Scalar<T>(left_value_ -
@@ -42,20 +42,20 @@ Scalar<T> Step::u(const tnsr::I<T, 1>& x, const double t) const {
 }
 
 template <typename T>
-Scalar<T> Step::du_dt(const tnsr::I<T, 1>& x, const double /*t*/) const {
+Scalar<T> Step::dv_dt(const tnsr::I<T, 1>& x, const double /*t*/) const {
   return make_with_value<Scalar<T>>(x, 0.0);
 }
 
-tuples::TaggedTuple<Tags::U> Step::variables(
+tuples::TaggedTuple<Tags::V> Step::variables(
     const tnsr::I<DataVector, 1>& x, const double t,
-    tmpl::list<Tags::U> /*meta*/) const {
-  return {u(x, t)};
+    tmpl::list<Tags::V> /*meta*/) const {
+  return {v(x, t)};
 }
 
-tuples::TaggedTuple<::Tags::dt<Tags::U>> Step::variables(
+tuples::TaggedTuple<::Tags::dt<Tags::V>> Step::variables(
     const tnsr::I<DataVector, 1>& x, const double t,
-    tmpl::list<::Tags::dt<Tags::U>> /*meta*/) const {
-  return {du_dt(x, t)};
+    tmpl::list<::Tags::dt<Tags::V>> /*meta*/) const {
+  return {dv_dt(x, t)};
 }
 
 void Step::pup(PUP::er& p) {
@@ -71,9 +71,9 @@ PUP::able::PUP_ID Step::my_PUP_ID = 0;
 #define DTYPE(data) BOOST_PP_TUPLE_ELEM(0, data)
 
 #define INSTANTIATE(_, data)                                    \
-  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Step::u(     \
+  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Step::v(     \
       const tnsr::I<DTYPE(data), 1>& x, double t) const;        \
-  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Step::du_dt( \
+  template Scalar<DTYPE(data)> BurgersVariant::Solutions::Step::dv_dt( \
       const tnsr::I<DTYPE(data), 1>& x, double t) const;
 
 GENERATE_INSTANTIATIONS(INSTANTIATE, (double, DataVector))

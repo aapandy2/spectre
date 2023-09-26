@@ -77,28 +77,28 @@ class Rusanov final : public BoundaryCorrection {
   std::unique_ptr<BoundaryCorrection> get_clone() const override;
 
   using dg_package_field_tags =
-      tmpl::list<Tags::U, ::Tags::NormalDotFlux<Tags::U>, AbsCharSpeed>;
+      tmpl::list<Tags::V, ::Tags::NormalDotFlux<Tags::V>, AbsCharSpeed>;
   using dg_package_data_temporary_tags = tmpl::list<>;
   using dg_package_data_volume_tags = tmpl::list<>;
 
   static double dg_package_data(
-      gsl::not_null<Scalar<DataVector>*> packaged_u,
+      gsl::not_null<Scalar<DataVector>*> packaged_v,
       gsl::not_null<Scalar<DataVector>*> packaged_normal_dot_flux,
       gsl::not_null<Scalar<DataVector>*> packaged_abs_char_speed,
-      const Scalar<DataVector>& u,
-      const tnsr::I<DataVector, 1, Frame::Inertial>& flux_u,
+      const Scalar<DataVector>& v,
+      const tnsr::I<DataVector, 1, Frame::Inertial>& flux_v,
       const tnsr::i<DataVector, 1, Frame::Inertial>& normal_covector,
       const std::optional<tnsr::I<DataVector, 1, Frame::Inertial>>&
           mesh_velocity,
       const std::optional<Scalar<DataVector>>& normal_dot_mesh_velocity);
 
   static void dg_boundary_terms(
-      gsl::not_null<Scalar<DataVector>*> boundary_correction_u,
-      const Scalar<DataVector>& u_int,
-      const Scalar<DataVector>& normal_dot_flux_u_int,
+      gsl::not_null<Scalar<DataVector>*> boundary_correction_v,
+      const Scalar<DataVector>& v_int,
+      const Scalar<DataVector>& normal_dot_flux_v_int,
       const Scalar<DataVector>& abs_char_speed_int,
-      const Scalar<DataVector>& u_ext,
-      const Scalar<DataVector>& normal_dot_flux_u_ext,
+      const Scalar<DataVector>& v_ext,
+      const Scalar<DataVector>& normal_dot_flux_v_ext,
       const Scalar<DataVector>& abs_char_speed_ext,
       dg::Formulation dg_formulation);
 };

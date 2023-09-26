@@ -12,7 +12,7 @@ class DataVector;
 // IWYU pragma: no_forward_declare Tensor
 namespace BurgersVariant {
 namespace Tags {
-struct U;
+struct V;
 }  // namespace Tags
 }  // namespace BurgersVariant
 namespace gsl {
@@ -24,10 +24,10 @@ class not_null;
 namespace BurgersVariant {
 /// The flux of \f$U\f$ is \f$\frac{1}{2} U^2\f$.
 struct Fluxes {
-  using argument_tags = tmpl::list<Tags::U>;
+  using argument_tags = tmpl::list<Tags::V>;
   using return_tags =
-      tmpl::list<::Tags::Flux<Tags::U, tmpl::size_t<1>, Frame::Inertial>>;
+      tmpl::list<::Tags::Flux<Tags::V, tmpl::size_t<1>, Frame::Inertial>>;
   static void apply(gsl::not_null<tnsr::I<DataVector, 1>*> flux,
-                    const Scalar<DataVector>& u);
+                    const Scalar<DataVector>& v);
 };
 }  // namespace BurgersVariant

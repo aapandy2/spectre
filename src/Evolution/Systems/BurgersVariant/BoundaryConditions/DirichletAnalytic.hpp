@@ -55,7 +55,7 @@ namespace BurgersVariant::BoundaryConditions {
 class DirichletAnalytic final : public BoundaryCondition {
  private:
   using flux_tag =
-      ::Tags::Flux<BurgersVariant::Tags::U, tmpl::size_t<1>, Frame::Inertial>;
+      ::Tags::Flux<BurgersVariant::Tags::V, tmpl::size_t<1>, Frame::Inertial>;
 
  public:
   /// \brief What analytic solution/data to prescribe.
@@ -100,8 +100,8 @@ class DirichletAnalytic final : public BoundaryCondition {
   using dg_gridless_tags = tmpl::list<::Tags::Time>;
 
   std::optional<std::string> dg_ghost(
-      const gsl::not_null<Scalar<DataVector>*> u,
-      const gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux_u,
+      const gsl::not_null<Scalar<DataVector>*> v,
+      const gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux_v,
       const std::optional<
           tnsr::I<DataVector, 1, Frame::Inertial>>& /*face_mesh_velocity*/,
       const tnsr::i<DataVector, 1, Frame::Inertial>& /*normal_covector*/,
@@ -118,7 +118,7 @@ class DirichletAnalytic final : public BoundaryCondition {
                                                              Frame::Inertial>,
                  fd::Tags::Reconstructor>;
 
-  void fd_ghost(const gsl::not_null<Scalar<DataVector>*> u,
+  void fd_ghost(const gsl::not_null<Scalar<DataVector>*> v,
                 const Direction<1>& direction, const Mesh<1> subcell_mesh,
                 const double time,
                 const std::unordered_map<
@@ -133,7 +133,7 @@ class DirichletAnalytic final : public BoundaryCondition {
  private:
   static void flux_impl(
       gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux,
-      const Scalar<DataVector>& u_analytic);
+      const Scalar<DataVector>& v_analytic);
 
   std::unique_ptr<evolution::initial_data::InitialData> analytic_prescription_;
 };

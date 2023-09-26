@@ -14,20 +14,20 @@
 
 namespace BurgersVariant::subcell {
 std::tuple<bool, evolution::dg::subcell::RdmpTciData> TciOnFdGrid::apply(
-    const Scalar<DataVector>& subcell_u, const Mesh<1>& dg_mesh,
+    const Scalar<DataVector>& subcell_v, const Mesh<1>& dg_mesh,
     const Mesh<1>& subcell_mesh,
     const evolution::dg::subcell::RdmpTciData& past_rdmp_tci_data,
     const evolution::dg::subcell::SubcellOptions& subcell_options,
     const double persson_exponent, const bool need_rdmp_data_only) {
-  const Scalar<DataVector> dg_u{evolution::dg::subcell::fd::reconstruct(
-      get(subcell_u), dg_mesh, subcell_mesh.extents(),
+  const Scalar<DataVector> dg_v{evolution::dg::subcell::fd::reconstruct(
+      get(subcell_v), dg_mesh, subcell_mesh.extents(),
       evolution::dg::subcell::fd::ReconstructionMethod::DimByDim)};
 
   using std::max;
   using std::min;
   const evolution::dg::subcell::RdmpTciData rdmp_data_for_tci{
-      {max(max(get(dg_u)), max(get(subcell_u)))},
-      {min(min(get(dg_u)), min(get(subcell_u)))}};
+      {max(max(get(dg_v)), max(get(subcell_v)))},
+      {min(min(get(dg_v)), min(get(subcell_v)))}};
 
   if (need_rdmp_data_only) {
     return {false, rdmp_data_for_tci};
@@ -42,7 +42,7 @@ std::tuple<bool, evolution::dg::subcell::RdmpTciData> TciOnFdGrid::apply(
           subcell_options.rdmp_delta0(), subcell_options.rdmp_epsilon()));
 
   return {cell_is_troubled or ::evolution::dg::subcell::persson_tci(
-                                  dg_u, dg_mesh, persson_exponent),
-          {{max(get(subcell_u))}, {min(get(subcell_u))}}};
+                                  dg_v, dg_mesh, persson_exponent),
+          {{max(get(subcell_v))}, {min(get(subcell_v))}}};
 }
 }  // namespace BurgersVariant::subcell

@@ -48,7 +48,7 @@ void MonotonisedCentral::reconstruct(
         vars_on_lower_face,
     const gsl::not_null<std::array<Variables<face_vars_tags>, 1>*>
         vars_on_upper_face,
-    const Variables<tmpl::list<BurgersVariant::Tags::U>>& volume_vars,
+    const Variables<tmpl::list<BurgersVariant::Tags::V>>& volume_vars,
     const Element<1>& element,
     const FixedHashMap<
         maximum_number_of_neighbors(1), std::pair<Direction<1>, ElementId<1>>,

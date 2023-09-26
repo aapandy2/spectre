@@ -14,17 +14,17 @@
 
 namespace BurgersVariant::Tags {
 void CharacteristicSpeedsCompute::function(
-    const gsl::not_null<return_type*> result, const Scalar<DataVector>& u,
+    const gsl::not_null<return_type*> result, const Scalar<DataVector>& v,
     const tnsr::i<DataVector, 1>& normal) {
-  ASSERT(get(u).size() == 1 and get<0>(normal).size() == 1,
+  ASSERT(get(v).size() == 1 and get<0>(normal).size() == 1,
          "Char speeds only written for 1d boundaries.  "
          "Got wrong number of points: "
-         << get(u).size() << " and " << get<0>(normal).size());
-  gsl::at(*result, 0) = get<0>(normal)[0] > 0.0 ? get(u) : -get(u);
+         << get(v).size() << " and " << get<0>(normal).size());
+  gsl::at(*result, 0) = get<0>(normal)[0] > 0.0 ? get(v) : -get(v);
 }
 
 void ComputeLargestCharacteristicSpeed::function(
-    const gsl::not_null<double*> speed, const Scalar<DataVector>& u) {
-  *speed = max(sqrt(abs(get(u))));
+    const gsl::not_null<double*> speed, const Scalar<DataVector>& v) {
+  *speed = max(sqrt(abs(get(v))));
 }
 }  // namespace BurgersVariant::Tags

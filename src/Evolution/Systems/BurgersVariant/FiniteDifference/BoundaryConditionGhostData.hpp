@@ -104,7 +104,7 @@ void BoundaryConditionGhostData::apply(
 
     // a Variables object to store the computed FD ghost data
     Variables<tmpl::list<BurgersVariant::Tags::
-        U>> ghost_data_vars{ghost_zone_size *
+        V>> ghost_data_vars{ghost_zone_size *
                                                             num_face_pts};
 
     // We don't need to care about boundary ghost data when using the periodic
@@ -145,7 +145,7 @@ void BoundaryConditionGhostData::apply(
                   (*boundary_condition)
                       .fd_ghost(make_not_null(
                                     &get<BurgersVariant::Tags::
-                                    U>(ghost_data_vars)),
+                                    V>(ghost_data_vars)),
                                 direction, boundary_ghost_data_args...);
                 };
             apply_subcell_boundary_condition_impl(apply_fd_ghost, box,
@@ -176,7 +176,7 @@ void BoundaryConditionGhostData::apply(
                   return (*boundary_condition)
                       .fd_demand_outgoing_char_speeds(
                           make_not_null(
-                              &get<BurgersVariant::Tags::U>(ghost_data_vars)),
+                              &get<BurgersVariant::Tags::V>(ghost_data_vars)),
                           direction, face_mesh_velocity,
                           outward_directed_normal_covector,
                           boundary_ghost_data_args...);
@@ -204,8 +204,8 @@ void BoundaryConditionGhostData::apply(
               ghost_data_ptr->at(mortar_id)
                   .neighbor_ghost_data_for_reconstruction();
           neighbor_data.destructive_resize(ghost_data_vars.size());
-          std::copy(get(get<BurgersVariant::Tags::U>(ghost_data_vars)).begin(),
-                    get(get<BurgersVariant::Tags::U>(ghost_data_vars)).end(),
+          std::copy(get(get<BurgersVariant::Tags::V>(ghost_data_vars)).begin(),
+                    get(get<BurgersVariant::Tags::V>(ghost_data_vars)).end(),
                     neighbor_data.begin());
         },
         box);

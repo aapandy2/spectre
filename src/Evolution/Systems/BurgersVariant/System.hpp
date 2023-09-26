@@ -28,8 +28,8 @@ struct System {
   using boundary_conditions_base = BoundaryConditions::BoundaryCondition;
   using boundary_correction_base = BoundaryCorrections::BoundaryCorrection;
 
-  using variables_tag = ::Tags::Variables<tmpl::list<Tags::U>>;
-  using flux_variables = tmpl::list<Tags::U>;
+  using variables_tag = ::Tags::Variables<tmpl::list<Tags::V>>;
+  using flux_variables = tmpl::list<Tags::V>;
   using gradient_variables = tmpl::list<>;
 
   using compute_volume_time_derivative_terms = TimeDerivativeTerms;

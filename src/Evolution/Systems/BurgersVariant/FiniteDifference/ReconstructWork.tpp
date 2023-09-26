@@ -30,7 +30,7 @@ void reconstruct_work(
     const gsl::not_null<std::array<Variables<TagsList>, 1>*> vars_on_lower_face,
     const gsl::not_null<std::array<Variables<TagsList>, 1>*> vars_on_upper_face,
     const Reconstructor& reconstruct,
-    const Variables<tmpl::list<Tags::U>> volume_vars, const Element<1>& element,
+    const Variables<tmpl::list<Tags::V>> volume_vars, const Element<1>& element,
     const FixedHashMap<
         maximum_number_of_neighbors(1), std::pair<Direction<1>, ElementId<1>>,
         evolution::dg::subcell::GhostData,
@@ -45,10 +45,10 @@ void reconstruct_work(
   std::array<gsl::span<double>, 1> lower_face_vars{};
   for (size_t i = 0; i < 1; i++) {
     gsl::at(upper_face_vars, i) =
-        gsl::make_span(get<Tags::U>(gsl::at(*vars_on_upper_face, i))[0].data(),
+        gsl::make_span(get<Tags::V>(gsl::at(*vars_on_upper_face, i))[0].data(),
                        reconstructed_num_pts);
     gsl::at(lower_face_vars, i) =
-        gsl::make_span(get<Tags::U>(gsl::at(*vars_on_lower_face, i))[0].data(),
+        gsl::make_span(get<Tags::V>(gsl::at(*vars_on_lower_face, i))[0].data(),
                        reconstructed_num_pts);
   }
 
@@ -91,7 +91,7 @@ void reconstruct_work(
   }
 
   // make span of volume variables
-  auto& volume_tensor = get<Tags::U>(volume_vars);
+  auto& volume_tensor = get<Tags::V>(volume_vars);
   const gsl::span<const double> volume_vars_span =
       gsl::make_span((volume_tensor)[0].data(), volume_num_pts);
 
@@ -106,7 +106,7 @@ void reconstruct_fd_neighbor_work(
     const gsl::not_null<Variables<TagsList>*> vars_on_face,
     const ReconstructLower& reconstruct_lower_neighbor,
     const ReconstructUpper& reconstruct_upper_neighbor,
-    const Variables<tmpl::list<Tags::U>>& subcell_volume_vars,
+    const Variables<tmpl::list<Tags::V>>& subcell_volume_vars,
     const Element<1>& element,
     const FixedHashMap<
         maximum_number_of_neighbors(1), std::pair<Direction<1>, ElementId<1>>,
@@ -122,7 +122,7 @@ void reconstruct_fd_neighbor_work(
   ghost_data_extents[direction_to_reconstruct.dimension()] = ghost_zone_size;
 
   // allocate Variable for storing data from neighbor
-  Variables<tmpl::list<Tags::U>> neighbor_vars{ghost_data_extents.product()};
+  Variables<tmpl::list<Tags::V>> neighbor_vars{ghost_data_extents.product()};
 
   {
     ASSERT(ghost_data.contains(mortar_id),
@@ -138,9 +138,9 @@ void reconstruct_fd_neighbor_work(
         neighbor_vars.data());
   }
 
-  const auto& tensor_volume = get<Tags::U>(subcell_volume_vars);
-  const auto& tensor_neighbor = get<Tags::U>(neighbor_vars);
-  auto& tensor_on_face = get<Tags::U>(*vars_on_face);
+  const auto& tensor_volume = get<Tags::V>(subcell_volume_vars);
+  const auto& tensor_neighbor = get<Tags::V>(neighbor_vars);
+  auto& tensor_on_face = get<Tags::V>(*vars_on_face);
 
   if (direction_to_reconstruct.side() == Side::Upper) {
     for (size_t tensor_index = 0; tensor_index < tensor_on_face.size();

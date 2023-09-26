@@ -57,18 +57,18 @@ class Linear : public evolution::initial_data::InitialData,
   /// \endcond
 
   template <typename T>
-  Scalar<T> u(const tnsr::I<T, 1>& x, double t) const;
+  Scalar<T> v(const tnsr::I<T, 1>& x, double t) const;
 
   template <typename T>
-  Scalar<T> du_dt(const tnsr::I<T, 1>& x, double t) const;
+  Scalar<T> dv_dt(const tnsr::I<T, 1>& x, double t) const;
 
-  tuples::TaggedTuple<Tags::U> variables(const tnsr::I<DataVector, 1>& x,
+  tuples::TaggedTuple<Tags::V> variables(const tnsr::I<DataVector, 1>& x,
                                          double t,
-                                         tmpl::list<Tags::U> /*meta*/) const;
+                                         tmpl::list<Tags::V> /*meta*/) const;
 
-  tuples::TaggedTuple<::Tags::dt<Tags::U>> variables(
+  tuples::TaggedTuple<::Tags::dt<Tags::V>> variables(
       const tnsr::I<DataVector, 1>& x, double t,
-      tmpl::list<::Tags::dt<Tags::U>> /*meta*/) const;
+      tmpl::list<::Tags::dt<Tags::V>> /*meta*/) const;
 
   // NOLINTNEXTLINE(google-runtime-references)
   void pup(PUP::er& p) override;

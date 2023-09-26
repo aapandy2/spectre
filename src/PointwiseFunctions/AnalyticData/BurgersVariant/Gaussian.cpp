@@ -16,7 +16,7 @@
 
 namespace BurgersVariant::AnalyticData {
 template <typename T>
-Scalar<T> Gaussian::u(const tnsr::I<T, 1>& x) const {
+Scalar<T> Gaussian::v(const tnsr::I<T, 1>& x) const {
 //  return Scalar<T>{sin(get<0>(x))};
   return Scalar<T>{1. + exp(-square(get<0>(x)))};
 }
@@ -28,9 +28,9 @@ std::unique_ptr<evolution::initial_data::InitialData> Gaussian::get_clone()
 
 Gaussian::Gaussian(CkMigrateMessage* msg) : InitialData(msg) {}
 
-tuples::TaggedTuple<Tags::U> Gaussian::variables(
-    const tnsr::I<DataVector, 1>& x, tmpl::list<Tags::U> /*meta*/) const {
-  return {u(x)};
+tuples::TaggedTuple<Tags::V> Gaussian::variables(
+    const tnsr::I<DataVector, 1>& x, tmpl::list<Tags::V> /*meta*/) const {
+  return {v(x)};
 }
 
 void Gaussian::pup(PUP::er& p) { InitialData::pup(p); }
@@ -49,7 +49,7 @@ bool operator!=(const Gaussian& lhs, const Gaussian& rhs) {
 #define DTYPE(data) BOOST_PP_TUPLE_ELEM(0, data)
 
 #define INSTANTIATE(_, data)                                       \
-  template Scalar<DTYPE(data)> BurgersVariant::AnalyticData::Gaussian::u( \
+  template Scalar<DTYPE(data)> BurgersVariant::AnalyticData::Gaussian::v( \
       const tnsr::I<DTYPE(data), 1>& x) const;
 
 GENERATE_INSTANTIATIONS(INSTANTIATE, (double, DataVector))

@@ -12,7 +12,7 @@ class DataVector;
 // IWYU pragma: no_forward_declare Tensor
 namespace BurgersVariant {
 namespace Tags {
-struct U;
+struct V;
 }  // namespace Tags
 }  // namespace BurgersVariant
 namespace gsl {
@@ -28,7 +28,7 @@ namespace BurgersVariant {
 // which are just the fluxes.
 struct TimeDerivativeTerms {
   using temporary_tags = tmpl::list<>;
-  using argument_tags = tmpl::list<Tags::U>;
+  using argument_tags = tmpl::list<Tags::V>;
 
   static void apply(
       // Time derivatives returned by reference. No source terms or
@@ -38,9 +38,9 @@ struct TimeDerivativeTerms {
 
       // Fluxes returned by reference. Listed in the system struct as
       // flux_variables.
-      gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux_u,
+      gsl::not_null<tnsr::I<DataVector, 1, Frame::Inertial>*> flux_v,
 
       // Arguments listed in argument_tags above
-      const Scalar<DataVector>& u);
+      const Scalar<DataVector>& v);
 };
 }  // namespace BurgersVariant

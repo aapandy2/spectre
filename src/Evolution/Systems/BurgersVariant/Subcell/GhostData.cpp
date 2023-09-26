@@ -9,11 +9,11 @@
 
 namespace BurgersVariant::subcell {
 DataVector GhostVariables::apply(
-    const Variables<tmpl::list<BurgersVariant::Tags::U>>& vars,
+    const Variables<tmpl::list<BurgersVariant::Tags::V>>& vars,
     const size_t rdmp_size) {
   DataVector buffer{vars.number_of_grid_points() + rdmp_size};
   DataVector var_view{buffer.data(), vars.number_of_grid_points()};
-  var_view = get(get<BurgersVariant::Tags::U>(vars));
+  var_view = get(get<BurgersVariant::Tags::V>(vars));
   return buffer;
 }
 }  // namespace BurgersVariant::subcell
