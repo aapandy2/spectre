@@ -159,6 +159,31 @@ at the characteristic speed).
 
 \clearpage
 
+\section{Summary: Burgers' equation and the variant}
+
+The inviscid Burgers' equation takes the form
+\begin{equation} \label{eq:Burgers_PDE_summary}
+0 = \partial_t U + \partial_x \Big( \frac{1}{2} U^2 \Big).
+\end{equation}
+
+If we restrict ourselves to solutions where $U > 0$, one might expect that the
+variant
+\begin{equation} \label{eq:Burgers_Variant_PDE_summary}
+\begin{aligned}
+0 &= 2 U \Big[ \partial_t U + \partial_x \Big( \frac{1}{2} U^2 \Big) \Big] \\
+&= \partial_t (U^2) + \partial_x \Big( \frac{2}{3} U^3 \Big) \\
+&= \partial_t (V) + \partial_x \Big( \frac{2}{3} V^{3/2} \Big) \\
+\end{aligned}
+\end{equation}
+where $V \equiv U^2$, should have identical solutions to
+(\ref{eq:Burgers_PDE_summary}).
+
+It turns out that smooth solutions to (\ref{eq:Burgers_PDE_summary}-
+\ref{eq:Burgers_Variant_PDE_summary}) agree, but weak solutions (e.g. those
+with shocks) differ---one can show that shocks propagate faster for the variant.
+
+\clearpage
+
 \begin{thebibliography}{10}
 \bibitem{LeVeque92} LeVeque, R. J.,
     \textit{Numerical Methods for Conservation Laws} (1992)
