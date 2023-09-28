@@ -18,7 +18,7 @@ namespace BurgersVariant::AnalyticData {
 template <typename T>
 Scalar<T> Gaussian::v(const tnsr::I<T, 1>& x) const {
 //  return Scalar<T>{sin(get<0>(x))};
-  return Scalar<T>{1. + exp(-square(get<0>(x)))};
+  return Scalar<T>{square(1. + exp(-square(get<0>(x))))};
 }
 
 std::unique_ptr<evolution::initial_data::InitialData> Gaussian::get_clone()
