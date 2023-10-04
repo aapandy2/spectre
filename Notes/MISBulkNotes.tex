@@ -1,0 +1,88 @@
+%// Distributed under the MIT License.
+%// See LICENSE.txt for details.
+
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{braket}
+\usepackage{bm}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{listings}
+
+\allowdisplaybreaks
+\numberwithin{equation}{section}
+
+\interfootnotelinepenalty=10000
+
+\usepackage{calligra}
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=violet}
+
+\DeclareMathAlphabet{\mathcalligra}{T1}{calligra}{m}{n}
+\DeclareFontShape{T1}{calligra}{m}{n}{<->s*[2.2]callig15}{}
+\newcommand{\scriptr}{\mathcalligra{r}\,}
+\newcommand{\boldscriptr}{\pmb{\mathcalligra{r}}\,}
+
+\newcommand{\Lagr}{\mathcal{L}}
+\newcommand{\Hami}{\mathcal{H}}
+\newcommand{\reals}{\rm I\!R}
+\newcommand{\order}{\mathcal{O}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bp}{\mathbf{p}}
+\newcommand{\bq}{\mathbf{q}}
+\newcommand{\redtext}[1]{\textcolor{red}{#1}}
+\newcommand{\pvec}[1]{\vec{#1}\mkern2mu\vphantom{#1}}
+\newcommand{\mA}{\mathcal{A}}
+
+%\setcounter{section}{-1}
+
+\begin{document}
+\title{Implementing the MIS-bulk system in {\tt SpECTRE}}
+\author{Alex Pandya}
+\date{\today}
+\maketitle
+%\tableofcontents
+%\clearpage
+
+\section{Warm-up: GRMHD}
+
+To get used to the form of the equations solved in SpECTRE, we'll work out the
+ equations of GRMHD following \cite{Deppe22}.
+They start with the metric in $(3+1)$ form,
+\begin{equation}
+ds^2 = - \alpha^2 dt^2 + \gamma_{ij} (dx^i + \beta^i dt) (dx^j + \beta^j dt)
+\end{equation}
+where $\alpha$ is the lapse, $\beta^{i}$ is the shift vector, and $\gamma_{ij}$
+ is the spatial metric, and they use the convention where the indices $i,j,k$
+ are spatial and $a,b,c$ are spacetime.
+
+The equations of motion for GRMHD are
+\begin{align}
+0 &= \nabla_{a} J^{a}    \\
+0 &= \nabla_{a} T^{ab}   \\
+0 &= \nabla_{a} ^*F^{ab},
+\end{align}
+where the conserved currents are
+\begin{align}
+J^{a} &\equiv n u^a \\
+T^{ab} &\equiv (\rho h)^* u^a u^b + p^* g^{ab} - b^a b^b \\
+^*F^{ab} &\equiv 
+\end{align}
+\textbf{get Faraday tensor from \cite{BaumgarteShapiro} pg 149}
+
+
+
+
+\clearpage
+
+\begin{thebibliography}{10}
+\bibitem{Deppe22} Deppe, N., et al. \url{https://arxiv.org/abs/2109.12033}
+\bibitem{BaumgarteShapiro} Baumgarte, T. \& Shapiro, S.
+\end{thebibliography}
+
+\end{document}
