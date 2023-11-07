@@ -75,6 +75,160 @@ The conservation laws are then
 0 &= \nabla_{a} J^{a}.
 \end{align}
 
+It will be useful to exchange these covariant derivatives for partial derivatives; doing so yields
+\begin{align}
+\partial_a \big[ \sqrt{|g|} T^{a}_{~b} \big] &= \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{b} g_{ac} \\
+\partial_a \big[ \sqrt{|g|} J^{a} \big] &= 0.
+\end{align}
+
+\subsection{Valencia formulation}
+
+In this section we will derive the equations used in {\tt SpECTRE}, namely the Valencia formulation of PF hydro, following Chapter 7 of \cite{RezzollaZanotti}.
+
+We aim to write the equations of motion in conservation-law form, i.e. as
+\begin{equation}
+\partial_t [\sqrt{\gamma} \bm{U}] + \partial_i [\sqrt{\gamma} \bm{F}^{i}] = \bm{S}.
+\end{equation}
+
+We will later write everything in terms of the Eulerian spatial four-velocity $v^a$ rather than the typical four-velocity $u^a$; the two are related via
+\begin{equation}
+u^a = W (n^a + v^a),
+\end{equation}
+which implies the identities
+\begin{equation}
+\begin{aligned}
+u^t &= W/\alpha \\
+u_t &= W (-\alpha + \beta_i v^i) \\
+v^t &= 0 \\
+v_t &= \beta_i v^i \\
+v^i &= \frac{1}{\alpha} \Big( \frac{u^i}{u^t} + \beta^i \Big) \\
+v_i &= \frac{u_i}{W} \\
+u^i &= W (v^i - \beta^i/\alpha).
+\end{aligned}
+\end{equation}
+
+\subsubsection{Baryon current conservation law}
+
+The easiest place to start is with the baryon current conservation law, which is
+\begin{equation}
+\begin{aligned}
+0 &= \partial_a \big[ \sqrt{|g|} J^{a} \big] \\
+&= \partial_a \big[ \alpha \sqrt{\gamma} \rho u^a \big] \\
+0 &= \partial_t (\sqrt{\gamma} D) + \partial_i \big[ \sqrt{\gamma} D (\alpha v^i - \beta^i) \big] \\
+\end{aligned}
+\end{equation}
+where we have defined the conserved baryon density
+\begin{equation}
+D \equiv \rho W.
+\end{equation}
+
+\subsubsection{Momentum conservation law}
+
+Rezzolla and Zanotti \cite{RezzollaZanotti} first decompose the stress-energy tensor with respect to the normal vector $n^a$ to get
+\begin{equation}
+\begin{aligned}
+T^{ab} &= E n^a n^b + S^a n^b + S^b n^a + S^{ab} \\
+&= (e+p) u^a u^b + p g^{ab} \\
+&= (e+p) W (n^a + v^a) W (n^b + v^b) + p (\gamma^{ab} - n^a n^b) \\
+&= (\rho h W^2 - p) n^a n^b + \rho h W^2 n^a v^b + \rho h W^2 v^a n^b + [\rho h W^2 v^a v^b + p \gamma^{ab}] \\
+\end{aligned}
+\end{equation}
+which implies the components are
+\begin{equation}
+\begin{aligned}
+E &= \rho h W^2 - p \\
+S^{a} &= \rho h W^2 v^a \\
+S^{ab} &= \rho h W^2 v^a v^b + p \gamma^{ab},
+\end{aligned}
+\end{equation}
+where
+\begin{equation}
+\rho h = e + p
+\end{equation}
+defines the specific enthalpy $h$.
+
+We now write the momentum conservation equation as \textbf{TODO: finish this; see \cite{RezzollaZanotti} eq 7.227}
+\begin{equation}
+\begin{aligned}
+0 &= \partial_a \big[ \sqrt{|g|} T^{a}_{~b} \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{b} g_{ac} \\
+&= \partial_t \big[ \sqrt{|g|} T^{t}_{~j} \big] + \partial_i \big[ \sqrt{|g|} T^{i}_{~j} \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
+&= \partial_t \big[ \sqrt{\gamma} S_j \big] + \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
+\end{aligned}
+\end{equation}
+
+\clearpage
+
+We will now work out the components explicitly.
+Starting with the baryon current, we have
+\begin{equation}
+\begin{aligned}
+0 &= \partial_a \big[ \sqrt{|g|} J^{a} \big] \\
+&= \partial_a \big[ \alpha \sqrt{\gamma} n u^a \big] \\
+0 &= \partial_t \tilde{D} + \partial_i \big[ \tilde{D} v^i \big] \\
+\end{aligned}
+\end{equation}
+where we have defined
+\begin{equation}
+\begin{aligned}
+\tilde{D} &\equiv \sqrt{\gamma} \rho W \\
+v^{i} &\equiv \frac{u^i}{u^t}.
+\end{aligned}
+\end{equation}
+
+\subsection{Valencia formulation}
+
+{\tt SpECTRE} solves the relativistic Euler equations in the so-called \textit{Valencia formulation}.
+Here we will derive the equations following \cite{RezzollaZanotti}; we can transform our conservation laws (\ref{eq:Baumgarte_cons_comps}) into the Valencia formulation by comparing the conserved variables.
+
+In particular, we have
+\begin{equation}
+\begin{aligned}
+\tilde{D} &= \sqrt{\gamma} \rho W \\
+\tilde{S}_j &= \sqrt{\gamma} \alpha T^{t}_{~j} \\
+&= \sqrt{\gamma} \alpha (e + p) u^t u_j \\
+&= \sqrt{\gamma} \alpha (e + p) u^t u_j \\
+\end{aligned}
+\end{equation}
+
+
+\clearpage
+
+\begin{thebibliography}{10}
+\bibitem{Deppe22} Deppe, N., et al. \url{https://arxiv.org/abs/2109.12033}
+\bibitem{BaumgarteShapiro} Baumgarte, T. \& Shapiro, S.
+\bibitem{RezzollaZanotti} Rezzolla, L. \& Zanotti, O.
+\end{thebibliography}
+
+\appendix
+
+\clearpage
+
+\section{Warm-up: perfect fluid hydrodynamics}
+
+The natural place to start is with perfect fluid hydrodynamics.
+
+We will start with the metric in $(3+1)$ form,
+\begin{equation}
+ds^2 = - \alpha^2 dt^2 + \gamma_{ij} (dx^i + \beta^i dt) (dx^j + \beta^j dt)
+\end{equation}
+where $\alpha$ is the lapse, $\beta^{i}$ is the shift vector, and $\gamma_{ij}$
+is the spatial metric, and they use the convention where the indices $i,j,k$
+are spatial and $a,b,c$ are spacetime.
+The conserved currents are
+\begin{align}
+T^{ab} &= e u^a u^b + p \Delta^{ab} \\
+J^{a} &= \rho u^a
+\end{align}
+where we have used $\rho = m n$, placing the $m$ back explicitly, and
+\begin{equation}
+\Delta \equiv u^a u^b + g^{ab}.
+\end{equation}
+The conservation laws are then
+\begin{align}
+0 &= \nabla_{a} T^{ab} \\
+0 &= \nabla_{a} J^{a}.
+\end{align}
+
 \subsection{EOM in conservation-law form}
 
 We now wish to write the equations of motion (EOM) in conservation-law form.
@@ -176,34 +330,6 @@ S =
 \end{pmatrix},
 \end{equation}
 which agrees with \cite{BaumgarteShapiro}.
-
-\subsection{Valencia formulation}
-
-{\tt SpECTRE} solves the relativistic Euler equations in the so-called \textit{Valencia formulation}.
-Here we will derive the equations following \cite{RezzollaZanotti}; we can transform our conservation laws (\ref{eq:Baumgarte_cons_comps}) into the Valencia formulation by comparing the conserved variables.
-
-In particular, we have
-\begin{equation}
-\begin{aligned}
-\tilde{D} &= \sqrt{\gamma} \rho W \\
-\tilde{S}_j &= \sqrt{\gamma} \alpha T^{t}_{~j} \\
-&= \sqrt{\gamma} \alpha (e + p) u^t u_j \\
-&= \sqrt{\gamma} \alpha (e + p) u^t u_j \\
-\end{aligned}
-\end{equation}
-
-
-\clearpage
-
-\begin{thebibliography}{10}
-\bibitem{Deppe22} Deppe, N., et al. \url{https://arxiv.org/abs/2109.12033}
-\bibitem{BaumgarteShapiro} Baumgarte, T. \& Shapiro, S.
-\bibitem{RezzollaZanotti} Rezzolla, L. \& Zanotti, O.
-\end{thebibliography}
-
-\appendix
-
-\clearpage
 
 \section{Warm-up: GRMHD}
 
