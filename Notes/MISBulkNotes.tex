@@ -49,6 +49,162 @@
 %\tableofcontents
 %\clearpage
 
+\section{Warm-up: perfect fluid hydrodynamics}
+
+The natural place to start is with perfect fluid hydrodynamics.
+
+We will start with the metric in $(3+1)$ form,
+\begin{equation}
+ds^2 = - \alpha^2 dt^2 + \gamma_{ij} (dx^i + \beta^i dt) (dx^j + \beta^j dt)
+\end{equation}
+where $\alpha$ is the lapse, $\beta^{i}$ is the shift vector, and $\gamma_{ij}$
+is the spatial metric, and they use the convention where the indices $i,j,k$
+are spatial and $a,b,c$ are spacetime.
+The conserved currents are
+\begin{align}
+T^{ab} &= e u^a u^b + p \Delta^{ab} \\
+J^{a} &= \rho u^a
+\end{align}
+where we have used $\rho = m n$, placing the $m$ back explicitly, and
+\begin{equation}
+\Delta \equiv u^a u^b + g^{ab}.
+\end{equation}
+The conservation laws are then
+\begin{align}
+0 &= \nabla_{a} T^{ab} \\
+0 &= \nabla_{a} J^{a}.
+\end{align}
+
+\subsection{EOM in conservation-law form}
+
+We now wish to write the equations of motion (EOM) in conservation-law form.
+Following \cite{BaumgarteShapiro}, we will cast everything into the form of the conservation law
+\begin{equation}
+\partial_t U + \partial_i F^{i} = S.
+\end{equation}
+
+Let's begin by rewriting the conservation laws with only partial derivatives via
+\begin{align}
+\partial_a \big[ \sqrt{|g|} T^{ab} \big] &= -\sqrt{|g|} \Gamma^{b}_{a \lambda} T^{a \lambda} \\
+\partial_a \big[ \sqrt{|g|} J^{a} \big] &= 0.
+\end{align}
+
+We will now work out the components explicitly.
+Starting with the baryon current, we have
+\begin{equation}
+\begin{aligned}
+0 &= \partial_a \big[ \sqrt{|g|} J^{a} \big] \\
+&= \partial_a \big[ \alpha \sqrt{\gamma} n u^a \big] \\
+0 &= \partial_t \tilde{D} + \partial_i \big[ \tilde{D} v^i \big] \\
+\end{aligned}
+\end{equation}
+where we have defined
+\begin{equation}
+\begin{aligned}
+\tilde{D} &\equiv \sqrt{\gamma} \rho W \\
+v^{i} &\equiv \frac{u^i}{u^t}.
+\end{aligned}
+\end{equation}
+
+Moving on to the stress-energy conservation equation, we will begin with the energy equation with the second index lowered
+\begin{equation}
+\begin{aligned}
+0 &= \nabla_{a} T^{a}_{~b} \\
+&= \partial_a T^{a}_{~b} + \Gamma^{a}_{a \lambda} T^{\lambda}_{~b} - \Gamma^{\lambda}_{ab} T^{a}_{~\lambda} \\
+&= \sqrt{|g|} \partial_a T^{a}_{~b} + T^{a}_{~b} \partial_{a} \sqrt{|g|} - \sqrt{|g|} \Gamma^{\lambda}_{ab} T^{a}_{~\lambda} \\
+&= \partial_a \Big( \sqrt{|g|} T^{a}_{~b} \Big) - \sqrt{|g|} \Gamma^{\lambda}_{ab} T^{a}_{~\lambda} \\
+&= \partial_t \Big( \sqrt{|g|} T^{t}_{~j} \Big) + \partial_i \Big( \sqrt{|g|} T^{i}_{~j} \Big) - \sqrt{|g|} \Gamma^{\lambda}_{ab} T^{a}_{~\lambda} \\
+&= \partial_t \Big( \sqrt{|g|} T^{t}_{~j} \Big) + \partial_i \Big( \sqrt{|g|} T^{i}_{~j} \Big) - \sqrt{|g|} \Gamma^{\lambda}_{ab} g_{c \lambda} T^{a c} \\
+&= \partial_t \Big( \sqrt{|g|} T^{t}_{~j} \Big) + \partial_i \Big( \sqrt{|g|} T^{i}_{~j} \Big) - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
+&= \partial_t \tilde{S}_j + \partial_i \Big( \alpha \sqrt{\gamma} T^{i}_{~j} \Big) - \frac{1}{2} \alpha \sqrt{\gamma} T^{ac} \partial_{j} g_{ac} \\
+\end{aligned}
+\end{equation}
+where we have used the identity
+\begin{equation}
+\begin{aligned}
+0 &= \nabla_{d} g_{ef} \\
+&= \partial_{d} g_{ef} - \Gamma^{\lambda}_{df} g_{e \lambda} - \Gamma^{\lambda}_{ef} g_{d \lambda} \\
+%\implies &= \frac{1}{2} \sqrt{|g|} \Big[ - \Gamma^{\lambda}_{df} g_{e \lambda} T^{d e} - \Gamma^{\lambda}_{ef} g_{d \lambda} T^{e d} \Big]
+\end{aligned}
+\end{equation}
+where the second two terms become the same when contracted with $T^{ac}$ as above, and we have defined
+\begin{equation}
+\tilde{S}_j \equiv \alpha \sqrt{\gamma} T^{t}_{~j}.
+\end{equation}
+
+The third equation comes in two parts.
+The first step involves computing the normal projection of the stress-energy conservation law:
+\begin{equation}
+\begin{aligned}
+0 &= n_b \partial_a \big[ \sqrt{|g|} T^{ab} \big] + n_b \sqrt{|g|} \Gamma^{b}_{a \lambda} T^{a \lambda} \\
+&= n_t \partial_a \big[ \sqrt{|g|} T^{at} \big] + n_t \sqrt{|g|} \Gamma^{t}_{a \lambda} T^{a \lambda} + n_j \partial_a \big[ \sqrt{|g|} T^{aj} \big] + n_j \sqrt{|g|} \Gamma^{j}_{a \lambda} T^{a \lambda} \\
+&= \partial_a \big[ \alpha \sqrt{|g|} T^{at} \big] + \alpha \sqrt{|g|} \Gamma^{t}_{a \lambda} T^{a \lambda} - \sqrt{|g|} T^{at} \partial_a \alpha \\
+&= \partial_t \big[ \alpha^2 \sqrt{\gamma} T^{tt} \big] + \partial_i \big[ \alpha^2 \sqrt{\gamma} T^{it} \big] + \alpha \sqrt{|g|} \Gamma^{t}_{a \lambda} T^{a \lambda} - \sqrt{|g|} T^{at} \partial_a \alpha \\
+\end{aligned}
+\end{equation}
+and then we subtract off a copy of the baryon current conservation law
+\begin{equation}
+\begin{aligned}
+0 &= \partial_t \tilde{\tau} + \partial_i \big[ \alpha^2 \sqrt{\gamma} T^{it} - \tilde{D} v^i \big] + \alpha \sqrt{|g|} \Gamma^{t}_{a \lambda} T^{a \lambda} - \sqrt{|g|} T^{at} \partial_a \alpha \\
+&= \partial_t \tilde{\tau} + \partial_i \big[ \alpha^2 \sqrt{\gamma} T^{it} - \tilde{D} v^i \big] - \alpha \sqrt{\gamma} (T^{at} \partial_a \alpha - \alpha \Gamma^{t}_{a \lambda} T^{a \lambda}) \\
+\end{aligned}
+\end{equation}
+and we have defined
+\begin{equation}
+\tilde{\tau} \equiv \alpha^2 \sqrt{\gamma} T^{tt} - \tilde{D}.
+\end{equation}
+
+Altogether the conservation law can be written in component form as
+\begin{equation} \label{eq:Baumgarte_cons_comps}
+U =
+\begin{pmatrix}
+\tilde{D} \\
+\tilde{S}_j \\
+\tilde{\tau}
+\end{pmatrix},~~~
+F^{i} =
+\begin{pmatrix}
+\tilde{D} v^i \\
+\alpha \sqrt{\gamma} T^{i}_{~j} \\
+\alpha^2 \sqrt{\gamma} T^{it} - \tilde{D} v^i
+\end{pmatrix},~~~
+S =
+\begin{pmatrix}
+0 \\
+\frac{1}{2} \alpha \sqrt{\gamma} T^{ac} \partial_{j} g_{ac} \\
+\alpha \sqrt{\gamma} (T^{at} \partial_a \alpha - \alpha \Gamma^{t}_{a \lambda} T^{a \lambda})
+\end{pmatrix},
+\end{equation}
+which agrees with \cite{BaumgarteShapiro}.
+
+\subsection{Valencia formulation}
+
+{\tt SpECTRE} solves the relativistic Euler equations in the so-called \textit{Valencia formulation}.
+Here we will derive the equations following \cite{RezzollaZanotti}; we can transform our conservation laws (\ref{eq:Baumgarte_cons_comps}) into the Valencia formulation by comparing the conserved variables.
+
+In particular, we have
+\begin{equation}
+\begin{aligned}
+\tilde{D} &= \sqrt{\gamma} \rho W \\
+\tilde{S}_j &= \sqrt{\gamma} \alpha T^{t}_{~j} \\
+&= \sqrt{\gamma} \alpha (e + p) u^t u_j \\
+&= \sqrt{\gamma} \alpha (e + p) u^t u_j \\
+\end{aligned}
+\end{equation}
+
+
+\clearpage
+
+\begin{thebibliography}{10}
+\bibitem{Deppe22} Deppe, N., et al. \url{https://arxiv.org/abs/2109.12033}
+\bibitem{BaumgarteShapiro} Baumgarte, T. \& Shapiro, S.
+\bibitem{RezzollaZanotti} Rezzolla, L. \& Zanotti, O.
+\end{thebibliography}
+
+\appendix
+
+\clearpage
+
 \section{Warm-up: GRMHD}
 
 To get used to the form of the equations solved in SpECTRE, we'll work out the
@@ -61,28 +217,137 @@ where $\alpha$ is the lapse, $\beta^{i}$ is the shift vector, and $\gamma_{ij}$
  is the spatial metric, and they use the convention where the indices $i,j,k$
  are spatial and $a,b,c$ are spacetime.
 
-The equations of motion for GRMHD are
+\subsection{Basics of MHD}
+
+In general, the Faraday tensor can be written
+\begin{equation}
+F^{ab} = n^a E^b - n^b E^a + n_d \epsilon^{dabc} B_c,
+\end{equation}
+where $E^a, B^a$ are four-vectors containing the components of the electric and magnetic fields (respectively) as seen by a normal observer $n^a$.
+Both of these vectors are purely spatial, so
+\begin{equation}
+E^a n_a = B^a n_a = 0,
+\end{equation}
+and one finds that they can be recovered from $F^{ab}$ via
+\begin{equation}
+\begin{aligned}
+n_b F^{ab} &= n_b (n^a E^b - n^b E^a + n_d \epsilon^{dabc} B_c) \\
+&= 0 - (-1) E^a + n_b n_d \epsilon^{dabc} B_c \\
+&= E^{a}
+\end{aligned}
+\end{equation}
+where we have used the fact that $n_a$ is timelike, $E^{a}$ is purely spatial, and that $n_b n_d$ is a symmetric $2$-tensor contracted with the totally antisymmetric tensor $\epsilon^{dabc}$ so the contraction yields zero.
+Similarly, 
+\begin{equation}
+\begin{aligned}
+\frac{1}{2} \epsilon^{abcd} n_b F_{dc} &= \frac{1}{2} \epsilon^{abcd} n_b (n_d E_c - n_c E_d + n^e \epsilon_{edcf} B^f) \\
+&= \frac{1}{2} \epsilon^{abcd} n_b n^e \epsilon_{edcf} B^f \\
+&= B^a \\
+\end{aligned}
+\end{equation}
+where we have used the identity $\epsilon_{abcd} \epsilon^{abkl} = 2 (\delta^{k}_{c} \delta^{l}_{d} - \delta^{l}_{c} \delta^{k}_{d})$ and the fact that $B^a$ is purely spatial to obtain the final line.
+
+The EM stress-energy tensor is written
+\begin{equation}
+T^{ab}_{EM} = \frac{1}{\mu_0} \Big[ F^{a c} F^{b}_{~c} - \frac{1}{4} g^{ab} F_{cd} F^{cd} \Big],
+\end{equation}
+where \cite{BaumgarteShapiro,Deppe22} use the Gaussian-CGS unit convention where $\mu_0 = 4 \pi$.
+
+\subsection{Ideal MHD}
+
+We will now specialize to \textit{ideal MHD}, by which we mean that the fluid has perfect electrical conductivity.
+This statement means that if a net charge is ever sourced, fluid should move such that the charge gets screened instantaneously---in other words, we should find that in the rest frame of the fluid, the electric field vanishes, i.e. 
+\begin{equation}
+\begin{aligned}
+0 &= u_a E^{a} \\
+0 &= u_a (n_b F^{ab}) \\
+\implies 0 &= u_{a} F^{ab}, ~~~~~~~~\textnormal{(ideal MHD assumption)}
+\end{aligned}
+\end{equation}
+because $n_b$ is non-vanishing.
+
+%For a co-moving observer $n_a = u_a$ and the electric field vanishes, so we can write $F^{ab}$ in a particularly simple form:
+%\begin{equation}
+%F^{ab} = u_d \epsilon^{abcd} B_{c}^{(u)}. 
+%\end{equation}
+The fact that the ideal MHD assumption specifies the electric field in the rest frame of the fluid flow implies that we now have two different reference frames to keep track of, namely the coordinate frame defined with respect to $n^a$ and the flow frame defined with respect to $u^a$.
+We'll need the relationship between the $E, B$ fields between the two frames, which is given by \cite{BaumgarteShapiro} to be
+\begin{align}
+E^{a} &= -\epsilon^{abc} u_b B^{(u)}_{c} \\
+B^{a} &= -n_b u^b B^{a}_{(u)} + n_b B^{b}_{(u)} u^a,
+\end{align}
+where the subscript $(u)$ appears on quantities in the fluid rest frame, and we have defined the purely spatial Levi-Civita tensor via
+\begin{equation}
+\epsilon^{abc} = n_d \epsilon^{dabc}.
+\end{equation}
+
+We now introduce the dual to the Faraday tensor,
+\begin{equation}
+F^{*ab} = \frac{1}{2} \epsilon^{abcd} F_{cd},
+\end{equation}
+which implies that in the flow frame
+\begin{equation} \label{eq:Fstar_Bflow}
+\begin{aligned}
+F^{*ab} &= \frac{1}{2} \epsilon^{abcd} (n_c E_d - n_d E_c + n^e \epsilon_{ecdf} B^f) \\
+&= \frac{1}{2} \epsilon^{abcd} \Big( n_c [-\epsilon_{def} u^e B_{(u)}^{f}] - n_d [-\epsilon_{cef} u^e B_{(u)}^{f}] + n^e \epsilon_{ecdf} [-n_g u^g B^{f}_{(u)} + n_g B^{g}_{(u)} u^f] \Big) \\
+&= n_g \Big[ u^g (+ n^a B^{b}_{(u)} - n^b B^{a}_{(u)}) + B^{g}_{(u)} (n^b u^a - n^a u^b) \Big] \\
+&= u^b B^{a}_{(u)} - u^a B^{b}_{(u)}, \\
+\end{aligned}
+\end{equation}
+where we have used the fact that $n_a = u_a$ in the flow frame to arrive at the final line.
+
+The Maxwell equations of motion are
+\begin{equation}
+\nabla_{a} F^{ab} = 0
+\end{equation}
+which implies
+\begin{equation} \label{eq:maxwell_eq}
+\nabla_{a} F^{*ab} = 0
+\end{equation}
+and we can substitute (\ref{eq:Fstar_Bflow}) into (\ref{eq:maxwell_eq}) to find
+\begin{equation} \label{eq:maxwell_eq_Bu}
+\begin{aligned}
+0 &= \nabla_{a} F^{*ab} \\
+&= \nabla_{a} (u^b B^{a}_{(u)} - u^a B^{b}_{(u)}) \\
+&= \frac{1}{\sqrt{|g|}} \partial_{a} (\sqrt{|g|} [u^b B^{a}_{(u)} - u^a B^{b}_{(u)}]) \\
+&= \partial_{a} \Big( W \sqrt{\gamma} [v^b B^{a}_{(u)} - v^a B^{b}_{(u)}] \Big) \\
+\end{aligned}
+\end{equation}
+where we have used the identity $\sqrt{|g|} = \alpha \sqrt{\gamma}$, where $\gamma$ is the determinant of the spatial metric, and $\nabla_{a} X^{ab} = |g|^{-1/2} \partial_a (\sqrt{|g|} X^{ab})$, which only holds true if $X^{ab}$ is antisymmetric as is the case here, and defined
+\begin{equation}
+v^a \equiv \frac{u^a}{u^t}.
+\end{equation}
+
+The equation (\ref{eq:maxwell_eq_Bu}) is more commonly written
+\begin{equation}
+0 = \partial_{a} \Big( W \sqrt{\gamma} [v^b b^{a} - v^a b^{b}] \Big)
+\end{equation}
+where we have defined
+\begin{equation} \label{eq:ba}
+b^{a} \equiv \frac{B^{a}_{(u)}}{\sqrt{4 \pi}}.
+\end{equation}
+Notice that $b^a$ obeys the orthogonality relation $u_a b^a = 0$.
+
+\subsection{EOM in covariant form}
+
+The equations of motion for ideal (infinite conductivity) GRMHD are
 \begin{align}
 0 &= \nabla_{a} J^{a}    \\
 0 &= \nabla_{a} T^{ab}   \\
-0 &= \nabla_{a} ^*F^{ab},
+0 &= \nabla_{a} F^{*ab},
 \end{align}
 where the conserved currents are
 \begin{align}
-J^{a} &\equiv n u^a \\
-T^{ab} &\equiv (\rho h)^* u^a u^b + p^* g^{ab} - b^a b^b \\
-^*F^{ab} &\equiv 
+J^{a} &= n u^a \\
+T^{ab} &= \Big( e + \frac{1}{2} b_c b^c \Big) u^a u^b + \Big( p + \frac{1}{2} b_c b^c \Big) \Delta^{ab} - b^a b^b  \\
+F^{*ab} &= \sqrt{4 \pi} [u^b b^{a} - u^a b^{b}]
 \end{align}
-\textbf{get Faraday tensor from \cite{BaumgarteShapiro} pg 149}
+where
+\begin{equation}
+\Delta^{ab} = u^a u^b + g^{ab}
+\end{equation}
+and $e$ is the energy density, $p$ is the pressure of the fluid.
 
-
-
-
-\clearpage
-
-\begin{thebibliography}{10}
-\bibitem{Deppe22} Deppe, N., et al. \url{https://arxiv.org/abs/2109.12033}
-\bibitem{BaumgarteShapiro} Baumgarte, T. \& Shapiro, S.
-\end{thebibliography}
+\subsection{EOM in flux-conservative form}
 
 \end{document}
