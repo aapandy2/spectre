@@ -86,7 +86,7 @@ It will be useful to exchange these covariant derivatives for partial derivative
 In this section we will derive the equations used in {\tt SpECTRE}, namely the Valencia formulation of PF hydro, following Chapter 7 of \cite{RezzollaZanotti}.
 
 We aim to write the equations of motion in conservation-law form, i.e. as
-\begin{equation}
+\begin{equation} \label{eq:RZ_cons_law}
 \partial_t [\sqrt{\gamma} \bm{U}] + \partial_i [\sqrt{\gamma} \bm{F}^{i}] = \bm{S}.
 \end{equation}
 
@@ -147,7 +147,7 @@ where
 \end{equation}
 defines the specific enthalpy $h$.
 
-We now write the momentum conservation equation as \textbf{TODO: finish this; see \cite{RezzollaZanotti} eq 7.227}
+We now write the momentum conservation equation as
 \begin{equation}
 \begin{aligned}
 0 &= \partial_a \big[ \sqrt{|g|} T^{a}_{~b} \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{b} g_{ac} \\
@@ -155,6 +155,66 @@ We now write the momentum conservation equation as \textbf{TODO: finish this; se
 &= \partial_t \big[ \sqrt{\gamma} S_j \big] + \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
 \end{aligned}
 \end{equation}
+which is in the form we want, but the source term needs to be expanded a bit.
+It is (note that I've renamed an index):
+\begin{equation}
+\begin{aligned}
+(\textnormal{source}) &= \frac{1}{2} \sqrt{|g|} T^{ab} \partial_{j} g_{ab} \\
+&= \sqrt{|g|} (\frac{1}{2} S^{ik} \partial_{j} \gamma_{ik} + S^a n^b \partial_{j} g_{ab} + \frac{1}{2} E n^a n^b \partial_{j} g_{ab}) \\
+&= \sqrt{|g|} (\frac{1}{2} S^{ik} \partial_{j} \gamma_{ik} + \frac{1}{\alpha} S_i \partial_{j} \beta^i + \frac{1}{2} E n^a n^b \partial_{j} g_{ab}) \\
+\end{aligned}
+\end{equation}
+where the third line was obtained by doing a computation involving Christoffel symbols, which I haven't done myself (\textbf{TODO: compute it}); see \cite{RezzollaZanotti} equation 7.227.
+
+\subsubsection{Energy conservation equation}
+
+We can now compute the energy conservation equation, which comes from the stress-energy conservation law contracted with the normal vector:
+\begin{equation}
+\begin{aligned}
+0 &= \nabla_a T^{ab} \\
+&= \nabla_a (T^{ab} n_b) - T^{ab} \nabla_a n_b \\
+&= \nabla_a (E n^a + S^a) + T^{ab} \nabla_a n_b \\
+&= \partial_a (\sqrt{|g|} n^a E) + \partial_a (\sqrt{|g|} S^a) + \sqrt{|g|} T^{ab} \nabla_a n_b \\
+&= \partial_t (\sqrt{\gamma} E) + \partial_i (\sqrt{\gamma} [\alpha S^i - \beta^i E]) + \sqrt{|g|} T^{ab} \nabla_a n_b \\
+\end{aligned}
+\end{equation}
+the source term can be rewritten as (\cite{RezzollaZanotti} equation 7.229) (\textbf{TODO: compute this})
+\begin{equation}
+-\sqrt{|g|} T^{ab} \nabla_{a} n_b = \sqrt{|g|} (K_{ij} S^{ij} - S^{i} \partial_{i} \ln \alpha),
+\end{equation}
+where $K_{ij}$ is the extrinsic curvature.
+
+\section{Equations of motion in conservation-law form}
+
+Summarizing the results above (and subtracting a copy of the baryon current conservation law from the energy equation to improve numerical accuracy) we find that the conservation law (\ref{eq:RZ_cons_law}) has components
+\begin{equation}
+\begin{aligned}
+\bm{U} =
+\begin{pmatrix}
+D \\
+S_j \\
+\tau
+\end{pmatrix},~~~
+\bm{F}^i =
+\begin{pmatrix}
+\alpha v^i D - \beta^i D \\
+\alpha S^{i}_{~j} - \beta^i S_j \\
+\alpha (S^i - D v^i) - \beta^i \tau
+\end{pmatrix},~~~
+\bm{S} =
+\begin{pmatrix}
+0 \\
+\frac{1}{2} \alpha S^{ik} \partial_j \gamma_{ik} + S_i \partial_j \beta^i - E \partial_j \alpha \\
+\alpha S^{ij} K_{ij} - S^j \partial_j \alpha
+\end{pmatrix}
+\end{aligned}
+\end{equation}
+where
+\begin{align}
+D &\equiv \rho W \\
+S_j &\equiv \rho h W^2 v_j \\
+\tau &\equiv E - D = \rho h W^2 - p - D.
+\end{align}
 
 \clearpage
 
