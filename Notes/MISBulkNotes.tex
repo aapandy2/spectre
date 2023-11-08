@@ -81,7 +81,7 @@ It will be useful to exchange these covariant derivatives for partial derivative
 \partial_a \big[ \sqrt{|g|} J^{a} \big] &= 0.
 \end{align}
 
-\subsection{Valencia formulation}
+\subsection{Valencia formulation conservation laws}
 
 In this section we will derive the equations used in {\tt SpECTRE}, namely the Valencia formulation of PF hydro, following Chapter 7 of \cite{RezzollaZanotti}.
 
@@ -184,7 +184,7 @@ the source term can be rewritten as (\cite{RezzollaZanotti} equation 7.229) (\te
 \end{equation}
 where $K_{ij}$ is the extrinsic curvature.
 
-\section{Equations of motion in conservation-law form}
+\subsection{Summary}
 
 Summarizing the results above (and subtracting a copy of the baryon current conservation law from the energy equation to improve numerical accuracy) we find that the conservation law (\ref{eq:RZ_cons_law}) has components
 \begin{equation}
@@ -216,40 +216,43 @@ S_j &\equiv \rho h W^2 v_j \\
 \tau &\equiv E - D = \rho h W^2 - p - D.
 \end{align}
 
-\clearpage
+\section{MIS-bulk}
 
-We will now work out the components explicitly.
-Starting with the baryon current, we have
-\begin{equation}
-\begin{aligned}
-0 &= \partial_a \big[ \sqrt{|g|} J^{a} \big] \\
-&= \partial_a \big[ \alpha \sqrt{\gamma} n u^a \big] \\
-0 &= \partial_t \tilde{D} + \partial_i \big[ \tilde{D} v^i \big] \\
-\end{aligned}
+The MIS-bulk equations \cite{Bemfica19} are very similar to the relativistic Euler equations.
+In particular, the conserved currents are
+\begin{align}
+T^{ab} &= e u^a u^b + (p + \Pi) \Delta^{ab} \\
+J^{a} &= \rho u^a
+\end{align}
+and the equations of motion are
+\begin{align}
+0 &= \nabla_{a} T^{ab} \\
+0 &= \nabla_{a} J^{a} \\
+0 &= \tau_{\Pi} u^a \nabla_a \Pi + \Pi + \lambda \Pi^2 + \zeta \nabla_a u^a, \label{eq:bulk_eq}
+\end{align}
+where $\tau_{\Pi}, \zeta, \lambda$ are transport coefficients dependent on the state of the flow through $e, n$.
+
+Inspection of the equations above implies that the first two conservation laws are modified only trivially by the addition of bulk viscosity, in that $p \to p + \Pi$.
+Unfortunately we gain an additional evolution equation, (\ref{eq:bulk_eq}), which is not conservative.
+Even worse, it has a term proportional to the divergence of the flow velocity which will include time derivatives of $u^a$ if this equation is solved as written, complicating the solution scheme.
+
+\subsection{MIS-bulk as a FOSH system}
+
+\textbf{TODO: rederive everything in this section in Mathematica.}
+This should be done by coding up the EOM and solving for the components of $\nabla_a \Psi$, where $\Psi$ is defined below.
+
+Fortunately we can rewrite the MIS-bulk equations in a useful way.
+Specifically, they can be written as a first-order symmetric hyperbolic (FOSH) system, whereby they take the form
+\begin{equation} \label{eq:MIS_bulk_FOSH_form}
+0 = M^a(\Psi) \nabla_a \Psi + N(\Psi) \Psi
 \end{equation}
-where we have defined
+where $N^\mu$ are matrices, $N$ is a vector, and $\Psi = (\epsilon, u^b, n, \Pi)^T$ contains all of the state variables.
+Notice that in (\ref{eq:MIS_bulk_FOSH_form}) each equation only includes one covariant derivative term, so in particular the $\Pi$ equation will be:
 \begin{equation}
-\begin{aligned}
-\tilde{D} &\equiv \sqrt{\gamma} \rho W \\
-v^{i} &\equiv \frac{u^i}{u^t}.
-\end{aligned}
+0 = M^t(\Psi) \partial_t \Psi + M^i(\Psi) \partial_i \Psi + N(\Psi) \Psi
 \end{equation}
-
-\subsection{Valencia formulation}
-
-{\tt SpECTRE} solves the relativistic Euler equations in the so-called \textit{Valencia formulation}.
-Here we will derive the equations following \cite{RezzollaZanotti}; we can transform our conservation laws (\ref{eq:Baumgarte_cons_comps}) into the Valencia formulation by comparing the conserved variables.
-
-In particular, we have
-\begin{equation}
-\begin{aligned}
-\tilde{D} &= \sqrt{\gamma} \rho W \\
-\tilde{S}_j &= \sqrt{\gamma} \alpha T^{t}_{~j} \\
-&= \sqrt{\gamma} \alpha (e + p) u^t u_j \\
-&= \sqrt{\gamma} \alpha (e + p) u^t u_j \\
-\end{aligned}
-\end{equation}
-
+and will be free of time derivatives of the other variables.
+We should be able to use this equation combined with the conservation laws in the typical (Valencia) form to evolve the system.
 
 \clearpage
 
@@ -257,6 +260,7 @@ In particular, we have
 \bibitem{Deppe22} Deppe, N., et al. \url{https://arxiv.org/abs/2109.12033}
 \bibitem{BaumgarteShapiro} Baumgarte, T. \& Shapiro, S.
 \bibitem{RezzollaZanotti} Rezzolla, L. \& Zanotti, O.
+\bibitem{Bemfica19} Bemfica, F., Disconzi, M., \& Noronha, J. \url{https://arxiv.org/abs/1901.06701}
 \end{thebibliography}
 
 \appendix
