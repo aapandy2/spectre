@@ -324,7 +324,20 @@ We now want to write the system in first-order symmetric hyperbolic (FOSH) form,
 \mathcal{A}^{a} \partial_{a} \Phi + \mathcal{B}(\Phi) = F,
 \end{equation}
 where $\Phi = (e, u^i, \rho , \Pi)$ and $\mathcal{A}^a$ is matrix-valued for each value of the index $a$, and $\mathcal{B}, F$ are vectors.
-In order to accomplish this, we'll need to express all of the equations of motion in terms of partial derivatives instead of covariant derivatives, and we'll have to eliminate derivatives of $u^t$ because $\Phi$ contains only $u^i$.
+
+It is critical to note that the state vector contains only spatial components of the four-velocity, $u^i$, so we'll have to eliminate derivatives of the time component $\partial_a u^t$.
+We can do this using the condition that $u^a$ is timelike:
+\begin{equation}
+\begin{aligned}
+-1 &= g_{ab} u^a u^b \\
+-1 &= g_{tt} (u^t)^2 + g_{ti} u^t u^i + g_{jt} u^j u^t + g_{ij} u^i u^j \\
+-1 &= g_{tt} (u^t)^2 + 2 g_{ti} u^t u^i + g_{ij} u^i u^j \\
+\partial_{a} (-1) &= \partial_{a} \Big[ g_{tt} (u^t)^2 + 2 g_{ti} u^t u^i + g_{ij} u^i u^j \Big] \\
+0 &= \partial_{a} [g_{tt} (u^t)^2] + 2 \partial_{a} [g_{ti} u^t u^i] + \partial_{a} [g_{ij} u^i u^j] \\
+\end{aligned}
+\end{equation}
+
+\noindent\textbf{old stuff below}
 
 \begin{equation}
 \begin{aligned}
