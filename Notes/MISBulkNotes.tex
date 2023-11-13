@@ -279,15 +279,53 @@ in agreement with \cite{Bemfica19} equation 3.
 
 \subsection{MIS-bulk as a FOSH system}
 
+\subsubsection{Equations in covariant form}
+
+We will begin by writing the equations in the form
+\begin{equation}
+0 = \mathcal{M}^a \nabla_a \Psi + \mathcal{N} \Psi,
+\end{equation}
+where $\Psi = (e, u^b, \rho, \Pi)$ is the state vector.
+
+To write the equations in this form we will have to manipulate the EOM slightly; doing so yields
+\begin{equation}
+\begin{aligned}
+0 &= u^a \nabla_{a} e + [e + p + \Pi] \delta^{a}_{c} \nabla_{a} u^c \\
+0 &= \alpha_1 \Delta^{ac} \nabla_a e + (e + p + \Pi) u^a \nabla_{a} u^c + \alpha_2 \Delta^{ac} \nabla_a \rho + \Delta^{ac} \nabla_{a} \Pi \\
+0 &= \rho \delta^{a}_{c} \nabla_{a} u^c + u^a \nabla_{a} \rho \\
+0 &= \zeta \delta^{a}_{c} \nabla_a u^c + \tau_{\Pi} u^a \nabla_a \Pi + \Pi + \lambda \Pi^2 \\
+\end{aligned}
+\end{equation}
+and we can read off $\mathcal{M}^{a}, \mathcal{N}$:
+\begin{equation}
+\mathcal{M}^{a} =
+\begin{pmatrix}
+u^a & (e+p+\Pi) \delta^{a}_{c} & 0 & 0 \\
+\alpha_1 \Delta^{ac} & (e+p+\Pi) u^a & \alpha_2 \Delta^{ac} & \Delta^{ac} \\
+0 & \rho \delta^{a}_{c} & u^a & 0 \\
+0 & \zeta \delta^{a}_{c} & 0 & \tau_{\Pi} u^a \\
+\end{pmatrix},~~~
+\mathcal{N} =
+\begin{pmatrix}
+0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 + \lambda \Pi
+\end{pmatrix}
+\end{equation}
+which agrees with the appendix of \cite{Bemfica19}.
+
+%\clearpage
+
+\subsubsection{Equations in FOSH form}
+
 We now want to write the system in first-order symmetric hyperbolic (FOSH) form, i.e.
 \begin{equation}
 \mathcal{A}^{a} \partial_{a} \Phi + \mathcal{B}(\Phi) = F,
 \end{equation}
-where $\mathcal{A}^{a}$ is matrix-valued for each value of the index $a$, $\mathcal{B}, F$ are vectors, and $\Phi$ is a ``solution vector'' composed of the variables we're trying to evolve.
-In \cite{Bemfica19}, they claim that the MIS-bulk system can be written in FOSH form with $F = 0$.
+where $\Phi = (e, u^i, \rho , \Pi)$ and $\mathcal{A}^a$ is matrix-valued for each value of the index $a$, and $\mathcal{B}, F$ are vectors.
+In order to accomplish this, we'll need to express all of the equations of motion in terms of partial derivatives instead of covariant derivatives, and we'll have to eliminate derivatives of $u^t$ because $\Phi$ contains only $u^i$.
 
-Doing so requires us to write the equations of motion in terms of individual components.
-The baryon current equation is
 \begin{equation}
 \begin{aligned}
 0 &= \rho \nabla_{a} u^a + u^a \nabla_{a} \rho \\
@@ -316,10 +354,6 @@ The momentum equation is
 0 &= (e + p + \Pi) u^a \nabla_{a} u^c + \alpha_1 \Delta^{ac} \nabla_a e + \alpha_2 \Delta^{ac} \nabla_a \rho + \Delta^{ac} \nabla_{a} \Pi \\
 \end{aligned}
 \end{equation}
-
-\clearpage
-
-
 
 \clearpage
 
