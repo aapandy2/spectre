@@ -236,23 +236,64 @@ Inspection of the equations above implies that the first two conservation laws a
 Unfortunately we gain an additional evolution equation, (\ref{eq:bulk_eq}), which is not conservative.
 Even worse, it has a term proportional to the divergence of the flow velocity which will include time derivatives of $u^a$ if this equation is solved as written, complicating the solution scheme.
 
-\subsection{MIS-bulk as a FOSH system}
+\subsection{MIS-bulk EOM}
 
-\textbf{TODO: rederive everything in this section in Mathematica.}
-This should be done by coding up the EOM and solving for the components of $\nabla_a \Psi$, where $\Psi$ is defined below.
+The goal of this section is to derive the MIS-bulk EOM so that the evolution equation for $\Pi$ is free of time derivatives of $e, u^a$.
+We will do this by writing out the EOM as they appear in \cite{Bemfica19} equations 2-5.
 
-Fortunately we can rewrite the MIS-bulk equations in a useful way.
-Specifically, they can be written as a first-order symmetric hyperbolic (FOSH) system, whereby they take the form
-\begin{equation} \label{eq:MIS_bulk_FOSH_form}
-0 = M^a(\Psi) \nabla_a \Psi + N(\Psi) \Psi
-\end{equation}
-where $N^\mu$ are matrices, $N$ is a vector, and $\Psi = (\epsilon, u^b, n, \Pi)^T$ contains all of the state variables.
-Notice that in (\ref{eq:MIS_bulk_FOSH_form}) each equation only includes one covariant derivative term, so in particular the $\Pi$ equation will be:
+The easiest equation is their equation 5, the baryon current conservation law:
 \begin{equation}
-0 = M^t(\Psi) \partial_t \Psi + M^i(\Psi) \partial_i \Psi + N(\Psi) \Psi
+\begin{aligned}
+0 &= \nabla_{a} J^{a} \\
+&= \nabla_{a} (\rho u^a) \\
+&= \rho \nabla_{a} u^a + u^a \nabla_{a} \rho. \\
+\end{aligned}
 \end{equation}
-and will be free of time derivatives of the other variables.
-We should be able to use this equation combined with the conservation laws in the typical (Valencia) form to evolve the system.
+
+Next we will consider the projection of the stress-energy conservation law along $u_b$:
+\begin{equation}
+\begin{aligned}
+0 &= u_b \nabla_{a} T^{ab} \\
+&= u_b \nabla_{a} [e u^a u^b + (p + \Pi) \Delta^{ab}] \\
+&= u_b \nabla_{a} (e u^a u^b) + u_b \nabla_{a} [(p + \Pi) (g^{ab} + u^a u^b)] \\
+&= u^a \nabla_{a} e + [e + p + \Pi] \nabla_{a} u^a \\
+\end{aligned}
+\end{equation}
+in agreement with \cite{Bemfica19} equation 2.
+
+Next is the projection orthogonal to the flow velocity, which is
+\begin{equation}
+\begin{aligned}
+0 &= \Delta_{bc} \nabla_{a} T^{ab} \\
+&= \Delta_{bc} \nabla_{a} [e u^a u^b + (p + \Pi) \Delta^{ab}] \\
+&= e u^a \nabla_{a} u_c + (p + \Pi) u^a \nabla_{a} u_c + \Delta^{a}_{~c} \nabla_{a} p + \Delta^{a}_{~c} \nabla_{a} \Pi \\
+&= (e + p + \Pi) u^a \nabla_{a} u_c + \alpha_1 \Delta^{a}_{~c} \nabla_a e + \alpha_2 \Delta^{a}_{~c} \nabla_a \rho + \Delta^{a}_{~c} \nabla_{a} \Pi \\
+\end{aligned}
+\end{equation}
+where we have defined
+\begin{align}
+\alpha_1 &\equiv \frac{\partial p}{\partial e} \Big|_\rho \\
+\alpha_2 &\equiv \frac{\partial p}{\partial \rho} \Big|_e
+\end{align}
+in agreement with \cite{Bemfica19} equation 3.
+
+%\subsection{MIS-bulk as a FOSH system}
+%
+%\textbf{TODO: rederive everything in this section in Mathematica.}
+%This should be done by coding up the EOM and solving for the components of $\nabla_a \Psi$, where $\Psi$ is defined below.
+%
+%Fortunately we can rewrite the MIS-bulk equations in a useful way.
+%Specifically, they can be written as a first-order symmetric hyperbolic (FOSH) system, whereby they take the form
+%\begin{equation} \label{eq:MIS_bulk_FOSH_form}
+%0 = M^a(\Psi) \nabla_a \Psi + N(\Psi) \Psi
+%\end{equation}
+%where $N^\mu$ are matrices, $N$ is a vector, and $\Psi = (\epsilon, u^b, n, \Pi)^T$ contains all of the state variables.
+%Notice that in (\ref{eq:MIS_bulk_FOSH_form}) each equation only includes one covariant derivative term, so in particular the $\Pi$ equation will be:
+%\begin{equation}
+%0 = M^t(\Psi) \partial_t \Psi + M^i(\Psi) \partial_i \Psi + N(\Psi) \Psi
+%\end{equation}
+%and will be free of time derivatives of the other variables.
+%We should be able to use this equation combined with the conservation laws in the typical (Valencia) form to evolve the system.
 
 \clearpage
 
