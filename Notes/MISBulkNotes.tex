@@ -219,12 +219,12 @@ S_j &\equiv \rho h W^2 v_j \\
 \section{MIS-bulk}
 
 The MIS-bulk equations \cite{Bemfica19} are very similar to the relativistic Euler equations.
-In particular, the conserved currents are
+The conserved currents are
 \begin{align}
 T^{ab} &= e u^a u^b + (p + \Pi) \Delta^{ab} \\
 J^{a} &= \rho u^a
 \end{align}
-and the equations of motion are
+where $\Delta^{ab} = g^{ab} + u^a u^b$, and the equations of motion are
 \begin{align}
 0 &= \nabla_{a} T^{ab} \\
 0 &= \nabla_{a} J^{a} \\
@@ -277,23 +277,49 @@ where we have defined
 \end{align}
 in agreement with \cite{Bemfica19} equation 3.
 
-%\subsection{MIS-bulk as a FOSH system}
-%
-%\textbf{TODO: rederive everything in this section in Mathematica.}
-%This should be done by coding up the EOM and solving for the components of $\nabla_a \Psi$, where $\Psi$ is defined below.
-%
-%Fortunately we can rewrite the MIS-bulk equations in a useful way.
-%Specifically, they can be written as a first-order symmetric hyperbolic (FOSH) system, whereby they take the form
-%\begin{equation} \label{eq:MIS_bulk_FOSH_form}
-%0 = M^a(\Psi) \nabla_a \Psi + N(\Psi) \Psi
-%\end{equation}
-%where $N^\mu$ are matrices, $N$ is a vector, and $\Psi = (\epsilon, u^b, n, \Pi)^T$ contains all of the state variables.
-%Notice that in (\ref{eq:MIS_bulk_FOSH_form}) each equation only includes one covariant derivative term, so in particular the $\Pi$ equation will be:
-%\begin{equation}
-%0 = M^t(\Psi) \partial_t \Psi + M^i(\Psi) \partial_i \Psi + N(\Psi) \Psi
-%\end{equation}
-%and will be free of time derivatives of the other variables.
-%We should be able to use this equation combined with the conservation laws in the typical (Valencia) form to evolve the system.
+\subsection{MIS-bulk as a FOSH system}
+
+We now want to write the system in first-order symmetric hyperbolic (FOSH) form, i.e.
+\begin{equation}
+\mathcal{A}^{a} \partial_{a} \Phi + \mathcal{B}(\Phi) = F,
+\end{equation}
+where $\mathcal{A}^{a}$ is matrix-valued for each value of the index $a$, $\mathcal{B}, F$ are vectors, and $\Phi$ is a ``solution vector'' composed of the variables we're trying to evolve.
+In \cite{Bemfica19}, they claim that the MIS-bulk system can be written in FOSH form with $F = 0$.
+
+Doing so requires us to write the equations of motion in terms of individual components.
+The baryon current equation is
+\begin{equation}
+\begin{aligned}
+0 &= \rho \nabla_{a} u^a + u^a \nabla_{a} \rho \\
+&= \frac{\rho}{\sqrt{|g|}} \partial_{a} (\sqrt{|g|} u^a) + u^a \partial_{a} \rho \\
+&= \rho \partial_{a} u^a + u^a \partial_{a} \rho + \rho u^a \partial_{a} \ln(\sqrt{|g|}) \\
+\end{aligned}
+\end{equation}
+the energy equation is
+\begin{equation}
+\begin{aligned}
+0 &= u^a \nabla_{a} e + [e + p + \Pi] \nabla_{a} u^a \\
+&= u^a \partial_{a} e + \frac{[e + p + \Pi]}{\sqrt{|g|}} \partial_{a} (\sqrt{|g|} u^a) \\
+&= u^a \partial_{a} e + [e + p + \Pi] \partial_{a} u^a + [e + p + \Pi] u^a \partial_{a} \ln(\sqrt{|g|}) \\
+\end{aligned}
+\end{equation}
+the $\Pi$ equation is
+\begin{equation}
+\begin{aligned}
+0 &= \tau_{\Pi} u^a \nabla_a \Pi + \Pi + \lambda \Pi^2 + \zeta \nabla_a u^a \\
+&= \tau_{\Pi} u^a \partial_a \Pi + \zeta \partial_a u^a + \Pi + \lambda \Pi^2 + \zeta u^a \partial_a \ln(\sqrt{|g|}) \\
+\end{aligned}
+\end{equation}
+The momentum equation is
+\begin{equation}
+\begin{aligned}
+0 &= (e + p + \Pi) u^a \nabla_{a} u^c + \alpha_1 \Delta^{ac} \nabla_a e + \alpha_2 \Delta^{ac} \nabla_a \rho + \Delta^{ac} \nabla_{a} \Pi \\
+\end{aligned}
+\end{equation}
+
+\clearpage
+
+
 
 \clearpage
 
