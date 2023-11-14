@@ -334,6 +334,10 @@ We can do this using the condition that $u^a$ is timelike:
 -1 &= g_{tt} (u^t)^2 + 2 g_{ti} u^t u^i + g_{ij} u^i u^j \\
 \partial_{a} (-1) &= \partial_{a} \Big[ g_{tt} (u^t)^2 + 2 g_{ti} u^t u^i + g_{ij} u^i u^j \Big] \\
 0 &= \partial_{a} [g_{tt} (u^t)^2] + 2 \partial_{a} [g_{ti} u^t u^i] + \partial_{a} [g_{ij} u^i u^j] \\
+&= (2 g_{tt} u^t + 2 g_{ti} u^i) \partial_{a} u^t \\
+&+ (2 g_{ti} u^t + 2 g_{ij} u^j) \partial_{a} u^i \\
+&+ (u^t)^2 \partial_{a} g_{tt} + 2 u^t u^i \partial_{a} g_{ti} + u^i u^j \partial_{a} g_{ij} \\
+&= (2 g_{tt} u^t + 2 g_{ti} u^i) \partial_{a} u^t + (2 g_{ti} u^t + 2 g_{ij} u^j) \partial_{a} u^i + u^c u^d \partial_{a} g_{cd} \\
 \end{aligned}
 \end{equation}
 
@@ -361,10 +365,11 @@ the $\Pi$ equation is
 &= \tau_{\Pi} u^a \partial_a \Pi + \zeta \partial_a u^a + \Pi + \lambda \Pi^2 + \zeta u^a \partial_a \ln(\sqrt{|g|}) \\
 \end{aligned}
 \end{equation}
-The momentum equation is
+The momentum equations are (notice the free index $c$)
 \begin{equation}
 \begin{aligned}
 0 &= (e + p + \Pi) u^a \nabla_{a} u^c + \alpha_1 \Delta^{ac} \nabla_a e + \alpha_2 \Delta^{ac} \nabla_a \rho + \Delta^{ac} \nabla_{a} \Pi \\
+&= (e + p + \Pi) u^a \partial_{a} u^c + \alpha_1 \Delta^{ac} \partial_a e + \alpha_2 \Delta^{ac} \partial_a \rho + \Delta^{ac} \partial_{a} \Pi + (e + p + \Pi) \Gamma^{c}_{ad} u^a u^d \\
 \end{aligned}
 \end{equation}
 
