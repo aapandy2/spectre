@@ -331,60 +331,14 @@ taking a time derivative of both sides yields
 \end{aligned}
 \end{equation}
 in agreement with \cite{Servignat22} equation 29.
-We still need to eliminate time derivatives from the RHS.
-The first term can be handled using the evolution equation for the inverse spatial metric (\textbf{TODO: check this})
-\begin{equation}
-\partial_t \gamma^{ij} = -2 \alpha K^{ij} + D^i \beta^j + D^j \beta^i.
-\end{equation}
 
-Eliminating the second term requires us to use all of the other equations.
-Starting with the $\Pi$ equation, we have
-\begin{equation}
-\begin{aligned}
-0 &= \tau_{\Pi} u^a \nabla_a \Pi + \Pi + \lambda \Pi^2 + \zeta \nabla_a u^a \\
-&= \tau_{\Pi} u^t \partial_t \Pi + \tau_{\Pi} u^i \partial_i \Pi + \Pi + \lambda \Pi^2 + \zeta \frac{1}{\alpha} \partial_t ( W) + \zeta u^t \partial_t \ln(\sqrt{\gamma}) + \zeta \frac{1}{\sqrt{|g|}} \partial_i (\sqrt{|g|} u^i) \\
-\partial_t \Pi &= - \frac{1}{\tau_{\Pi} u^t}\Big[ \tau_{\Pi} u^i \partial_i \Pi + \Pi + \lambda \Pi^2 + \zeta \frac{1}{\alpha} \partial_t ( W) + \zeta u^t \partial_t \ln(\sqrt{\gamma}) + \zeta \frac{1}{\sqrt{|g|}} \partial_i (\sqrt{|g|} u^i) \Big]. \\
-\end{aligned}
-\end{equation}
-
-\textbf{DO THE STUFF BELOW IN STANDARD MATHEMATICA}
-
-%We will begin with the second term in parentheses, which we can get from expanding out the momentum conservation law:
-%\begin{equation}
-%\begin{aligned}
-%0 &= \partial_t \big[ \sqrt{\gamma} \rho h W^2 v_j \big] + \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
-%\partial_t v_j &= - \frac{1}{\sqrt{\gamma} \rho h W^2}\Big[ \rho h W^2 v_j \partial_t \sqrt{\gamma} + \sqrt{\gamma} W^2 v_j \partial_t e + \sqrt{\gamma} W^2 v_j \partial_t p + 2 W \sqrt{\gamma} \rho h v_j \partial_t W \\
-%&+ \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \Big]. \\
-%\end{aligned}
-%\end{equation}
-%Notice that this still has time derivative terms we don't already have, namely $\partial_t e, \partial_t p$.
-%
-%We will handle the second term first, as it is the most intensive---it turns out we will need $\partial_t \rho, \partial_t e$, and thus will need to expand out all three of the Valencia-form relativistic Euler equations.
-%Doing so for the baryon current conservation law gives us
-%\begin{equation}
-%\begin{aligned}
-%0 
-%%&= \partial_t (\sqrt{\gamma} D) + \partial_i \big[ \sqrt{\gamma} D (\alpha v^i - \beta^i) \big] \\
-%&= \partial_t (\sqrt{\gamma} \rho W) + \partial_i \big[ \sqrt{\gamma} D (\alpha v^i - \beta^i) \big] \\
-%\partial_t \rho &= -\frac{1}{\sqrt{\gamma} W} \Big( \rho W \partial_t \sqrt{\gamma} + \sqrt{\gamma} \rho \partial_t W + \partial_i \big[ \sqrt{\gamma} D (\alpha v^i - \beta^i) \big] \Big) \\
-%\end{aligned}
-%\end{equation}
-%the energy equation yields
-%\begin{equation}
-%\begin{aligned}
-%0 &= \partial_t (\sqrt{\gamma} [\rho h W^2 - p]) + \partial_i (\sqrt{\gamma} [\alpha S^i - \beta^i E]) + \sqrt{|g|} T^{ab} \nabla_a n_b \\
-%&= \sqrt{\gamma} W^2 \Big( 1 + v_i v^i \frac{\partial p}{\partial e} \Big) \partial_t e + \sqrt{\gamma} W^2 v_i v^i \frac{\partial p}{\partial \rho} \partial_t \rho + 2 W \sqrt{\gamma} [e+p] \partial_t W + [\rho h W^2 - p] \partial_t (\sqrt{\gamma}) \\
-%&+ \partial_i (\sqrt{\gamma} [\alpha S^i - \beta^i E]) + \sqrt{|g|} T^{ab} \nabla_a n_b \\
-%\end{aligned}
-%\end{equation}
-%and the momentum equations are
-%\begin{equation}
-%\begin{aligned}
-%0 &= \partial_t \big[ \sqrt{\gamma} \rho h W^2 v_j \big] + \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
-%&= \rho h W^2 v_j \partial_t \big[ \sqrt{\gamma} \big] + \sqrt{\gamma} W^2 v_j \partial_t \big[ e+p \big] + \sqrt{\gamma} \rho h v_j \partial_t \big[ W^2 \big] + \sqrt{\gamma} \rho h W^2 \partial_t \big[ v_j \big] \\
-%&+ \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
-%\end{aligned}
-%\end{equation}
+\vspace{3mm}\textbf{TODO:}
+\begin{enumerate}
+\item compute evolution equation for the inverse spatial metric following \cite{BaumgarteShapiro}
+\item write out $\Pi$ evolution equation in coordinate component form
+\item code everything up into standard Mathematica and solve for $\partial_t W$
+\item check that \cite{Servignat22}'s equation 31 agrees with our result
+\end{enumerate}
 
 
 
