@@ -325,18 +325,27 @@ W &= (1 - v_i v^i)^{-1/2} \\
 taking a time derivative of both sides yields
 \begin{equation}
 \begin{aligned}
-\partial_t W^{-2} &= \partial_t ( 1 - \gamma_{ij} v^i v^j ) \\
-\partial_t W &= \frac{1}{2} W^3 \partial_t ( \gamma_{ij} v^i v^j ) \\
-&= \frac{1}{2} W^3 \Big( v^i v^j \partial_t \gamma_{ij} + 2 v_j \partial_t v^j \Big) \\
+\partial_t W^{-2} &= \partial_t ( 1 - \gamma^{ij} v_i v_j ) \\
+\partial_t W &= \frac{1}{2} W^3 \partial_t ( \gamma^{ij} v_i v_j ) \\
+&= \frac{1}{2} W^3 \Big( v_i v_j \partial_t \gamma^{ij} + 2 v^j \partial_t v_j \Big) \\
 \end{aligned}
 \end{equation}
 in agreement with \cite{Servignat22} equation 29.
-We still need to eliminate the time derivatives on the RHS, the first one which can be handled using the evolution equation for the spatial metric (\cite{BaumgarteShapiro} equation 2.134):
+We still need to eliminate time derivatives from the RHS.
+The first term can be handled using the evolution equation for the inverse spatial metric (\textbf{TODO: check this})
 \begin{equation}
-\partial_t \gamma_{ij} = -2 \alpha K_{ij} + D_i \beta_j + D_j \beta_i.
+\partial_t \gamma^{ij} = -2 \alpha K^{ij} + D^i \beta^j + D^j \beta^i.
 \end{equation}
 
-To obtain the other term, we have to use the conservation laws.
+Eliminating the second term requires us to use all of the other equations.
+Starting with the $\Pi$ equation, we have
+\begin{equation}
+\begin{aligned}
+0 &= \tau_{\Pi} u^a \nabla_a \Pi + \Pi + \lambda \Pi^2 + \zeta \nabla_a u^a \\
+&= \tau_{\Pi} u^t \partial_t \Pi + \tau_{\Pi} u^i \partial_i \Pi + \Pi + \lambda \Pi^2 + \zeta \frac{1}{\alpha} \partial_t ( W) + \zeta u^t \partial_t \ln(\sqrt{\gamma}) + \zeta \frac{1}{\sqrt{|g|}} \partial_i (\sqrt{|g|} u^i) \\
+\partial_t \Pi &= - \frac{1}{\tau_{\Pi} u^t}\Big[ \tau_{\Pi} u^i \partial_i \Pi + \Pi + \lambda \Pi^2 + \zeta \frac{1}{\alpha} \partial_t ( W) + \zeta u^t \partial_t \ln(\sqrt{\gamma}) + \zeta \frac{1}{\sqrt{|g|}} \partial_i (\sqrt{|g|} u^i) \Big]. \\
+\end{aligned}
+\end{equation}
 
 \textbf{DO THE STUFF BELOW IN STANDARD MATHEMATICA}
 
