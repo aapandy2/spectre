@@ -240,7 +240,63 @@ Inspection of the equations above implies that the first two conservation laws a
 Unfortunately we gain an additional evolution equation, (\ref{eq:bulk_eq}), which is not conservative.
 Even worse, it has a term proportional to the divergence of the flow velocity which will include time derivatives of $u^a$ if this equation is solved as written, complicating the solution scheme.
 
+\subsection{Handling the conservation laws}
+
+The conservation laws are, fortunately, quite similar to those for the relativistic Euler equations.
+The only change appears in the 3+1 decomposition of the stress-energy tensor, which becomes:
+\begin{equation}
+\begin{aligned}
+T^{ab} &= E n^a n^b + S^a n^b + S^b n^a + S^{ab} \\
+&= e u^a u^b + [p+\Pi] (u^a u^b + g^{ab}) \\
+&= [e+p+\Pi] u^a u^b + [p+\Pi] g^{ab} \\
+&= [e+p+\Pi] W (n^a + v^a) W (n^b + v^b) + [p+\Pi] (\gamma^{ab} - n^a n^b) \\
+&= ([e+p+\Pi] W^2 - [p+\Pi]) n^a n^b + [e+p+\Pi] W^2 n^a v^b + [e+p+\Pi] W^2 v^a n^b \\
+&+ \Big( [e+p+\Pi] W^2 v^a v^b + [p+\Pi] \gamma^{ab} \Big) \\
+\end{aligned}
+\end{equation}
+which implies the components are
+\begin{equation}
+\begin{aligned}
+E      &= [e+p+\Pi] W^2 - [p+\Pi] \\
+S^a    &= [e+p+\Pi] W^2 v^a \\
+S^{ab} &= [e+p+\Pi] W^2 v^a v^b + [p+\Pi] \gamma^{ab}
+\end{aligned}
+\end{equation}
+which recover the relativistic Euler equations in the limit $\Pi \to 0$.
+
+The calculation is otherwise precisely the same as in the relativistic Euler case, so we find conservation laws
+\begin{equation}
+\begin{aligned}
+\bm{U} =
+\begin{pmatrix}
+D \\
+S_j \\
+\tau
+\end{pmatrix},~~~
+\bm{F}^i =
+\begin{pmatrix}
+\alpha v^i D - \beta^i D \\
+\alpha S^{i}_{~j} - \beta^i S_j \\
+\alpha (S^i - D v^i) - \beta^i \tau
+\end{pmatrix},~~~
+\bm{S} =
+\begin{pmatrix}
+0 \\
+\frac{1}{2} \alpha S^{ik} \partial_j \gamma_{ik} + S_i \partial_j \beta^i - E \partial_j \alpha \\
+\alpha S^{ij} K_{ij} - S^j \partial_j \alpha
+\end{pmatrix}
+\end{aligned}
+\end{equation}
+where
+\begin{align}
+D &\equiv \rho W \\
+S_j &\equiv [e+p+\Pi] W^2 v_j \\
+\tau &\equiv [e+p+\Pi] W^2 - [p+\Pi] - D.
+\end{align}
+
 \subsection{Handling the $\Pi$ equation}
+
+\subsubsection{Computing $\partial_t W$}
 
 All of the trouble with the $\Pi$ equation comes from the time derivative in the term $\zeta \nabla_a u^a$; expanding it out, we find:
 \begin{equation}
@@ -269,51 +325,57 @@ W &= (1 - v_i v^i)^{-1/2} \\
 taking a time derivative of both sides yields
 \begin{equation}
 \begin{aligned}
-\partial_t W^{-2} &= \partial_t ( 1 - \gamma^{ij} v_i v_j ) \\
-\partial_t W &= \frac{1}{2} W^3 \partial_t ( \gamma^{ij} v_i v_j ) \\
-&= \frac{1}{2} W^3 \Big( v_i v_j \partial_t \gamma^{ij} + 2 v^j \partial_t v_i \Big) \\
+\partial_t W^{-2} &= \partial_t ( 1 - \gamma_{ij} v^i v^j ) \\
+\partial_t W &= \frac{1}{2} W^3 \partial_t ( \gamma_{ij} v^i v^j ) \\
+&= \frac{1}{2} W^3 \Big( v^i v^j \partial_t \gamma_{ij} + 2 v_j \partial_t v^j \Big) \\
 \end{aligned}
 \end{equation}
 in agreement with \cite{Servignat22} equation 29.
+We still need to eliminate the time derivatives on the RHS, the first one which can be handled using the evolution equation for the spatial metric (\cite{BaumgarteShapiro} equation 2.134):
+\begin{equation}
+\partial_t \gamma_{ij} = -2 \alpha K_{ij} + D_i \beta_j + D_j \beta_i.
+\end{equation}
+
+To obtain the other term, we have to use the conservation laws.
 
 \textbf{DO THE STUFF BELOW IN STANDARD MATHEMATICA}
 
-We will begin with the second term in parentheses, which we can get from expanding out the momentum conservation law:
-\begin{equation}
-\begin{aligned}
-0 &= \partial_t \big[ \sqrt{\gamma} \rho h W^2 v_j \big] + \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
-\partial_t v_j &= - \frac{1}{\sqrt{\gamma} \rho h W^2}\Big[ \rho h W^2 v_j \partial_t \sqrt{\gamma} + \sqrt{\gamma} W^2 v_j \partial_t e + \sqrt{\gamma} W^2 v_j \partial_t p + 2 W \sqrt{\gamma} \rho h v_j \partial_t W \\
-&+ \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \Big]. \\
-\end{aligned}
-\end{equation}
-Notice that this still has time derivative terms we don't already have, namely $\partial_t e, \partial_t p$.
-
-We will handle the second term first, as it is the most intensive---it turns out we will need $\partial_t \rho, \partial_t e$, and thus will need to expand out all three of the Valencia-form relativistic Euler equations.
-Doing so for the baryon current conservation law gives us
-\begin{equation}
-\begin{aligned}
-0 
-%&= \partial_t (\sqrt{\gamma} D) + \partial_i \big[ \sqrt{\gamma} D (\alpha v^i - \beta^i) \big] \\
-&= \partial_t (\sqrt{\gamma} \rho W) + \partial_i \big[ \sqrt{\gamma} D (\alpha v^i - \beta^i) \big] \\
-\partial_t \rho &= -\frac{1}{\sqrt{\gamma} W} \Big( \rho W \partial_t \sqrt{\gamma} + \sqrt{\gamma} \rho \partial_t W + \partial_i \big[ \sqrt{\gamma} D (\alpha v^i - \beta^i) \big] \Big) \\
-\end{aligned}
-\end{equation}
-the energy equation yields
-\begin{equation}
-\begin{aligned}
-0 &= \partial_t (\sqrt{\gamma} [\rho h W^2 - p]) + \partial_i (\sqrt{\gamma} [\alpha S^i - \beta^i E]) + \sqrt{|g|} T^{ab} \nabla_a n_b \\
-&= \sqrt{\gamma} W^2 \Big( 1 + v_i v^i \frac{\partial p}{\partial e} \Big) \partial_t e + \sqrt{\gamma} W^2 v_i v^i \frac{\partial p}{\partial \rho} \partial_t \rho + 2 W \sqrt{\gamma} [e+p] \partial_t W + [\rho h W^2 - p] \partial_t (\sqrt{\gamma}) \\
-&+ \partial_i (\sqrt{\gamma} [\alpha S^i - \beta^i E]) + \sqrt{|g|} T^{ab} \nabla_a n_b \\
-\end{aligned}
-\end{equation}
-and the momentum equations are
-\begin{equation}
-\begin{aligned}
-0 &= \partial_t \big[ \sqrt{\gamma} \rho h W^2 v_j \big] + \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
-&= \rho h W^2 v_j \partial_t \big[ \sqrt{\gamma} \big] + \sqrt{\gamma} W^2 v_j \partial_t \big[ e+p \big] + \sqrt{\gamma} \rho h v_j \partial_t \big[ W^2 \big] + \sqrt{\gamma} \rho h W^2 \partial_t \big[ v_j \big] \\
-&+ \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
-\end{aligned}
-\end{equation}
+%We will begin with the second term in parentheses, which we can get from expanding out the momentum conservation law:
+%\begin{equation}
+%\begin{aligned}
+%0 &= \partial_t \big[ \sqrt{\gamma} \rho h W^2 v_j \big] + \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
+%\partial_t v_j &= - \frac{1}{\sqrt{\gamma} \rho h W^2}\Big[ \rho h W^2 v_j \partial_t \sqrt{\gamma} + \sqrt{\gamma} W^2 v_j \partial_t e + \sqrt{\gamma} W^2 v_j \partial_t p + 2 W \sqrt{\gamma} \rho h v_j \partial_t W \\
+%&+ \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \Big]. \\
+%\end{aligned}
+%\end{equation}
+%Notice that this still has time derivative terms we don't already have, namely $\partial_t e, \partial_t p$.
+%
+%We will handle the second term first, as it is the most intensive---it turns out we will need $\partial_t \rho, \partial_t e$, and thus will need to expand out all three of the Valencia-form relativistic Euler equations.
+%Doing so for the baryon current conservation law gives us
+%\begin{equation}
+%\begin{aligned}
+%0 
+%%&= \partial_t (\sqrt{\gamma} D) + \partial_i \big[ \sqrt{\gamma} D (\alpha v^i - \beta^i) \big] \\
+%&= \partial_t (\sqrt{\gamma} \rho W) + \partial_i \big[ \sqrt{\gamma} D (\alpha v^i - \beta^i) \big] \\
+%\partial_t \rho &= -\frac{1}{\sqrt{\gamma} W} \Big( \rho W \partial_t \sqrt{\gamma} + \sqrt{\gamma} \rho \partial_t W + \partial_i \big[ \sqrt{\gamma} D (\alpha v^i - \beta^i) \big] \Big) \\
+%\end{aligned}
+%\end{equation}
+%the energy equation yields
+%\begin{equation}
+%\begin{aligned}
+%0 &= \partial_t (\sqrt{\gamma} [\rho h W^2 - p]) + \partial_i (\sqrt{\gamma} [\alpha S^i - \beta^i E]) + \sqrt{|g|} T^{ab} \nabla_a n_b \\
+%&= \sqrt{\gamma} W^2 \Big( 1 + v_i v^i \frac{\partial p}{\partial e} \Big) \partial_t e + \sqrt{\gamma} W^2 v_i v^i \frac{\partial p}{\partial \rho} \partial_t \rho + 2 W \sqrt{\gamma} [e+p] \partial_t W + [\rho h W^2 - p] \partial_t (\sqrt{\gamma}) \\
+%&+ \partial_i (\sqrt{\gamma} [\alpha S^i - \beta^i E]) + \sqrt{|g|} T^{ab} \nabla_a n_b \\
+%\end{aligned}
+%\end{equation}
+%and the momentum equations are
+%\begin{equation}
+%\begin{aligned}
+%0 &= \partial_t \big[ \sqrt{\gamma} \rho h W^2 v_j \big] + \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
+%&= \rho h W^2 v_j \partial_t \big[ \sqrt{\gamma} \big] + \sqrt{\gamma} W^2 v_j \partial_t \big[ e+p \big] + \sqrt{\gamma} \rho h v_j \partial_t \big[ W^2 \big] + \sqrt{\gamma} \rho h W^2 \partial_t \big[ v_j \big] \\
+%&+ \partial_i \big[ \sqrt{\gamma} (\alpha S^{i}_{~j} - \beta^{i} S_j) \big] - \frac{1}{2} \sqrt{|g|} T^{ac} \partial_{j} g_{ac} \\
+%\end{aligned}
+%\end{equation}
 
 
 
