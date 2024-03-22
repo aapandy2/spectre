@@ -29,6 +29,8 @@ template <typename DataType>
 struct DivergenceCleaningField;
 template <typename DataType>
 struct ElectronFraction;
+template <typename DataType>
+struct TransformedBulkScalar;
 struct EquationOfStateBase;
 template <typename EquationOfStateType>
 struct EquationOfState;
@@ -80,6 +82,7 @@ struct LorentzFactorTimesSpatialVelocity;
 template <typename DataType>
 using grmhd_tags = tmpl::list<hydro::Tags::RestMassDensity<DataType>,
                               hydro::Tags::ElectronFraction<DataType>,
+                              hydro::Tags::TransformedBulkScalar<DataType>,
                               hydro::Tags::SpecificInternalEnergy<DataType>,
                               hydro::Tags::SpatialVelocity<DataType, 3>,
                               hydro::Tags::MagneticField<DataType, 3>,

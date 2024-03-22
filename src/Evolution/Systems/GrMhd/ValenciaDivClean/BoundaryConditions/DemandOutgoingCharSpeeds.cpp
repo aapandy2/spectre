@@ -83,6 +83,7 @@ DemandOutgoingCharSpeeds::dg_demand_outgoing_char_speeds(
 void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
     const gsl::not_null<Scalar<DataVector>*> rest_mass_density,
     const gsl::not_null<Scalar<DataVector>*> electron_fraction,
+    const gsl::not_null<Scalar<DataVector>*> transformed_bulk_scalar,
     const gsl::not_null<Scalar<DataVector>*> pressure,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>
         lorentz_factor_times_spatial_velocity,
@@ -110,6 +111,7 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
     // fd_interior_primitive_variables_tags
     const Scalar<DataVector>& interior_rest_mass_density,
     const Scalar<DataVector>& interior_electron_fraction,
+    const Scalar<DataVector>& interior_transformed_bulk_scalar,
     const Scalar<DataVector>& interior_pressure,
     const Scalar<DataVector>& interior_specific_internal_energy,
     const Scalar<DataVector>& interior_lorentz_factor,
@@ -179,6 +181,8 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
 
     using RestMassDensity = hydro::Tags::RestMassDensity<DataVector>;
     using ElectronFraction = hydro::Tags::ElectronFraction<DataVector>;
+    using TransformedBulkScalar =
+        hydro::Tags::TransformedBulkScalar<DataVector>;
     using Pressure = hydro::Tags::Pressure<DataVector>;
     using SpecificInternalEnergy =
         hydro::Tags::SpecificInternalEnergy<DataVector>;
@@ -196,8 +200,8 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
     using Shift = gr::Tags::Shift<DataVector, 3>;
 
     using prim_tags_for_reconstruction =
-        tmpl::list<RestMassDensity, ElectronFraction, Pressure,
-                   LorentzFactorTimesSpatialVelocity, MagneticField,
+        tmpl::list<RestMassDensity, ElectronFraction, TransformedBulkScalar,
+                   Pressure, LorentzFactorTimesSpatialVelocity, MagneticField,
                    DivergenceCleaningField>;
     using fluxes_tags = tmpl::list<SpecificInternalEnergy, SpatialMetric, Lapse,
                                    Shift, SpatialVelocity, LorentzFactor,
@@ -236,6 +240,8 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
         get_boundary_val(interior_rest_mass_density);
     get<ElectronFraction>(boundary_vars) =
         get_boundary_val(interior_electron_fraction);
+    get<TransformedBulkScalar>(boundary_vars) =
+        get_boundary_val(interior_transformed_bulk_scalar);
     get<Pressure>(boundary_vars) = get_boundary_val(interior_pressure);
     // Note : 'lorentz factor times spatial velocity' needs to be in the FD
     // ghost data for reconstruction, instead of lorentz factor and spatial
@@ -261,6 +267,7 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
 
     *rest_mass_density = get<RestMassDensity>(ghost_vars);
     *electron_fraction = get<ElectronFraction>(ghost_vars);
+    *transformed_bulk_scalar = get<TransformedBulkScalar>(ghost_vars);
     *pressure = get<Pressure>(ghost_vars);
     *lorentz_factor_times_spatial_velocity =
         get<LorentzFactorTimesSpatialVelocity>(ghost_vars);
@@ -312,13 +319,14 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
       ConservativeFromPrimitive::apply(
           make_not_null(&get<Tags::TildeD>(temp_vars)),
           make_not_null(&get<Tags::TildeYe>(temp_vars)),
+          make_not_null(&get<Tags::TildeVB>(temp_vars)),
           make_not_null(&get<Tags::TildeTau>(temp_vars)),
           make_not_null(&get<Tags::TildeS<>>(temp_vars)),
           make_not_null(&get<Tags::TildeB<>>(temp_vars)),
           make_not_null(&get<Tags::TildePhi>(temp_vars)),
 
           // Note: Only the spatial velocity changes.
-          *rest_mass_density, *electron_fraction,
+          *rest_mass_density, *electron_fraction, *transformed_bulk_scalar,
           get<SpecificInternalEnergy>(ghost_fluxes_vars), *pressure,
           get<SpatialVelocity>(ghost_fluxes_vars),
           get<LorentzFactor>(ghost_fluxes_vars), *magnetic_field,
@@ -332,6 +340,8 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
           make_not_null(
               &get<Flux<Tags::TildeYe>>(cell_centered_ghost_fluxes->value())),
           make_not_null(
+              &get<Flux<Tags::TildeVB>>(cell_centered_ghost_fluxes->value())),
+          make_not_null(
               &get<Flux<Tags::TildeTau>>(cell_centered_ghost_fluxes->value())),
           make_not_null(
               &get<Flux<Tags::TildeS<>>>(cell_centered_ghost_fluxes->value())),
@@ -341,8 +351,9 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
               &get<Flux<Tags::TildePhi>>(cell_centered_ghost_fluxes->value())),
 
           get<Tags::TildeD>(temp_vars), get<Tags::TildeYe>(temp_vars),
-          get<Tags::TildeTau>(temp_vars), get<Tags::TildeS<>>(temp_vars),
-          get<Tags::TildeB<>>(temp_vars), get<Tags::TildePhi>(temp_vars),
+          get<Tags::TildeVB>(temp_vars), get<Tags::TildeTau>(temp_vars),
+          get<Tags::TildeS<>>(temp_vars), get<Tags::TildeB<>>(temp_vars),
+          get<Tags::TildePhi>(temp_vars),
 
           get<Lapse>(ghost_fluxes_vars), get<Shift>(ghost_fluxes_vars),
           get<SqrtDetSpatialMetric>(ghost_fluxes_vars),

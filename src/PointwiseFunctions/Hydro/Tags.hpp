@@ -92,6 +92,12 @@ struct ElectronFraction : db::SimpleTag {
   using type = Scalar<DataType>;
 };
 
+/// The transformed bulk scalar \f$\hat{\Pi}_B\f$.
+template <typename DataType>
+struct TransformedBulkScalar : db::SimpleTag {
+  using type = Scalar<DataType>;
+};
+
 /// Base tag for the equation of state
 struct EquationOfStateBase : db::BaseTag {};
 

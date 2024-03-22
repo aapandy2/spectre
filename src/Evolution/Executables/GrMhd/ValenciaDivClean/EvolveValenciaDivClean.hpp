@@ -239,6 +239,7 @@ struct EvolutionMetavars<tmpl::list<InterpolationTargetTags...>,
   using limiter = Tags::Limiter<
       Limiters::Minmod<3, tmpl::list<grmhd::ValenciaDivClean::Tags::TildeD,
                                      grmhd::ValenciaDivClean::Tags::TildeYe,
+                                     grmhd::ValenciaDivClean::Tags::TildeVB,
                                      grmhd::ValenciaDivClean::Tags::TildeTau,
                                      grmhd::ValenciaDivClean::Tags::TildeS<>,
                                      grmhd::ValenciaDivClean::Tags::TildeB<>>>>;

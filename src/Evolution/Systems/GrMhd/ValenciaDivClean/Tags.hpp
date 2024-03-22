@@ -39,6 +39,12 @@ struct TildeYe : db::SimpleTag {
   using type = Scalar<DataVector>;
 };
 
+/// The densitized conserved variable corresponding to bulk viscosity
+/// \f$\tilde{V}_B = \hat{Pi}_B W\f$
+struct TildeVB : db::SimpleTag {
+  using type = Scalar<DataVector>;
+};
+
 /// The densitized energy density \f${\tilde \tau}\f$
 struct TildeTau : db::SimpleTag {
   using type = Scalar<DataVector>;

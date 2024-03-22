@@ -88,6 +88,7 @@ class DemandOutgoingCharSpeeds final : public BoundaryCondition {
   using fd_interior_primitive_variables_tags =
       tmpl::list<hydro::Tags::RestMassDensity<DataVector>,
                  hydro::Tags::ElectronFraction<DataVector>,
+                 hydro::Tags::TransformedBulkScalar<DataVector>,
                  hydro::Tags::Pressure<DataVector>,
                  hydro::Tags::SpecificInternalEnergy<DataVector>,
                  hydro::Tags::LorentzFactor<DataVector>,
@@ -99,6 +100,7 @@ class DemandOutgoingCharSpeeds final : public BoundaryCondition {
   static void fd_demand_outgoing_char_speeds(
       gsl::not_null<Scalar<DataVector>*> rest_mass_density,
       gsl::not_null<Scalar<DataVector>*> electron_fraction,
+      gsl::not_null<Scalar<DataVector>*> transformed_bulk_scalar,
       gsl::not_null<Scalar<DataVector>*> pressure,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>
           lorentz_factor_times_spatial_velocity,
@@ -125,6 +127,7 @@ class DemandOutgoingCharSpeeds final : public BoundaryCondition {
       // fd_interior_primitive_variables_tags
       const Scalar<DataVector>& interior_rest_mass_density,
       const Scalar<DataVector>& interior_electron_fraction,
+      const Scalar<DataVector>& interior_transformed_bulk_scalar,
       const Scalar<DataVector>& interior_pressure,
       const Scalar<DataVector>& interior_specific_internal_energy,
       const Scalar<DataVector>& interior_lorentz_factor,

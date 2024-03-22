@@ -27,6 +27,7 @@ void Hll::pup(PUP::er& p) { BoundaryCorrection::pup(p); }
 double Hll::dg_package_data(
     const gsl::not_null<Scalar<DataVector>*> packaged_tilde_d,
     const gsl::not_null<Scalar<DataVector>*> packaged_tilde_ye,
+    const gsl::not_null<Scalar<DataVector>*> packaged_tilde_vb,
     const gsl::not_null<Scalar<DataVector>*> packaged_tilde_tau,
     const gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*>
         packaged_tilde_s,
@@ -35,6 +36,7 @@ double Hll::dg_package_data(
     const gsl::not_null<Scalar<DataVector>*> packaged_tilde_phi,
     const gsl::not_null<Scalar<DataVector>*> packaged_normal_dot_flux_tilde_d,
     const gsl::not_null<Scalar<DataVector>*> packaged_normal_dot_flux_tilde_ye,
+    const gsl::not_null<Scalar<DataVector>*> packaged_normal_dot_flux_tilde_vb,
     const gsl::not_null<Scalar<DataVector>*> packaged_normal_dot_flux_tilde_tau,
     const gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*>
         packaged_normal_dot_flux_tilde_s,
@@ -47,13 +49,14 @@ double Hll::dg_package_data(
         packaged_largest_ingoing_char_speed,
 
     const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& tilde_ye,
-    const Scalar<DataVector>& tilde_tau,
+    const Scalar<DataVector>& tilde_vb, const Scalar<DataVector>& tilde_tau,
     const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,
     const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,
     const Scalar<DataVector>& tilde_phi,
 
     const tnsr::I<DataVector, 3, Frame::Inertial>& flux_tilde_d,
     const tnsr::I<DataVector, 3, Frame::Inertial>& flux_tilde_ye,
+    const tnsr::I<DataVector, 3, Frame::Inertial>& flux_tilde_vb,
     const tnsr::I<DataVector, 3, Frame::Inertial>& flux_tilde_tau,
     const tnsr::Ij<DataVector, 3, Frame::Inertial>& flux_tilde_s,
     const tnsr::IJ<DataVector, 3, Frame::Inertial>& flux_tilde_b,
@@ -86,6 +89,7 @@ double Hll::dg_package_data(
 
   *packaged_tilde_d = tilde_d;
   *packaged_tilde_ye = tilde_ye;
+  *packaged_tilde_vb = tilde_vb;
   *packaged_tilde_tau = tilde_tau;
   *packaged_tilde_s = tilde_s;
   *packaged_tilde_b = tilde_b;
@@ -95,6 +99,8 @@ double Hll::dg_package_data(
                   flux_tilde_d);
   normal_dot_flux(packaged_normal_dot_flux_tilde_ye, normal_covector,
                   flux_tilde_ye);
+  normal_dot_flux(packaged_normal_dot_flux_tilde_vb, normal_covector,
+                  flux_tilde_vb);
   normal_dot_flux(packaged_normal_dot_flux_tilde_tau, normal_covector,
                   flux_tilde_tau);
   normal_dot_flux(packaged_normal_dot_flux_tilde_s, normal_covector,
@@ -112,6 +118,7 @@ double Hll::dg_package_data(
 void Hll::dg_boundary_terms(
     const gsl::not_null<Scalar<DataVector>*> boundary_correction_tilde_d,
     const gsl::not_null<Scalar<DataVector>*> boundary_correction_tilde_ye,
+    const gsl::not_null<Scalar<DataVector>*> boundary_correction_tilde_vb,
     const gsl::not_null<Scalar<DataVector>*> boundary_correction_tilde_tau,
     const gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*>
         boundary_correction_tilde_s,
@@ -120,12 +127,14 @@ void Hll::dg_boundary_terms(
     const gsl::not_null<Scalar<DataVector>*> boundary_correction_tilde_phi,
     const Scalar<DataVector>& tilde_d_int,
     const Scalar<DataVector>& tilde_ye_int,
+    const Scalar<DataVector>& tilde_vb_int,
     const Scalar<DataVector>& tilde_tau_int,
     const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s_int,
     const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b_int,
     const Scalar<DataVector>& tilde_phi_int,
     const Scalar<DataVector>& normal_dot_flux_tilde_d_int,
     const Scalar<DataVector>& normal_dot_flux_tilde_ye_int,
+    const Scalar<DataVector>& normal_dot_flux_tilde_vb_int,
     const Scalar<DataVector>& normal_dot_flux_tilde_tau_int,
     const tnsr::i<DataVector, 3, Frame::Inertial>& normal_dot_flux_tilde_s_int,
     const tnsr::I<DataVector, 3, Frame::Inertial>& normal_dot_flux_tilde_b_int,
@@ -134,12 +143,14 @@ void Hll::dg_boundary_terms(
     const Scalar<DataVector>& largest_ingoing_char_speed_int,
     const Scalar<DataVector>& tilde_d_ext,
     const Scalar<DataVector>& tilde_ye_ext,
+    const Scalar<DataVector>& tilde_vb_ext,
     const Scalar<DataVector>& tilde_tau_ext,
     const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s_ext,
     const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b_ext,
     const Scalar<DataVector>& tilde_phi_ext,
     const Scalar<DataVector>& normal_dot_flux_tilde_d_ext,
     const Scalar<DataVector>& normal_dot_flux_tilde_ye_ext,
+    const Scalar<DataVector>& normal_dot_flux_tilde_vb_ext,
     const Scalar<DataVector>& normal_dot_flux_tilde_tau_ext,
     const tnsr::i<DataVector, 3, Frame::Inertial>& normal_dot_flux_tilde_s_ext,
     const tnsr::I<DataVector, 3, Frame::Inertial>& normal_dot_flux_tilde_b_ext,
@@ -181,6 +192,11 @@ void Hll::dg_boundary_terms(
           lambda_min * get(normal_dot_flux_tilde_ye_ext)) +
          lambdas_product * (get(tilde_ye_ext) - get(tilde_ye_int))) *
         one_over_lambda_max_minus_min;
+    get(*boundary_correction_tilde_vb) =
+        ((lambda_max * get(normal_dot_flux_tilde_vb_int) +
+          lambda_min * get(normal_dot_flux_tilde_vb_ext)) +
+         lambdas_product * (get(tilde_vb_ext) - get(tilde_vb_int))) *
+        one_over_lambda_max_minus_min;
     get(*boundary_correction_tilde_tau) =
         ((lambda_max * get(normal_dot_flux_tilde_tau_int) +
           lambda_min * get(normal_dot_flux_tilde_tau_ext)) +
@@ -214,6 +230,11 @@ void Hll::dg_boundary_terms(
         (lambda_min * (get(normal_dot_flux_tilde_ye_int) +
                        get(normal_dot_flux_tilde_ye_ext)) +
          lambdas_product * (get(tilde_ye_ext) - get(tilde_ye_int))) *
+        one_over_lambda_max_minus_min;
+    get(*boundary_correction_tilde_vb) =
+        (lambda_min * (get(normal_dot_flux_tilde_vb_int) +
+                       get(normal_dot_flux_tilde_vb_ext)) +
+         lambdas_product * (get(tilde_vb_ext) - get(tilde_vb_int))) *
         one_over_lambda_max_minus_min;
     get(*boundary_correction_tilde_tau) =
         (lambda_min * (get(normal_dot_flux_tilde_tau_int) +

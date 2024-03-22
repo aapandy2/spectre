@@ -25,12 +25,14 @@ namespace grmhd::ValenciaDivClean {
 void ConservativeFromPrimitive::apply(
     const gsl::not_null<Scalar<DataVector>*> tilde_d,
     const gsl::not_null<Scalar<DataVector>*> tilde_ye,
+    const gsl::not_null<Scalar<DataVector>*> tilde_vb,
     const gsl::not_null<Scalar<DataVector>*> tilde_tau,
     const gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*> tilde_s,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_b,
     const gsl::not_null<Scalar<DataVector>*> tilde_phi,
     const Scalar<DataVector>& rest_mass_density,
     const Scalar<DataVector>& electron_fraction,
+    const Scalar<DataVector>& transformed_bulk_scalar,
     const Scalar<DataVector>& specific_internal_energy,
     const Scalar<DataVector>& pressure,
     const tnsr::I<DataVector, 3, Frame::Inertial>& spatial_velocity,
@@ -72,6 +74,10 @@ void ConservativeFromPrimitive::apply(
                   get(lorentz_factor);
 
   get(*tilde_ye) = get(*tilde_d) * get(electron_fraction);
+
+  get(*tilde_vb) = get(sqrt_det_spatial_metric) *
+                   get(transformed_bulk_scalar) *
+                   get(lorentz_factor);
 
   get(*tilde_tau) = get(sqrt_det_spatial_metric) *
                       (square(get(lorentz_factor)) *

@@ -23,6 +23,7 @@ namespace grmhd::ValenciaDivClean {
 void TimeDerivativeTerms::apply(
     const gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_tilde_d*/,
     const gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_tilde_ye*/,
+    const gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_tilde_vb*/,
     const gsl::not_null<Scalar<DataVector>*> non_flux_terms_dt_tilde_tau,
     const gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*>
         non_flux_terms_dt_tilde_s,
@@ -32,6 +33,7 @@ void TimeDerivativeTerms::apply(
 
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_d_flux,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_ye_flux,
+    const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_vb_flux,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>
         tilde_tau_flux,
     const gsl::not_null<tnsr::Ij<DataVector, 3, Frame::Inertial>*> tilde_s_flux,
@@ -72,6 +74,7 @@ void TimeDerivativeTerms::apply(
         temp_inverse_spatial_metric,
 
     const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& tilde_ye,
+    const Scalar<DataVector>& tilde_vb,
     const Scalar<DataVector>& tilde_tau,
     const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,
     const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,
@@ -90,6 +93,7 @@ void TimeDerivativeTerms::apply(
 
     const Scalar<DataVector>& rest_mass_density,
     const Scalar<DataVector>& electron_fraction,
+    const Scalar<DataVector>& transformed_bulk_scalar,
     const Scalar<DataVector>& specific_internal_energy,
     const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
     const double constraint_damping_parameter) {
@@ -121,15 +125,17 @@ void TimeDerivativeTerms::apply(
     lapse_b_over_w->get(i) *= get(lapse);
   }
 
-  detail::fluxes_impl(tilde_d_flux, tilde_ye_flux, tilde_tau_flux, tilde_s_flux,
-                      tilde_b_flux, tilde_phi_flux,
+  detail::fluxes_impl(tilde_d_flux, tilde_ye_flux, tilde_vb_flux,
+                      tilde_tau_flux, tilde_s_flux, tilde_b_flux,
+                      tilde_phi_flux,
                       // Temporaries
                       transport_velocity, *lapse_b_over_w,
                       *magnetic_field_dot_spatial_velocity,
                       *pressure_star_lapse_sqrt_det_spatial_metric,
                       // Extra args
-                      tilde_d, tilde_ye, tilde_tau, tilde_s, tilde_b, tilde_phi,
-                      lapse, shift, inv_spatial_metric, spatial_velocity);
+                      tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b,
+                      tilde_phi, lapse, shift, inv_spatial_metric,
+                      spatial_velocity);
 
   // Compute source terms
   gr::christoffel_first_kind(spatial_christoffel_first_kind, d_spatial_metric);
@@ -148,11 +154,12 @@ void TimeDerivativeTerms::apply(
       *magnetic_field_dot_spatial_velocity, *magnetic_field_squared,
       *one_over_w_squared, *pressure_star, *trace_spatial_christoffel_second,
 
-      tilde_d, tilde_ye, tilde_tau, tilde_s, tilde_b, tilde_phi, lapse,
-      sqrt_det_spatial_metric, inv_spatial_metric, d_lapse, d_shift,
+      tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
+      lapse, sqrt_det_spatial_metric, inv_spatial_metric, d_lapse, d_shift,
       d_spatial_metric, spatial_velocity, lorentz_factor, magnetic_field,
 
-      rest_mass_density, electron_fraction, pressure, specific_internal_energy,
-      extrinsic_curvature, constraint_damping_parameter);
+      rest_mass_density, electron_fraction, transformed_bulk_scalar, pressure,
+      specific_internal_energy, extrinsic_curvature,
+      constraint_damping_parameter);
 }
 }  // namespace grmhd::ValenciaDivClean

@@ -18,6 +18,7 @@ struct ConstraintDampingParameter;
 struct PrimitiveFromConservativeOptions;
 struct TildeD;
 struct TildeYe;
+struct TildeVB;
 struct TildeTau;
 template <typename Fr = Frame::Inertial>
 struct TildeS;

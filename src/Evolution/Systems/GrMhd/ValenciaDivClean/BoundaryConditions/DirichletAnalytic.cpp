@@ -86,6 +86,7 @@ PUP::able::PUP_ID DirichletAnalytic::my_PUP_ID = 0;
 std::optional<std::string> DirichletAnalytic::dg_ghost(
     const gsl::not_null<Scalar<DataVector>*> tilde_d,
     const gsl::not_null<Scalar<DataVector>*> tilde_ye,
+    const gsl::not_null<Scalar<DataVector>*> tilde_vb,
     const gsl::not_null<Scalar<DataVector>*> tilde_tau,
     const gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*> tilde_s,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_b,
@@ -93,6 +94,7 @@ std::optional<std::string> DirichletAnalytic::dg_ghost(
 
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_d_flux,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_ye_flux,
+    const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_vb_flux,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>
         tilde_tau_flux,
     const gsl::not_null<tnsr::Ij<DataVector, 3, Frame::Inertial>*> tilde_s_flux,
@@ -114,6 +116,7 @@ std::optional<std::string> DirichletAnalytic::dg_ghost(
   auto boundary_values = call_with_dynamic_type<
       tuples::TaggedTuple<hydro::Tags::RestMassDensity<DataVector>,
                           hydro::Tags::ElectronFraction<DataVector>,
+                          hydro::Tags::TransformedBulkScalar<DataVector>,
                           hydro::Tags::SpecificInternalEnergy<DataVector>,
                           hydro::Tags::Pressure<DataVector>,
                           hydro::Tags::SpatialVelocity<DataVector, 3>,
@@ -134,6 +137,7 @@ std::optional<std::string> DirichletAnalytic::dg_ghost(
               coords, time,
               tmpl::list<hydro::Tags::RestMassDensity<DataVector>,
                          hydro::Tags::ElectronFraction<DataVector>,
+                         hydro::Tags::TransformedBulkScalar<DataVector>,
                          hydro::Tags::SpecificInternalEnergy<DataVector>,
                          hydro::Tags::Pressure<DataVector>,
                          hydro::Tags::SpatialVelocity<DataVector, 3>,
@@ -152,6 +156,7 @@ std::optional<std::string> DirichletAnalytic::dg_ghost(
               coords,
               tmpl::list<hydro::Tags::RestMassDensity<DataVector>,
                          hydro::Tags::ElectronFraction<DataVector>,
+                         hydro::Tags::TransformedBulkScalar<DataVector>,
                          hydro::Tags::SpecificInternalEnergy<DataVector>,
                          hydro::Tags::Pressure<DataVector>,
                          hydro::Tags::SpatialVelocity<DataVector, 3>,
@@ -172,9 +177,10 @@ std::optional<std::string> DirichletAnalytic::dg_ghost(
       get<gr::Tags::InverseSpatialMetric<DataVector, 3>>(boundary_values);
   // Recover the conservative variables from the primitives
   ConservativeFromPrimitive::apply(
-      tilde_d, tilde_ye, tilde_tau, tilde_s, tilde_b, tilde_phi,
+      tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
       get<hydro::Tags::RestMassDensity<DataVector>>(boundary_values),
       get<hydro::Tags::ElectronFraction<DataVector>>(boundary_values),
+      get<hydro::Tags::TransformedBulkScalar<DataVector>>(boundary_values),
       get<hydro::Tags::SpecificInternalEnergy<DataVector>>(boundary_values),
       get<hydro::Tags::Pressure<DataVector>>(boundary_values),
       get<hydro::Tags::SpatialVelocity<DataVector, 3>>(boundary_values),
@@ -185,9 +191,9 @@ std::optional<std::string> DirichletAnalytic::dg_ghost(
       get<hydro::Tags::DivergenceCleaningField<DataVector>>(boundary_values));
 
   ComputeFluxes::apply(
-      tilde_d_flux, tilde_ye_flux, tilde_tau_flux, tilde_s_flux, tilde_b_flux,
-      tilde_phi_flux, *tilde_d, *tilde_ye, *tilde_tau, *tilde_s, *tilde_b,
-      *tilde_phi, *lapse, *shift,
+      tilde_d_flux, tilde_ye_flux, tilde_vb_flux, tilde_tau_flux, tilde_s_flux,
+      tilde_b_flux, tilde_phi_flux, *tilde_d, *tilde_ye, *tilde_vb, *tilde_tau,
+      *tilde_s, *tilde_b, *tilde_phi, *lapse, *shift,
       get<gr::Tags::SqrtDetSpatialMetric<DataVector>>(boundary_values),
       get<gr::Tags::SpatialMetric<DataVector, 3>>(boundary_values),
       get<gr::Tags::InverseSpatialMetric<DataVector, 3>>(boundary_values),
@@ -202,6 +208,7 @@ std::optional<std::string> DirichletAnalytic::dg_ghost(
 void DirichletAnalytic::fd_ghost(
     const gsl::not_null<Scalar<DataVector>*> rest_mass_density,
     const gsl::not_null<Scalar<DataVector>*> electron_fraction,
+    const gsl::not_null<Scalar<DataVector>*> transformed_bulk_scalar,
     const gsl::not_null<Scalar<DataVector>*> temperature,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>
         lorentz_factor_times_spatial_velocity,
@@ -241,6 +248,7 @@ void DirichletAnalytic::fd_ghost(
   auto boundary_values = call_with_dynamic_type<
       tuples::TaggedTuple<hydro::Tags::RestMassDensity<DataVector>,
                           hydro::Tags::ElectronFraction<DataVector>,
+                          hydro::Tags::TransformedBulkScalar<DataVector>,
                           hydro::Tags::Pressure<DataVector>,
                           hydro::Tags::Temperature<DataVector>,
                           hydro::Tags::SpatialVelocity<DataVector, 3>,
@@ -254,6 +262,7 @@ void DirichletAnalytic::fd_ghost(
         using hydro_tags =
             tmpl::list<hydro::Tags::RestMassDensity<DataVector>,
                        hydro::Tags::ElectronFraction<DataVector>,
+                       hydro::Tags::TransformedBulkScalar<DataVector>,
                        hydro::Tags::Pressure<DataVector>,
                        hydro::Tags::Temperature<DataVector>,
                        hydro::Tags::SpatialVelocity<DataVector, 3>,
@@ -275,6 +284,8 @@ void DirichletAnalytic::fd_ghost(
       get<hydro::Tags::RestMassDensity<DataVector>>(boundary_values);
   *electron_fraction =
       get<hydro::Tags::ElectronFraction<DataVector>>(boundary_values);
+  *transformed_bulk_scalar =
+      get<hydro::Tags::TransformedBulkScalar<DataVector>>(boundary_values);
   *temperature = get<hydro::Tags::Temperature<DataVector>>(boundary_values);
 
   for (size_t i = 0; i < 3; ++i) {
@@ -321,6 +332,7 @@ void DirichletAnalytic::fd_ghost(
     ConservativeFromPrimitive::apply(
         make_not_null(&get<Tags::TildeD>(conserved_vars)),
         make_not_null(&get<Tags::TildeYe>(conserved_vars)),
+        make_not_null(&get<Tags::TildeVB>(conserved_vars)),
         make_not_null(&get<Tags::TildeTau>(conserved_vars)),
         make_not_null(&get<Tags::TildeS<>>(conserved_vars)),
         make_not_null(&get<Tags::TildeB<>>(conserved_vars)),
@@ -328,6 +340,7 @@ void DirichletAnalytic::fd_ghost(
 
         get<hydro::Tags::RestMassDensity<DataVector>>(boundary_values),
         get<hydro::Tags::ElectronFraction<DataVector>>(boundary_values),
+        get<hydro::Tags::TransformedBulkScalar<DataVector>>(boundary_values),
         get<hydro::Tags::SpecificInternalEnergy<DataVector>>(boundary_values),
         get<hydro::Tags::Pressure<DataVector>>(boundary_values),
         get<hydro::Tags::SpatialVelocity<DataVector, 3>>(boundary_values),
@@ -343,6 +356,8 @@ void DirichletAnalytic::fd_ghost(
         make_not_null(
             &get<Flux<Tags::TildeYe>>(cell_centered_ghost_fluxes->value())),
         make_not_null(
+            &get<Flux<Tags::TildeVB>>(cell_centered_ghost_fluxes->value())),
+        make_not_null(
             &get<Flux<Tags::TildeTau>>(cell_centered_ghost_fluxes->value())),
         make_not_null(
             &get<Flux<Tags::TildeS<>>>(cell_centered_ghost_fluxes->value())),
@@ -352,7 +367,7 @@ void DirichletAnalytic::fd_ghost(
             &get<Flux<Tags::TildePhi>>(cell_centered_ghost_fluxes->value())),
 
         get<Tags::TildeD>(conserved_vars), get<Tags::TildeYe>(conserved_vars),
-        get<Tags::TildeTau>(conserved_vars),
+        get<Tags::TildeVB>(conserved_vars), get<Tags::TildeTau>(conserved_vars),
         get<Tags::TildeS<>>(conserved_vars),
         get<Tags::TildeB<>>(conserved_vars),
         get<Tags::TildePhi>(conserved_vars),

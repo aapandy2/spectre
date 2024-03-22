@@ -78,6 +78,7 @@ struct TimeDerivativeTerms {
   using argument_tags =
       tmpl::list<grmhd::ValenciaDivClean::Tags::TildeD,
                  grmhd::ValenciaDivClean::Tags::TildeYe,
+                 grmhd::ValenciaDivClean::Tags::TildeVB,
                  grmhd::ValenciaDivClean::Tags::TildeTau,
                  grmhd::ValenciaDivClean::Tags::TildeS<>,
                  grmhd::ValenciaDivClean::Tags::TildeB<>,
@@ -98,6 +99,7 @@ struct TimeDerivativeTerms {
                  hydro::Tags::MagneticField<DataVector, 3>,
                  hydro::Tags::RestMassDensity<DataVector>,
                  hydro::Tags::ElectronFraction<DataVector>,
+                 hydro::Tags::TransformedBulkScalar<DataVector>,
                  hydro::Tags::SpecificInternalEnergy<DataVector>,
                  gr::Tags::ExtrinsicCurvature<DataVector, 3>,
                  grmhd::ValenciaDivClean::Tags::ConstraintDampingParameter>;
@@ -105,6 +107,7 @@ struct TimeDerivativeTerms {
   static void apply(
       gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_tilde_d*/,
       gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_tilde_ye*/,
+      gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_tilde_vb*/,
       gsl::not_null<Scalar<DataVector>*> non_flux_terms_dt_tilde_tau,
       gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*>
           non_flux_terms_dt_tilde_s,
@@ -114,6 +117,7 @@ struct TimeDerivativeTerms {
 
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_d_flux,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_ye_flux,
+      gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_vb_flux,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_tau_flux,
       gsl::not_null<tnsr::Ij<DataVector, 3, Frame::Inertial>*> tilde_s_flux,
       gsl::not_null<tnsr::IJ<DataVector, 3, Frame::Inertial>*> tilde_b_flux,
@@ -150,7 +154,7 @@ struct TimeDerivativeTerms {
           temp_inverse_spatial_metric,
 
       const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& tilde_ye,
-      const Scalar<DataVector>& tilde_tau,
+      const Scalar<DataVector>& tilde_vb, const Scalar<DataVector>& tilde_tau,
       const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,
       const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,
       const Scalar<DataVector>& tilde_phi, const Scalar<DataVector>& lapse,
@@ -168,6 +172,7 @@ struct TimeDerivativeTerms {
 
       const Scalar<DataVector>& rest_mass_density,
       const Scalar<DataVector>& electron_fraction,
+      const Scalar<DataVector>& transformed_bulk_scalar,
       const Scalar<DataVector>& specific_internal_energy,
       const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
       double constraint_damping_parameter);
