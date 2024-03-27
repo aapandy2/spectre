@@ -36,7 +36,7 @@ using initial_data_list = tmpl::list<
 //    AnalyticData::RiemannProblem,
     //AnalyticData::SlabJet, Solutions::AlfvenWave,
     //grmhd::Solutions::BondiMichel, Solutions::KomissarovShock,
-//    Solutions::SmoothFlow//,
+    Solutions::SmoothFlow//,
     //RelativisticEuler::Solutions::FishboneMoncriefDisk,
     //RelativisticEuler::Solutions::RotatingStar,
     //RelativisticEuler::Solutions::TovStar

@@ -57,6 +57,15 @@ SmoothFlow<Dim>::variables(
 
 template <size_t Dim>
 template <typename DataType>
+tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>>
+SmoothFlow<Dim>::variables(
+    const tnsr::I<DataType, Dim>& x, double /*t*/,
+    tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>> /*meta*/) const {
+  return {make_with_value<Scalar<DataType>>(x, 0.1)};
+}
+
+template <size_t Dim>
+template <typename DataType>
 tuples::TaggedTuple<hydro::Tags::DivergenceCleaningField<DataType>>
 SmoothFlow<Dim>::variables(
     const tnsr::I<DataType, Dim>& x, double /*t*/,
@@ -109,6 +118,12 @@ bool operator!=(const SmoothFlow<Dim>& lhs, const SmoothFlow<Dim>& rhs) {
   SmoothFlow<DIM(data)>::variables(                                            \
       const tnsr::I<DATA_TYPE(data), DIM(data)>& x, double /*t*/,              \
       tmpl::list<hydro::Tags::ElectronFraction<DATA_TYPE(data)>> /*meta*/)     \
+      const;                                                                   \
+  template tuples::TaggedTuple<                                                \
+  hydro::Tags::TransformedBulkScalar<DATA_TYPE(data)>>                         \
+  SmoothFlow<DIM(data)>::variables(                                            \
+      const tnsr::I<DATA_TYPE(data), DIM(data)>& x, double /*t*/,              \
+      tmpl::list<hydro::Tags::TransformedBulkScalar<DATA_TYPE(data)>> /*meta*/)\
       const;                                                                   \
   template tuples::TaggedTuple<                                                \
       hydro::Tags::MagneticField<DATA_TYPE(data), DIM(data)>>                  \

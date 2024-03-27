@@ -19,6 +19,7 @@ struct AnalyticSolution {
       tmpl::push_back<typename gr::AnalyticSolution<3>::template tags<DataType>,
                       hydro::Tags::RestMassDensity<DataType>,
                       hydro::Tags::ElectronFraction<DataType>,
+                      hydro::Tags::TransformedBulkScalar<DataType>,
                       hydro::Tags::SpecificInternalEnergy<DataType>,
                       hydro::Tags::Temperature<DataType>,
                       hydro::Tags::Pressure<DataType>,

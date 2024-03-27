@@ -21,6 +21,7 @@ struct AnalyticSolution {
       typename gr::AnalyticSolution<Dim>::template tags<DataType>,
       hydro::Tags::RestMassDensity<DataType>,
       hydro::Tags::ElectronFraction<DataType>,
+      hydro::Tags::TransformedBulkScalar<DataType>,
       hydro::Tags::SpecificInternalEnergy<DataType>,
       hydro::Tags::Temperature<DataType>, hydro::Tags::Pressure<DataType>,
       hydro::Tags::SpatialVelocity<DataType, Dim>,
