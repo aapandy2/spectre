@@ -20,21 +20,21 @@ Evolution:
   TimeStepper: Rk3HesthavenSsp
 
 PhaseChangeAndTriggers:
-#  - Trigger:
-#      Slabs:
-#       EvenlySpaced:
-#         # Current implementation checks wallclock at these global syncs
-#         Interval: 100
-#         Offset: 0
-#    PhaseChanges:
-#      - CheckpointAndExitAfterWallclock:
-#          WallclockHours: None
+  - Trigger:
+      Slabs:
+       EvenlySpaced:
+         # Current implementation checks wallclock at these global syncs
+         Interval: 100
+         Offset: 0
+    PhaseChanges:
+      - CheckpointAndExitAfterWallclock:
+          WallclockHours: None
 
 DomainCreator:
   Brick:
-    LowerBound: [-6.0, -6.0, -6.0]
-    UpperBound: [6.0, 6.0, 6.0]
-    InitialRefinement: [2, 2, 0]
+    LowerBound: [-1.0, -1.0, -1.0]
+    UpperBound: [1.0, 1.0, 1.0]
+    InitialRefinement: [2, 2, 2]
     InitialGridPoints: [3, 3, 3]
     TimeDependence: None
     BoundaryConditionInX: Periodic
@@ -81,10 +81,10 @@ SpatialDiscretization:
 
 InitialData:
   SmoothFlow:
-    AdiabaticIndex: 1.3333333333333333333
-    MeanVelocity: [0.1, 0., 0.]
-    WaveVector: [-0.1, 0., 0.]
+    MeanVelocity: [0.7, 0., 0.]
+    WaveVector: [2., 0., 0.]
     Pressure: 1.0
+    AdiabaticIndex: 1.4
     PerturbationSize: 0.8
 
 EquationOfState:
@@ -105,7 +105,7 @@ VariableFixing:
     SafetyFactorForS: 1.0e-12
     SafetyFactorForSCutoffD: 1.0e-12
     SafetyFactorForSSlope: 0.0
-    MagneticField: AssumeZero
+    MagneticField: AssumeNonZero
   FixToAtmosphere:
     DensityOfAtmosphere: 1.0e-12
     DensityCutoff: 1.0e-12
@@ -118,7 +118,7 @@ PrimitiveFromConservative:
   KastaunMaxLorentzFactor: 10.0
 
 Observers:
-  VolumeFileName: "ValenciaDivCleanSmoothFlow"
+  VolumeFileName: "ValenciaDivCleanSmoothFlowVolume"
   ReductionFileName: "ValenciaDivCleanSmoothFlowReductions"
 
 Interpolator:
@@ -128,9 +128,21 @@ EventsAndTriggers:
   - Trigger:
       Slabs:
         Specified:
-          Values: [2]
+          Values: [100]
     Events:
       - Completion
+  - Trigger:
+      Slabs:
+        EvenlySpaced:
+          Interval: 1
+          Offset: 0
+    Events:
+      - ObserveFields:
+          SubfileName: VolumeData
+          VariablesToObserve: [RestMassDensity, ElectronFraction]
+          InterpolateToMesh: None
+          CoordinatesFloatingPointType: Double
+          FloatingPointTypes: [Double]
 
 EventsAndDenseTriggers:
 
