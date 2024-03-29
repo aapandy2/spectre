@@ -50,10 +50,10 @@ SpatialDiscretization:
     Subcell:
       TroubledCellIndicator:
         PerssonTci:
-          Exponent: 4.0
+          Exponent: 1.0 #previously 4.0; set to 1 to disable subcell
           NumHighestModes: 1
         RdmpTci:
-          Delta0: 1.0e-7
+          Delta0: 1.0e50 #previously 1.0e-7; set to large to disable subcell
           Epsilon: 1.0e-3
         FdToDgTci:
           NumberOfStepsBetweenTciCalls: 1
@@ -82,10 +82,10 @@ SpatialDiscretization:
 InitialData:
   SmoothFlow:
     MeanVelocity: [0.7, 0., 0.]
-    WaveVector: [2., 0., 0.]
+    WaveVector: [3.14159265, 0., 0.]
     Pressure: 1.0
     AdiabaticIndex: 1.4
-    PerturbationSize: 0.8
+    PerturbationSize: 0.5
 
 EquationOfState:
   FromInitialData
@@ -139,7 +139,8 @@ EventsAndTriggers:
     Events:
       - ObserveFields:
           SubfileName: VolumeData
-          VariablesToObserve: [RestMassDensity, ElectronFraction]
+          VariablesToObserve: [RestMassDensity, ElectronFraction,
+                               TransformedBulkScalar]
           InterpolateToMesh: None
           CoordinatesFloatingPointType: Double
           FloatingPointTypes: [Double]
