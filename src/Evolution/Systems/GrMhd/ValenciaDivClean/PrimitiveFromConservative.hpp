@@ -51,6 +51,7 @@ struct PrimitiveFromConservative {
   using return_tags =
       tmpl::list<hydro::Tags::RestMassDensity<DataVector>,
                  hydro::Tags::ElectronFraction<DataVector>,
+                 hydro::Tags::TransformedBulkScalar<DataVector>,
                  hydro::Tags::SpecificInternalEnergy<DataVector>,
                  hydro::Tags::SpatialVelocity<DataVector, 3>,
                  hydro::Tags::MagneticField<DataVector, 3>,
@@ -62,6 +63,7 @@ struct PrimitiveFromConservative {
   using argument_tags = tmpl::list<
       grmhd::ValenciaDivClean::Tags::TildeD,
       grmhd::ValenciaDivClean::Tags::TildeYe,
+      grmhd::ValenciaDivClean::Tags::TildeVB,
       grmhd::ValenciaDivClean::Tags::TildeTau,
       grmhd::ValenciaDivClean::Tags::TildeS<>,
       grmhd::ValenciaDivClean::Tags::TildeB<>,
@@ -76,6 +78,7 @@ struct PrimitiveFromConservative {
   static bool apply(
       gsl::not_null<Scalar<DataVector>*> rest_mass_density,
       gsl::not_null<Scalar<DataVector>*> electron_fraction,
+      gsl::not_null<Scalar<DataVector>*> transformed_bulk_scalar,
       gsl::not_null<Scalar<DataVector>*> specific_internal_energy,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> spatial_velocity,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> magnetic_field,
@@ -84,7 +87,7 @@ struct PrimitiveFromConservative {
       gsl::not_null<Scalar<DataVector>*> pressure,
       gsl::not_null<Scalar<DataVector>*> temperature,
       const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& tilde_ye,
-      const Scalar<DataVector>& tilde_tau,
+      const Scalar<DataVector>& tilde_vb, const Scalar<DataVector>& tilde_tau,
       const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,
       const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,
       const Scalar<DataVector>& tilde_phi,
@@ -100,6 +103,7 @@ struct PrimitiveFromConservative {
   static bool impl(
       gsl::not_null<Scalar<DataVector>*> rest_mass_density,
       gsl::not_null<Scalar<DataVector>*> electron_fraction,
+      gsl::not_null<Scalar<DataVector>*> transformed_bulk_scalar,
       gsl::not_null<Scalar<DataVector>*> specific_internal_energy,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> spatial_velocity,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> magnetic_field,
@@ -108,7 +112,7 @@ struct PrimitiveFromConservative {
       gsl::not_null<Scalar<DataVector>*> pressure,
       gsl::not_null<Scalar<DataVector>*> temperature,
       const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& tilde_ye,
-      const Scalar<DataVector>& tilde_tau,
+      const Scalar<DataVector>& tilde_vb, const Scalar<DataVector>& tilde_tau,
       const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,
       const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,
       const Scalar<DataVector>& tilde_phi,

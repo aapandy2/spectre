@@ -132,6 +132,7 @@ class Flattener {
   void operator()(
       gsl::not_null<Scalar<DataVector>*> tilde_d,
       gsl::not_null<Scalar<DataVector>*> tilde_ye,
+      gsl::not_null<Scalar<DataVector>*> tilde_vb,
       gsl::not_null<Scalar<DataVector>*> tilde_tau,
       gsl::not_null<tnsr::i<DataVector, 3>*> tilde_s,
       gsl::not_null<Variables<hydro::grmhd_tags<DataVector>>*> primitives,

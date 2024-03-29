@@ -25,7 +25,8 @@ void PrimsAfterRollback<OrderedListOfRecoverySchemes>::apply(
     const gsl::not_null<Variables<hydro::grmhd_tags<DataVector>>*> prim_vars,
     const bool did_rollback, const Mesh<3>& dg_mesh,
     const Mesh<3>& subcell_mesh, const Scalar<DataVector>& tilde_d,
-    const Scalar<DataVector>& tilde_ye, const Scalar<DataVector>& tilde_tau,
+    const Scalar<DataVector>& tilde_ye, const Scalar<DataVector>& tilde_vb,
+    const Scalar<DataVector>& tilde_tau,
     const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,
     const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,
     const Scalar<DataVector>& tilde_phi,
@@ -55,6 +56,9 @@ void PrimsAfterRollback<OrderedListOfRecoverySchemes>::apply(
                 &get<hydro::Tags::RestMassDensity<DataVector>>(*prim_vars)),
             make_not_null(
                 &get<hydro::Tags::ElectronFraction<DataVector>>(*prim_vars)),
+            make_not_null(
+                &get<hydro::Tags::TransformedBulkScalar<DataVector>>(
+                *prim_vars)),
             make_not_null(&get<hydro::Tags::SpecificInternalEnergy<DataVector>>(
                 *prim_vars)),
             make_not_null(
@@ -69,7 +73,7 @@ void PrimsAfterRollback<OrderedListOfRecoverySchemes>::apply(
             make_not_null(&get<hydro::Tags::Pressure<DataVector>>(*prim_vars)),
             make_not_null(
                 &get<hydro::Tags::Temperature<DataVector>>(*prim_vars)),
-            tilde_d, tilde_ye, tilde_tau, tilde_s, tilde_b, tilde_phi,
+            tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
             spatial_metric, inv_spatial_metric, sqrt_det_spatial_metric, eos,
             primitive_from_conservative_options);
   }
@@ -92,7 +96,7 @@ using KastaunThenNewmanThenPalenzuela =
           prim_vars,                                                          \
       bool did_rollback, const Mesh<3>& dg_mesh, const Mesh<3>& subcell_mesh, \
       const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& tilde_ye,  \
-      const Scalar<DataVector>& tilde_tau,                                    \
+      const Scalar<DataVector>& tilde_vb, const Scalar<DataVector>& tilde_tau,\
       const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,                 \
       const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,                 \
       const Scalar<DataVector>& tilde_phi,                                    \

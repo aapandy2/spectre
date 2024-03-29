@@ -33,6 +33,7 @@ std::tuple<int, evolution::dg::subcell::RdmpTciData>
 TciOnDgGrid<RecoveryScheme>::apply(
     const gsl::not_null<Variables<hydro::grmhd_tags<DataVector>>*> dg_prim_vars,
     const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& tilde_ye,
+    const Scalar<DataVector>& tilde_vb,
     const Scalar<DataVector>& tilde_tau,
     const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,
     const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,
@@ -125,6 +126,9 @@ TciOnDgGrid<RecoveryScheme>::apply(
               make_not_null(&get<hydro::Tags::ElectronFraction<DataVector>>(
                   pre_tci_prims)),
               make_not_null(
+                  &get<hydro::Tags::TransformedBulkScalar<DataVector>>(
+                  pre_tci_prims)),
+              make_not_null(
                   &get<hydro::Tags::SpecificInternalEnergy<DataVector>>(
                       pre_tci_prims)),
               make_not_null(&get<hydro::Tags::SpatialVelocity<DataVector, 3>>(
@@ -140,8 +144,9 @@ TciOnDgGrid<RecoveryScheme>::apply(
                   &get<hydro::Tags::Pressure<DataVector>>(pre_tci_prims)),
               make_not_null(
                   &get<hydro::Tags::Temperature<DataVector>>(pre_tci_prims)),
-              tilde_d, tilde_ye, tilde_tau, tilde_s, tilde_b, tilde_phi,
-              spatial_metric, inv_spatial_metric, sqrt_det_spatial_metric, eos,
+              tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b,
+              tilde_phi, spatial_metric, inv_spatial_metric,
+              sqrt_det_spatial_metric, eos,
               primitive_from_conservative_options);
 
   // This lambda is called before every TCI failure

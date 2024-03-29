@@ -42,6 +42,7 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
                                ErrorOnFailure>::
     apply(const gsl::not_null<Scalar<DataVector>*> rest_mass_density,
           const gsl::not_null<Scalar<DataVector>*> electron_fraction,
+          const gsl::not_null<Scalar<DataVector>*> transformed_bulk_scalar,
           const gsl::not_null<Scalar<DataVector>*> specific_internal_energy,
           const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>
               spatial_velocity,
@@ -52,6 +53,7 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
           const gsl::not_null<Scalar<DataVector>*> pressure,
           const gsl::not_null<Scalar<DataVector>*> temperature,
           const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& tilde_ye,
+          const Scalar<DataVector>& tilde_vb,
           const Scalar<DataVector>& tilde_tau,
           const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,
           const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,
@@ -66,12 +68,12 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
       bool, typename EquationsOfState::detail::DerivedClasses<true, 3>::type>(
       &equation_of_state, [&](const auto* const derived_eos) {
         return impl<EnforcePhysicality>(
-            rest_mass_density, electron_fraction, specific_internal_energy,
-            spatial_velocity, magnetic_field, divergence_cleaning_field,
-            lorentz_factor, pressure, temperature, tilde_d, tilde_ye, tilde_tau,
-            tilde_s, tilde_b, tilde_phi, spatial_metric, inv_spatial_metric,
-            sqrt_det_spatial_metric, *derived_eos,
-            primitive_from_conservative_options);
+            rest_mass_density, electron_fraction, transformed_bulk_scalar,
+            specific_internal_energy, spatial_velocity, magnetic_field,
+            divergence_cleaning_field, lorentz_factor, pressure, temperature,
+            tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
+            spatial_metric, inv_spatial_metric, sqrt_det_spatial_metric,
+            *derived_eos, primitive_from_conservative_options);
       });
 }
 
@@ -83,6 +85,7 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
                                ErrorOnFailure>::
     impl(const gsl::not_null<Scalar<DataVector>*> rest_mass_density,
          const gsl::not_null<Scalar<DataVector>*> electron_fraction,
+         const gsl::not_null<Scalar<DataVector>*> transformed_bulk_scalar,
          const gsl::not_null<Scalar<DataVector>*> specific_internal_energy,
          const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>
              spatial_velocity,
@@ -93,6 +96,7 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
          const gsl::not_null<Scalar<DataVector>*> pressure,
          const gsl::not_null<Scalar<DataVector>*> temperature,
          const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& tilde_ye,
+         const Scalar<DataVector>& tilde_vb,
          const Scalar<DataVector>& tilde_tau,
          const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,
          const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,
@@ -166,6 +170,10 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
     // Quick exit from inversion in low-density regions where we will
     // apply atmosphere corrections anyways.
     if (rest_mass_density_times_lorentz_factor[s] < cutoffD) {
+
+      //in atmosphere set TransformedBulkScalar = 1 (implies Bulk scalar = 0)
+      get(*transformed_bulk_scalar)[s] = 1.;
+
       double specific_energy_at_point =
           equation_of_state.specific_internal_energy_lower_bound(
               floorD, get(*electron_fraction)[s]);
@@ -239,6 +247,13 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
             coefficient_of_s * tilde_s_upper.get(i)[s];
       }
       get(*lorentz_factor)[s] = primitive_data.value().lorentz_factor;
+
+      //use Lorentz factor to get transformed_bulk_scalar; TODO: enforce > 0
+      get(*transformed_bulk_scalar)[s] = get(tilde_vb)[s] /
+                                         primitive_data.value().lorentz_factor /
+                                         get(sqrt_det_spatial_metric)[s];
+      //get(*transformed_bulk_scalar)[s] = 0.;
+
       get(*pressure)[s] = primitive_data.value().pressure;
       if constexpr (not eos_is_barotropic) {
         get(*specific_internal_energy)[s] =
@@ -320,6 +335,7 @@ GENERATE_INSTANTIATIONS(
       apply<PHYSICALITY(data)>(                                                \
           const gsl::not_null<Scalar<DataVector>*> rest_mass_density,          \
           const gsl::not_null<Scalar<DataVector>*> electron_fraction,          \
+          const gsl::not_null<Scalar<DataVector>*> transformed_bulk_scalar,    \
           const gsl::not_null<Scalar<DataVector>*> specific_internal_energy,   \
           const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>        \
               spatial_velocity,                                                \
@@ -331,6 +347,7 @@ GENERATE_INSTANTIATIONS(
           const gsl::not_null<Scalar<DataVector>*> temperature,                \
           const Scalar<DataVector>& tilde_d,                                   \
           const Scalar<DataVector>& tilde_ye,                                  \
+          const Scalar<DataVector>& tilde_vb,                                  \
           const Scalar<DataVector>& tilde_tau,                                 \
           const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,              \
           const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,              \

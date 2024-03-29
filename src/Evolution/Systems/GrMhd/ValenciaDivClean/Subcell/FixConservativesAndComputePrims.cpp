@@ -47,6 +47,8 @@ void FixConservativesAndComputePrims<OrderedListOfRecoverySchemes>::apply(
               *primitive_vars_ptr)),
           make_not_null(&get<hydro::Tags::ElectronFraction<DataVector>>(
               *primitive_vars_ptr)),
+          make_not_null(&get<hydro::Tags::TransformedBulkScalar<DataVector>>(
+              *primitive_vars_ptr)),
           make_not_null(&get<hydro::Tags::SpecificInternalEnergy<DataVector>>(
               *primitive_vars_ptr)),
           make_not_null(&get<hydro::Tags::SpatialVelocity<DataVector, 3>>(
@@ -63,6 +65,7 @@ void FixConservativesAndComputePrims<OrderedListOfRecoverySchemes>::apply(
               &get<hydro::Tags::Temperature<DataVector>>(*primitive_vars_ptr)),
           get<Tags::TildeD>(*conserved_vars_ptr),
           get<Tags::TildeYe>(*conserved_vars_ptr),
+          get<Tags::TildeVB>(*conserved_vars_ptr),
           get<Tags::TildeTau>(*conserved_vars_ptr),
           get<Tags::TildeS<Frame::Inertial>>(*conserved_vars_ptr),
           get<Tags::TildeB<Frame::Inertial>>(*conserved_vars_ptr),

@@ -48,6 +48,7 @@ template <typename RecoverySchemesList>
 void Flattener<RecoverySchemesList>::operator()(
     const gsl::not_null<Scalar<DataVector>*> tilde_d,
     const gsl::not_null<Scalar<DataVector>*> tilde_ye,
+    const gsl::not_null<Scalar<DataVector>*> tilde_vb,
     const gsl::not_null<Scalar<DataVector>*> tilde_tau,
     const gsl::not_null<tnsr::i<DataVector, 3>*> tilde_s,
     const gsl::not_null<Variables<hydro::grmhd_tags<DataVector>>*> primitives,
@@ -197,6 +198,9 @@ void Flattener<RecoverySchemesList>::operator()(
               make_not_null(
                   &get<hydro::Tags::ElectronFraction<DataVector>>(temp_prims)),
               make_not_null(
+                  &get<hydro::Tags::TransformedBulkScalar<DataVector>>(
+                  temp_prims)),
+              make_not_null(
                   &get<hydro::Tags::SpecificInternalEnergy<DataVector>>(
                       temp_prims)),
               make_not_null(&get<hydro::Tags::SpatialVelocity<DataVector, 3>>(
@@ -212,8 +216,9 @@ void Flattener<RecoverySchemesList>::operator()(
                   &get<hydro::Tags::Pressure<DataVector>>(temp_prims)),
               make_not_null(
                   &get<hydro::Tags::Temperature<DataVector>>(temp_prims)),
-              *tilde_d, *tilde_ye, *tilde_tau, *tilde_s, tilde_b, tilde_phi,
-              spatial_metric, inv_spatial_metric, sqrt_det_spatial_metric, eos,
+              *tilde_d, *tilde_ye, *tilde_vb, *tilde_tau, *tilde_s, tilde_b,
+              tilde_phi, spatial_metric, inv_spatial_metric,
+              sqrt_det_spatial_metric, eos,
               primitive_from_conservative_options)) {
     compute_means();
 
@@ -232,6 +237,9 @@ void Flattener<RecoverySchemesList>::operator()(
               make_not_null(
                   &get<hydro::Tags::ElectronFraction<DataVector>>(temp_prims)),
               make_not_null(
+                  &get<hydro::Tags::TransformedBulkScalar<DataVector>>(
+                  temp_prims)),
+              make_not_null(
                   &get<hydro::Tags::SpecificInternalEnergy<DataVector>>(
                       temp_prims)),
               make_not_null(&get<hydro::Tags::SpatialVelocity<DataVector, 3>>(
@@ -247,8 +255,9 @@ void Flattener<RecoverySchemesList>::operator()(
                   &get<hydro::Tags::Pressure<DataVector>>(temp_prims)),
               make_not_null(
                   &get<hydro::Tags::Temperature<DataVector>>(temp_prims)),
-              *tilde_d, *tilde_ye, *tilde_tau, *tilde_s, tilde_b, tilde_phi,
-              spatial_metric, inv_spatial_metric, sqrt_det_spatial_metric, eos,
+              *tilde_d, *tilde_ye, *tilde_vb, *tilde_tau, *tilde_s, tilde_b,
+              tilde_phi, spatial_metric, inv_spatial_metric,
+              sqrt_det_spatial_metric, eos,
               primitive_from_conservative_options);
     }
   }

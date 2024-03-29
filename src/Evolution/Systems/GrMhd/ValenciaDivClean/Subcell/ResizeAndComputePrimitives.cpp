@@ -29,6 +29,7 @@ void ResizeAndComputePrims<OrderedListOfRecoverySchemes>::apply(
     const evolution::dg::subcell::ActiveGrid active_grid,
     const Mesh<3>& dg_mesh, const Mesh<3>& subcell_mesh,
     const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& tilde_ye,
+    const Scalar<DataVector>& tilde_vb,
     const Scalar<DataVector>& tilde_tau,
     const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,
     const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,
@@ -63,6 +64,9 @@ void ResizeAndComputePrims<OrderedListOfRecoverySchemes>::apply(
                 &get<hydro::Tags::RestMassDensity<DataVector>>(*prim_vars)),
             make_not_null(
                 &get<hydro::Tags::ElectronFraction<DataVector>>(*prim_vars)),
+            make_not_null(
+                &get<hydro::Tags::TransformedBulkScalar<DataVector>>(
+                *prim_vars)),
             make_not_null(&get<hydro::Tags::SpecificInternalEnergy<DataVector>>(
                 *prim_vars)),
             make_not_null(
@@ -77,7 +81,7 @@ void ResizeAndComputePrims<OrderedListOfRecoverySchemes>::apply(
             make_not_null(&get<hydro::Tags::Pressure<DataVector>>(*prim_vars)),
             make_not_null(
                 &get<hydro::Tags::Temperature<DataVector>>(*prim_vars)),
-            tilde_d, tilde_ye, tilde_tau, tilde_s, tilde_b, tilde_phi,
+            tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
             spatial_metric, inv_spatial_metric, sqrt_det_spatial_metric, eos,
             primitive_from_conservative_options);
   }
