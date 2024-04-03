@@ -1,0 +1,159 @@
+# Distributed under the MIT License.
+# See LICENSE.txt for details.
+
+Executable: EvolveValenciaDivClean
+Testing:
+  Check: parse;execute
+  Priority: High
+
+---
+
+Parallelization:
+  ElementDistribution: NumGridPoints
+
+ResourceInfo:
+  AvoidGlobalProc0: false
+
+Evolution:
+  InitialTime: 0.0
+  InitialTimeStep: 0.01
+  TimeStepper: Rk3HesthavenSsp
+
+PhaseChangeAndTriggers:
+  - Trigger:
+      Slabs:
+       EvenlySpaced:
+         # Current implementation checks wallclock at these global syncs
+         Interval: 100
+         Offset: 0
+    PhaseChanges:
+      - CheckpointAndExitAfterWallclock:
+          WallclockHours: None
+
+
+DomainCreator:
+  Brick:
+    LowerBound: [-1.0, -1.0, -1.0]
+    UpperBound: [1.0, 1.0, 1.0]
+    InitialRefinement: [2, 2, 2]
+    InitialGridPoints: [3, 3, 3]
+    TimeDependence: None
+    BoundaryConditionInX: HydroFreeOutflow
+    BoundaryConditionInY: HydroFreeOutflow
+    BoundaryConditionInZ: HydroFreeOutflow
+
+SpatialDiscretization:
+  BoundaryCorrection:
+    Rusanov:
+  DiscontinuousGalerkin:
+    Formulation: StrongInertial
+    Quadrature: GaussLobatto
+    Subcell:
+      TroubledCellIndicator:
+        PerssonTci:
+          Exponent: 1.0 #previously 4.0; set to 1 to disable subcell
+          NumHighestModes: 1
+        RdmpTci:
+          Delta0: 1.0e50 #previously 1.0e-7; set to large to disable subcell
+          Epsilon: 1.0e-3
+        FdToDgTci:
+          NumberOfStepsBetweenTciCalls: 1
+          MinTciCallsAfterRollback: 1
+          MinimumClearTcis: 1
+        AlwaysUseSubcells: false
+        UseHalo: false
+        OnlyDgBlocksAndGroups: None
+      SubcellToDgReconstructionMethod: DimByDim
+      FiniteDifferenceDerivativeOrder: 2
+    TciOptions:
+      MinimumValueOfD: 1.0e-20
+      MinimumValueOfYe: 1.0e-20
+      MinimumValueOfTildeTau: 1.0e-50
+      MagneticFieldCutoff: DoNotCheckMagneticField
+      AtmosphereDensity: 1.01e-15
+      SafetyFactorForB: 1.0e-12
+  SubcellSolver:
+    Reconstructor:
+      Wcns5zPrim:
+        NonlinearWeightExponent: 2
+        Epsilon: 1.0e-15
+        FallbackReconstructor: MonotonisedCentral
+        MaxNumberOfExtrema: 0
+
+InitialData:
+  RiemannProblem:
+    AdiabaticIndex: 1.4
+    LeftDensity: 1.0
+    LeftVelocity: [0.0, 0.5, -0.3]
+    LeftPressure: 1.0
+    RightDensity: 0.125
+    RightVelocity: [0.0, 0.2, 0.1]
+    RightPressure: 0.1
+    LeftMagneticField: [0.0, 0.0, 0.0]
+    RightMagneticField: [0.0, 0.0, 0.0]
+    Lapse: 1.0
+    ShiftX: 0.0
+
+EquationOfState:
+  FromInitialData
+
+EvolutionSystem:
+  ValenciaDivClean:
+    DampingParameter: 1.0
+
+VariableFixing:
+  FixConservatives:
+    Enable: false # Only needed when not using Kastaun for recovery
+    CutoffD: &CutoffD 1.0e-12
+    MinimumValueOfD: &MinimumD 1.0e-12
+    CutoffYe: 0.0
+    MinimumValueOfYe: 0.0
+    SafetyFactorForB: 1.0e-12
+    SafetyFactorForS: 1.0e-12
+    SafetyFactorForSCutoffD: 1.0e-12
+    SafetyFactorForSSlope: 0.0
+    MagneticField: AssumeNonZero
+  FixToAtmosphere:
+    DensityOfAtmosphere: 1.0e-12
+    DensityCutoff: 1.0e-12
+    TransitionDensityCutoff: 1.0e-11
+    MaxVelocityMagnitude: 1.0e-4
+
+PrimitiveFromConservative:
+  CutoffDForInversion: *CutoffD
+  DensityWhenSkippingInversion: *MinimumD
+  KastaunMaxLorentzFactor: 10.0
+
+Observers:
+  VolumeFileName: "ValenciaDivCleanRiemannProblemVolume"
+  ReductionFileName: "ValenciaDivCleanRiemannProblemReductions"
+
+Interpolator:
+  DumpVolumeDataOnFailure: false
+
+EventsAndTriggers:
+  - Trigger:
+      Slabs:
+        Specified:
+          Values: [100]
+    Events:
+      - Completion
+  - Trigger:
+      Slabs:
+        EvenlySpaced:
+          Interval: 1
+          Offset: 0
+    Events:
+      - ObserveFields:
+          SubfileName: VolumeData
+          VariablesToObserve: [RestMassDensity, ElectronFraction,
+                               TransformedBulkScalar]
+          InterpolateToMesh: None
+          CoordinatesFloatingPointType: Double
+          FloatingPointTypes: [Double]
+
+EventsAndDenseTriggers:
+
+EventsRunAtCleanup:
+  ObservationValue: -1000.0
+  Events:

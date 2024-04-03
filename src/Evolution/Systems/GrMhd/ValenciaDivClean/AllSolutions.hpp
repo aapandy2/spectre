@@ -33,7 +33,7 @@ using initial_data_list = tmpl::list<
     //AnalyticData::MagneticFieldLoop, AnalyticData::MagneticRotor,
     //AnalyticData::MagnetizedFmDisk, AnalyticData::MagnetizedTovStar,
     //AnalyticData::OrszagTangVortex, AnalyticData::PolarMagnetizedFmDisk,
-//    AnalyticData::RiemannProblem,
+    AnalyticData::RiemannProblem,
     //AnalyticData::SlabJet, Solutions::AlfvenWave,
     //grmhd::Solutions::BondiMichel, Solutions::KomissarovShock,
     Solutions::SmoothFlow//,

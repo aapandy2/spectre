@@ -90,6 +90,15 @@ RiemannProblem::variables(
 }
 
 template <typename DataType>
+tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>>
+RiemannProblem::variables(
+    const tnsr::I<DataType, 3>& x,
+    tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>> /*meta*/) const {
+
+    return {make_with_value<Scalar<DataType>>(x, 0.1)};
+}
+
+template <typename DataType>
 tuples::TaggedTuple<hydro::Tags::SpatialVelocity<DataType, 3>>
 RiemannProblem::variables(
     const tnsr::I<DataType, 3>& x,
@@ -240,7 +249,8 @@ GENERATE_INSTANTIATIONS(
     (hydro::Tags::RestMassDensity, hydro::Tags::SpecificInternalEnergy,
      hydro::Tags::Pressure, hydro::Tags::DivergenceCleaningField,
      hydro::Tags::LorentzFactor, hydro::Tags::SpecificEnthalpy,
-     hydro::Tags::ElectronFraction, hydro::Tags::Temperature, gr::Tags::Lapse))
+     hydro::Tags::ElectronFraction, hydro::Tags::TransformedBulkScalar,
+     hydro::Tags::Temperature, gr::Tags::Lapse))
 
 #define INSTANTIATE_VECTORS(_, data)                        \
   template tuples::TaggedTuple<TAG(data) < DTYPE(data), 3>> \
