@@ -50,10 +50,10 @@ SpatialDiscretization:
     Subcell:
       TroubledCellIndicator:
         PerssonTci:
-          Exponent: 1.0 #previously 4.0; set to 1 to disable subcell
+          Exponent: 4.0 #set to 1.0 to disable subcell
           NumHighestModes: 1
         RdmpTci:
-          Delta0: 1.0e50 #previously 1.0e-7; set to large to disable subcell
+          Delta0: 1.0e-7 #set to large (1.0e50) to disable subcell
           Epsilon: 1.0e-3
         FdToDgTci:
           NumberOfStepsBetweenTciCalls: 1
