@@ -25,6 +25,8 @@ DataVector PrimitiveGhostVariables::apply(
       get<hydro::Tags::RestMassDensity<DataVector>>(prims);
   get<hydro::Tags::ElectronFraction<DataVector>>(vars_to_reconstruct) =
       get<hydro::Tags::ElectronFraction<DataVector>>(prims);
+  get<hydro::Tags::TransformedBulkScalar<DataVector>>(vars_to_reconstruct) =
+      get<hydro::Tags::TransformedBulkScalar<DataVector>>(prims);
   get<hydro::Tags::Temperature<DataVector>>(vars_to_reconstruct) =
       get<hydro::Tags::Temperature<DataVector>>(prims);
   get<hydro::Tags::MagneticField<DataVector, 3>>(vars_to_reconstruct) =
