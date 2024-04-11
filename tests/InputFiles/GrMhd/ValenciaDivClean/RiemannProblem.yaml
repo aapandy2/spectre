@@ -31,6 +31,20 @@ PhaseChangeAndTriggers:
           WallclockHours: None
 
 
+InitialData: &initial_data
+  RiemannProblem:
+    AdiabaticIndex: 1.4
+    LeftDensity: 1.0
+    LeftVelocity: [0.0, 0.5, -0.3]
+    LeftPressure: 1.0
+    RightDensity: 0.125
+    RightVelocity: [0.0, 0.2, 0.1]
+    RightPressure: 0.1
+    LeftMagneticField: [0.0, 0.0, 0.0]
+    RightMagneticField: [0.0, 0.0, 0.0]
+    Lapse: 1.0
+    ShiftX: 0.0
+
 DomainCreator:
   Brick:
     LowerBound: [-1.0, -1.0, -1.0]
@@ -38,9 +52,15 @@ DomainCreator:
     InitialRefinement: [2, 2, 2]
     InitialGridPoints: [3, 3, 3]
     TimeDependence: None
-    BoundaryConditionInX: HydroFreeOutflow
-    BoundaryConditionInY: HydroFreeOutflow
-    BoundaryConditionInZ: HydroFreeOutflow
+    BoundaryConditionInX:
+      DirichletAnalytic:
+        AnalyticPrescription: *initial_data
+    BoundaryConditionInY:
+      DirichletAnalytic:
+        AnalyticPrescription: *initial_data
+    BoundaryConditionInZ:
+      DirichletAnalytic:
+        AnalyticPrescription: *initial_data
 
 SpatialDiscretization:
   BoundaryCorrection:
@@ -51,10 +71,10 @@ SpatialDiscretization:
     Subcell:
       TroubledCellIndicator:
         PerssonTci:
-          Exponent: 1.0 #previously 4.0; set to 1 to disable subcell
+          Exponent: 4.0 #set to 1.0 to disable subcell
           NumHighestModes: 1
         RdmpTci:
-          Delta0: 1.0e50 #previously 1.0e-7; set to large to disable subcell
+          Delta0: 1.0e-7 #set to large (1.0e50) to disable subcell
           Epsilon: 1.0e-3
         FdToDgTci:
           NumberOfStepsBetweenTciCalls: 1
@@ -79,20 +99,6 @@ SpatialDiscretization:
         Epsilon: 1.0e-15
         FallbackReconstructor: MonotonisedCentral
         MaxNumberOfExtrema: 0
-
-InitialData:
-  RiemannProblem:
-    AdiabaticIndex: 1.4
-    LeftDensity: 1.0
-    LeftVelocity: [0.0, 0.5, -0.3]
-    LeftPressure: 1.0
-    RightDensity: 0.125
-    RightVelocity: [0.0, 0.2, 0.1]
-    RightPressure: 0.1
-    LeftMagneticField: [0.0, 0.0, 0.0]
-    RightMagneticField: [0.0, 0.0, 0.0]
-    Lapse: 1.0
-    ShiftX: 0.0
 
 EquationOfState:
   FromInitialData
