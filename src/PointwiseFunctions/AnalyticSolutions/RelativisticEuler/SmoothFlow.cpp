@@ -61,7 +61,7 @@ tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>>
 SmoothFlow<Dim>::variables(
     const tnsr::I<DataType, Dim>& x, double /*t*/,
     tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>> /*meta*/) const {
-  return {make_with_value<Scalar<DataType>>(x, 0.1)};
+  return {make_with_value<Scalar<DataType>>(x, 1.0)};
 }
 
 template <size_t Dim>
