@@ -32,6 +32,7 @@ namespace grmhd {
 namespace ValenciaDivClean {
 namespace detail {
 void sources_impl(
+    gsl::not_null<Scalar<DataVector>*> source_tilde_vb,
     gsl::not_null<Scalar<DataVector>*> source_tilde_tau,
     gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*> source_tilde_s,
     gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> source_tilde_b,
@@ -130,7 +131,8 @@ void sources_impl(
  */
 struct ComputeSources {
   using return_tags =
-      tmpl::list<::Tags::Source<grmhd::ValenciaDivClean::Tags::TildeTau>,
+      tmpl::list<::Tags::Source<grmhd::ValenciaDivClean::Tags::TildeVB>,
+                 ::Tags::Source<grmhd::ValenciaDivClean::Tags::TildeTau>,
                  ::Tags::Source<grmhd::ValenciaDivClean::Tags::TildeS<>>,
                  ::Tags::Source<grmhd::ValenciaDivClean::Tags::TildeB<>>,
                  ::Tags::Source<grmhd::ValenciaDivClean::Tags::TildePhi>>;
@@ -164,6 +166,7 @@ struct ComputeSources {
                  grmhd::ValenciaDivClean::Tags::ConstraintDampingParameter>;
 
   static void apply(
+      gsl::not_null<Scalar<DataVector>*> source_tilde_vb,
       gsl::not_null<Scalar<DataVector>*> source_tilde_tau,
       gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*> source_tilde_s,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> source_tilde_b,

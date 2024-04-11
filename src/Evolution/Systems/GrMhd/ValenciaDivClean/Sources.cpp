@@ -74,6 +74,7 @@ struct EnthalpyTimesDensityWSquaredPlusBSquared : db::SimpleTag {
 namespace grmhd::ValenciaDivClean {
 namespace detail {
 void sources_impl(
+    const gsl::not_null<Scalar<DataVector>*> source_tilde_vb,
     const gsl::not_null<Scalar<DataVector>*> source_tilde_tau,
     const gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*>
         source_tilde_s,
@@ -111,7 +112,7 @@ void sources_impl(
 
     const Scalar<DataVector>& rest_mass_density,
     const Scalar<DataVector>& /* electron_fraction */,
-    const Scalar<DataVector>& /* transformed_bulk_scalar */,
+    const Scalar<DataVector>& transformed_bulk_scalar,
     const Scalar<DataVector>& pressure,
     const Scalar<DataVector>& specific_internal_energy,
     const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
@@ -142,6 +143,19 @@ void sources_impl(
                                 densitized_stress->get(m, n);
     }
   }
+
+  //TODO: currently hardcoding parameters for bulk EOM source
+  double zeta     = 1.0;
+  double tau_pi   = 1.0;
+  double lambda   = 1.0;
+  double xi       = zeta/tau_pi;
+  double script_W = 0.0;
+  get(*source_tilde_vb) = -get(lapse) * get(sqrt_det_spatial_metric) *
+                          get(transformed_bulk_scalar)
+                          * log(get(transformed_bulk_scalar)) *
+                          (1.0/tau_pi*(1.0
+                           + lambda*xi*log(get(transformed_bulk_scalar))) +
+                           script_W);
 
   for (size_t i = 0; i < 3; ++i) {
     source_tilde_s->get(i) = -(get(tilde_d) + get(tilde_tau)) * d_lapse.get(i);
@@ -175,6 +189,7 @@ void sources_impl(
 }  // namespace detail
 
 void ComputeSources::apply(
+    const gsl::not_null<Scalar<DataVector>*> source_tilde_vb,
     const gsl::not_null<Scalar<DataVector>*> source_tilde_tau,
     const gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*>
         source_tilde_s,
@@ -252,7 +267,8 @@ void ComputeSources::apply(
                      spatial_christoffel_second_kind, inv_spatial_metric);
 
   detail::sources_impl(
-      source_tilde_tau, source_tilde_s, source_tilde_b, source_tilde_phi,
+      source_tilde_vb, source_tilde_tau, source_tilde_s, source_tilde_b,
+      source_tilde_phi,
 
       make_not_null(&get<TildeSUp>(temp_tensors)),
       make_not_null(&get<DensitizedStress>(temp_tensors)),

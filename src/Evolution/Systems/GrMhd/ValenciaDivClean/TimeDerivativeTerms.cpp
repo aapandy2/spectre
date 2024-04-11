@@ -23,7 +23,7 @@ namespace grmhd::ValenciaDivClean {
 void TimeDerivativeTerms::apply(
     const gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_tilde_d*/,
     const gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_tilde_ye*/,
-    const gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_tilde_vb*/,
+    const gsl::not_null<Scalar<DataVector>*> non_flux_terms_dt_tilde_vb,
     const gsl::not_null<Scalar<DataVector>*> non_flux_terms_dt_tilde_tau,
     const gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*>
         non_flux_terms_dt_tilde_s,
@@ -146,8 +146,9 @@ void TimeDerivativeTerms::apply(
                      *spatial_christoffel_second_kind, inv_spatial_metric);
 
   detail::sources_impl(
-      non_flux_terms_dt_tilde_tau, non_flux_terms_dt_tilde_s,
-      non_flux_terms_dt_tilde_b, non_flux_terms_dt_tilde_phi,
+      non_flux_terms_dt_tilde_vb, non_flux_terms_dt_tilde_tau,
+      non_flux_terms_dt_tilde_s, non_flux_terms_dt_tilde_b,
+      non_flux_terms_dt_tilde_phi,
 
       tilde_s_up, densitized_stress, h_rho_w_squared_plus_b_squared,
 

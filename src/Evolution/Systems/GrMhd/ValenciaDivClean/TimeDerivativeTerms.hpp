@@ -107,7 +107,7 @@ struct TimeDerivativeTerms {
   static void apply(
       gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_tilde_d*/,
       gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_tilde_ye*/,
-      gsl::not_null<Scalar<DataVector>*> /*non_flux_terms_dt_tilde_vb*/,
+      gsl::not_null<Scalar<DataVector>*> non_flux_terms_dt_tilde_vb,
       gsl::not_null<Scalar<DataVector>*> non_flux_terms_dt_tilde_tau,
       gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*>
           non_flux_terms_dt_tilde_s,
