@@ -147,7 +147,7 @@ void sources_impl(
   //TODO: currently hardcoding parameters for bulk EOM source
   double zeta     = 1.0;
   double tau_pi   = 1.0;
-  double lambda   = 1.0;
+  double lambda   = 0.0;
   double xi       = zeta/tau_pi;
   double script_W = 0.0;
   get(*source_tilde_vb) = -get(lapse) * get(sqrt_det_spatial_metric) *

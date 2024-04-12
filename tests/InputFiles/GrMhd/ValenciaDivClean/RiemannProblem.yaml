@@ -49,18 +49,14 @@ DomainCreator:
   Brick:
     LowerBound: [-1.0, -1.0, -1.0]
     UpperBound: [1.0, 1.0, 1.0]
-    InitialRefinement: [2, 2, 2]
+    InitialRefinement: [2, 0, 0]
     InitialGridPoints: [3, 3, 3]
     TimeDependence: None
     BoundaryConditionInX:
       DirichletAnalytic:
         AnalyticPrescription: *initial_data
-    BoundaryConditionInY:
-      DirichletAnalytic:
-        AnalyticPrescription: *initial_data
-    BoundaryConditionInZ:
-      DirichletAnalytic:
-        AnalyticPrescription: *initial_data
+    BoundaryConditionInY: Periodic
+    BoundaryConditionInZ: Periodic
 
 SpatialDiscretization:
   BoundaryCorrection:
@@ -152,7 +148,7 @@ EventsAndTriggers:
     Events:
       - ObserveFields:
           SubfileName: VolumeData
-          VariablesToObserve: [RestMassDensity, ElectronFraction,
+          VariablesToObserve: [RestMassDensity, LorentzFactor,
                                TransformedBulkScalar]
           InterpolateToMesh: None
           CoordinatesFloatingPointType: Double
