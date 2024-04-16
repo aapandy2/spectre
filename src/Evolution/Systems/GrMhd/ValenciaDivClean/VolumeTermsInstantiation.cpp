@@ -68,5 +68,8 @@ template void volume_terms<::grmhd::ValenciaDivClean::TimeDerivativeTerms>(
     const Scalar<DataVector>& transformed_bulk_scalar,
     const Scalar<DataVector>& specific_internal_energy,
     const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
-    const double& constraint_damping_parameter);
+    const double& constraint_damping_parameter,
+    const double& bulk_viscosity,
+    const double& bulk_relaxation_time,
+    const double& bulk_nonlinear_coupling);
 }  // namespace evolution::dg::Actions::detail

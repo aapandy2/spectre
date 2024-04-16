@@ -617,7 +617,10 @@ struct EvolutionMetavars<tmpl::list<InterpolationTargetTags...>,
               grmhd::ValenciaDivClean::subcell::Tags::TciOptions>,
           tmpl::list<>>,
       equation_of_state_tag, initial_data_tag,
-      grmhd::ValenciaDivClean::Tags::ConstraintDampingParameter>;
+      grmhd::ValenciaDivClean::Tags::ConstraintDampingParameter,
+      grmhd::ValenciaDivClean::Tags::BulkViscosity,
+      grmhd::ValenciaDivClean::Tags::BulkRelaxationTime,
+      grmhd::ValenciaDivClean::Tags::BulkNonlinearCoupling>;
 
   static constexpr Options::String help{
       "Evolve the Valencia formulation of the GRMHD system with divergence "

@@ -116,7 +116,10 @@ void sources_impl(
     const Scalar<DataVector>& pressure,
     const Scalar<DataVector>& specific_internal_energy,
     const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
-    const double constraint_damping_parameter) {
+    const double constraint_damping_parameter,
+    const double bulk_viscosity,
+    const double bulk_relaxation_time,
+    const double bulk_nonlinear_coupling) {
   get(*h_rho_w_squared_plus_b_squared) =
       get(magnetic_field_squared) +
       (get(rest_mass_density) * (1.0 + get(specific_internal_energy)) +
@@ -145,16 +148,14 @@ void sources_impl(
   }
 
   //TODO: currently hardcoding parameters for bulk EOM source
-  double zeta     = 1.0;
-  double tau_pi   = 1.0;
-  double lambda   = 0.0;
-  double xi       = zeta/tau_pi;
+  double xi       = bulk_viscosity/bulk_relaxation_time;
   double script_W = 0.0;
   get(*source_tilde_vb) = -get(lapse) * get(sqrt_det_spatial_metric) *
                           get(transformed_bulk_scalar)
                           * log(get(transformed_bulk_scalar)) *
-                          (1.0/tau_pi*(1.0
-                           + lambda*xi*log(get(transformed_bulk_scalar))) +
+                          (1.0/bulk_relaxation_time*(1.0
+                           + bulk_nonlinear_coupling*xi
+                             *log(get(transformed_bulk_scalar))) +
                            script_W);
 
   for (size_t i = 0; i < 3; ++i) {
@@ -216,7 +217,10 @@ void ComputeSources::apply(
     const tnsr::II<DataVector, 3, Frame::Inertial>& inv_spatial_metric,
     const Scalar<DataVector>& sqrt_det_spatial_metric,
     const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
-    const double constraint_damping_parameter) {
+    const double constraint_damping_parameter,
+    const double bulk_viscosity,
+    const double bulk_relaxation_time,
+    const double bulk_nonlinear_coupling) {
   Variables<
       tmpl::list<TildeSUp, DensitizedStress, MagneticFieldOneForm,
                  hydro::Tags::MagneticFieldDotSpatialVelocity<DataVector>,
@@ -284,6 +288,7 @@ void ComputeSources::apply(
 
       rest_mass_density, electron_fraction, transformed_bulk_scalar, pressure,
       specific_internal_energy, extrinsic_curvature,
-      constraint_damping_parameter);
+      constraint_damping_parameter, bulk_viscosity, bulk_relaxation_time,
+      bulk_nonlinear_coupling);
 }
 }  // namespace grmhd::ValenciaDivClean

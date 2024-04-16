@@ -95,6 +95,36 @@ struct DampingParameter {
   using group = ValenciaDivCleanGroup;
 };
 
+
+/// \brief The bulk viscosity
+struct BulkViscosity {
+  static std::string name() { return "BulkViscosity"; }
+  using type = double;
+  static constexpr Options::String help{
+      "Bulk viscosity zeta for the bulk viscous evolution"};
+  using group = ValenciaDivCleanGroup;
+};
+
+
+/// \brief The bulk viscous relaxation time
+struct BulkRelaxationTime {
+  static std::string name() { return "BulkRelaxationTime"; }
+  using type = double;
+  static constexpr Options::String help{
+      "Relaxation time for the bulk viscous evolution"};
+  using group = ValenciaDivCleanGroup;
+};
+
+
+/// \brief Nonlinear coupling term in the bulk viscous EOM
+struct BulkNonlinearCoupling {
+  static std::string name() { return "BulkNonlinearCoupling"; }
+  using type = double;
+  static constexpr Options::String help{
+      "Coupling constant on the Pi^2 term in the bulk viscous EOM"};
+  using group = ValenciaDivCleanGroup;
+};
+
 struct PrimitiveFromConservativeOptions {
   static std::string name() { return "PrimitiveFromConservative"; }
   using type = grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions;
@@ -114,6 +144,39 @@ struct ConstraintDampingParameter : db::SimpleTag {
   static constexpr bool pass_metavariables = false;
   static double create_from_options(const double constraint_damping_parameter) {
     return constraint_damping_parameter;
+  }
+};
+
+/// The bulk viscosity
+struct BulkViscosity : db::SimpleTag {
+  using type = double;
+  using option_tags = tmpl::list<OptionTags::BulkViscosity>;
+
+  static constexpr bool pass_metavariables = false;
+  static double create_from_options(const double bulk_viscosity) {
+    return bulk_viscosity;
+  }
+};
+
+/// The bulk relaxation time
+struct BulkRelaxationTime : db::SimpleTag {
+  using type = double;
+  using option_tags = tmpl::list<OptionTags::BulkRelaxationTime>;
+
+  static constexpr bool pass_metavariables = false;
+  static double create_from_options(const double bulk_relaxation_time) {
+    return bulk_relaxation_time;
+  }
+};
+
+/// The bulk nonlinear coupling constant
+struct BulkNonlinearCoupling : db::SimpleTag {
+  using type = double;
+  using option_tags = tmpl::list<OptionTags::BulkNonlinearCoupling>;
+
+  static constexpr bool pass_metavariables = false;
+  static double create_from_options(const double bulk_nonlinear_coupling) {
+    return bulk_nonlinear_coupling;
   }
 };
 

@@ -96,7 +96,10 @@ void TimeDerivativeTerms::apply(
     const Scalar<DataVector>& transformed_bulk_scalar,
     const Scalar<DataVector>& specific_internal_energy,
     const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
-    const double constraint_damping_parameter) {
+    const double constraint_damping_parameter,
+    const double bulk_viscosity,
+    const double bulk_relaxation_time,
+    const double bulk_nonlinear_coupling) {
   // Note that if the temp_lapse and lapse arguments point to the same object
   // then the copy is elided internally.
   *temp_lapse = lapse;
@@ -161,6 +164,7 @@ void TimeDerivativeTerms::apply(
 
       rest_mass_density, electron_fraction, transformed_bulk_scalar, pressure,
       specific_internal_energy, extrinsic_curvature,
-      constraint_damping_parameter);
+      constraint_damping_parameter, bulk_viscosity, bulk_relaxation_time,
+      bulk_nonlinear_coupling);
 }
 }  // namespace grmhd::ValenciaDivClean

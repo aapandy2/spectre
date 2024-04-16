@@ -15,6 +15,9 @@ namespace ValenciaDivClean {
 namespace Tags {
 struct CharacteristicSpeeds;
 struct ConstraintDampingParameter;
+struct BulkViscosity;
+struct BulkRelaxationTime;
+struct BulkNonlinearCoupling;
 struct PrimitiveFromConservativeOptions;
 struct TildeD;
 struct TildeYe;

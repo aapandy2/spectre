@@ -69,7 +69,10 @@ void sources_impl(
     const Scalar<DataVector>& pressure,
     const Scalar<DataVector>& specific_internal_energy,
     const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
-    double constraint_damping_parameter);
+    double constraint_damping_parameter,
+    double bulk_viscosity,
+    double bulk_relaxation_time,
+    double bulk_nonlinear_coupling);
 }  // namespace detail
 
 /*!
@@ -163,7 +166,10 @@ struct ComputeSources {
                  gr::Tags::InverseSpatialMetric<DataVector, 3>,
                  gr::Tags::SqrtDetSpatialMetric<DataVector>,
                  gr::Tags::ExtrinsicCurvature<DataVector, 3>,
-                 grmhd::ValenciaDivClean::Tags::ConstraintDampingParameter>;
+                 grmhd::ValenciaDivClean::Tags::ConstraintDampingParameter,
+                 grmhd::ValenciaDivClean::Tags::BulkViscosity,
+                 grmhd::ValenciaDivClean::Tags::BulkRelaxationTime,
+                 grmhd::ValenciaDivClean::Tags::BulkNonlinearCoupling>;
 
   static void apply(
       gsl::not_null<Scalar<DataVector>*> source_tilde_vb,
@@ -191,7 +197,10 @@ struct ComputeSources {
       const tnsr::II<DataVector, 3, Frame::Inertial>& inv_spatial_metric,
       const Scalar<DataVector>& sqrt_det_spatial_metric,
       const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
-      double constraint_damping_parameter);
+      double constraint_damping_parameter,
+      double bulk_viscosity,
+      double bulk_relaxation_time,
+      double bulk_nonlinear_coupling);
 };
 }  // namespace ValenciaDivClean
 }  // namespace grmhd
