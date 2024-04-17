@@ -134,7 +134,7 @@ void ComputeFluxes::apply(
   one_over_w_squared = 1.0 / square(get(lorentz_factor));
 
   // p_star = p + p_m = p + b^2/2 = p + ((B^m v_m)^2 + (B^m B_m)/W^2)/2
-  // NOTE: adding bulk here
+  // NOTE: adding bulk here, so p -> p+Pi, where Pi is the bulk scalar
   Scalar<DataVector>& pressure_star_with_bulk_lapse_sqrt_det_spatial_metric =
       get<::Tags::TempScalar<1>>(temp_tensors);
   get(pressure_star_with_bulk_lapse_sqrt_det_spatial_metric) =
