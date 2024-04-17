@@ -49,9 +49,9 @@ void TimeDerivativeTerms::apply(
         magnetic_field_dot_spatial_velocity,
     const gsl::not_null<Scalar<DataVector>*> magnetic_field_squared,
     const gsl::not_null<Scalar<DataVector>*> one_over_w_squared,
-    const gsl::not_null<Scalar<DataVector>*> pressure_star,
+    const gsl::not_null<Scalar<DataVector>*> pressure_star_with_bulk,
     const gsl::not_null<Scalar<DataVector>*>
-        pressure_star_lapse_sqrt_det_spatial_metric,
+        pressure_star_with_bulk_lapse_sqrt_det_spatial_metric,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>
         transport_velocity,
     const gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*>
@@ -74,8 +74,7 @@ void TimeDerivativeTerms::apply(
         temp_inverse_spatial_metric,
 
     const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& tilde_ye,
-    const Scalar<DataVector>& tilde_vb,
-    const Scalar<DataVector>& tilde_tau,
+    const Scalar<DataVector>& tilde_vb, const Scalar<DataVector>& tilde_tau,
     const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,
     const tnsr::I<DataVector, 3, Frame::Inertial>& tilde_b,
     const Scalar<DataVector>& tilde_phi, const Scalar<DataVector>& lapse,
@@ -96,10 +95,8 @@ void TimeDerivativeTerms::apply(
     const Scalar<DataVector>& transformed_bulk_scalar,
     const Scalar<DataVector>& specific_internal_energy,
     const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
-    const double constraint_damping_parameter,
-    const double bulk_viscosity,
-    const double bulk_relaxation_time,
-    const double bulk_nonlinear_coupling) {
+    const double constraint_damping_parameter, const double bulk_viscosity,
+    const double bulk_relaxation_time, const double bulk_nonlinear_coupling) {
   // Note that if the temp_lapse and lapse arguments point to the same object
   // then the copy is elided internally.
   *temp_lapse = lapse;
@@ -113,11 +110,11 @@ void TimeDerivativeTerms::apply(
               *spatial_velocity_one_form);
   dot_product(magnetic_field_squared, magnetic_field, *magnetic_field_one_form);
   get(*one_over_w_squared) = 1.0 / square(get(lorentz_factor));
-  get(*pressure_star) =
+  get(*pressure_star_with_bulk) =
       get(pressure) + 0.5 * square(get(*magnetic_field_dot_spatial_velocity)) +
       0.5 * get(*magnetic_field_squared) * get(*one_over_w_squared);
-  get(*pressure_star_lapse_sqrt_det_spatial_metric) =
-      get(sqrt_det_spatial_metric) * get(lapse) * get(*pressure_star);
+  get(*pressure_star_with_bulk_lapse_sqrt_det_spatial_metric) =
+      get(sqrt_det_spatial_metric) * get(lapse) * get(*pressure_star_with_bulk);
 
   // lapse b_i / W = lapse (B_i / W^2 + v_i (B^m v_m)
   *lapse_b_over_w = *spatial_velocity_one_form;
@@ -128,17 +125,15 @@ void TimeDerivativeTerms::apply(
     lapse_b_over_w->get(i) *= get(lapse);
   }
 
-  detail::fluxes_impl(tilde_d_flux, tilde_ye_flux, tilde_vb_flux,
-                      tilde_tau_flux, tilde_s_flux, tilde_b_flux,
-                      tilde_phi_flux,
-                      // Temporaries
-                      transport_velocity, *lapse_b_over_w,
-                      *magnetic_field_dot_spatial_velocity,
-                      *pressure_star_lapse_sqrt_det_spatial_metric,
-                      // Extra args
-                      tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b,
-                      tilde_phi, lapse, shift, inv_spatial_metric,
-                      spatial_velocity);
+  detail::fluxes_impl(
+      tilde_d_flux, tilde_ye_flux, tilde_vb_flux, tilde_tau_flux, tilde_s_flux,
+      tilde_b_flux, tilde_phi_flux,
+      // Temporaries
+      transport_velocity, *lapse_b_over_w, *magnetic_field_dot_spatial_velocity,
+      *pressure_star_with_bulk_lapse_sqrt_det_spatial_metric,
+      // Extra args
+      tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
+      lapse, shift, inv_spatial_metric, spatial_velocity);
 
   // Compute source terms
   gr::christoffel_first_kind(spatial_christoffel_first_kind, d_spatial_metric);
@@ -156,7 +151,8 @@ void TimeDerivativeTerms::apply(
       tilde_s_up, densitized_stress, h_rho_w_squared_plus_b_squared,
 
       *magnetic_field_dot_spatial_velocity, *magnetic_field_squared,
-      *one_over_w_squared, *pressure_star, *trace_spatial_christoffel_second,
+      *one_over_w_squared, *pressure_star_with_bulk,
+      *trace_spatial_christoffel_second,
 
       tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
       lapse, sqrt_det_spatial_metric, inv_spatial_metric, d_lapse, d_shift,

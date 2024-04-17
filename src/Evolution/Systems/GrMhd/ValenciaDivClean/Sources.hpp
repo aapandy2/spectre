@@ -45,7 +45,7 @@ void sources_impl(
     const Scalar<DataVector>& magnetic_field_dot_spatial_velocity,
     const Scalar<DataVector>& magnetic_field_squared,
     const Scalar<DataVector>& one_over_w_squared,
-    const Scalar<DataVector>& pressure_star,
+    const Scalar<DataVector>& pressure_star_with_bulk,
     const tnsr::I<DataVector, 3, Frame::Inertial>&
         trace_spatial_christoffel_second,
 
@@ -69,10 +69,8 @@ void sources_impl(
     const Scalar<DataVector>& pressure,
     const Scalar<DataVector>& specific_internal_energy,
     const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
-    double constraint_damping_parameter,
-    double bulk_viscosity,
-    double bulk_relaxation_time,
-    double bulk_nonlinear_coupling);
+    double constraint_damping_parameter, double bulk_viscosity,
+    double bulk_relaxation_time, double bulk_nonlinear_coupling);
 }  // namespace detail
 
 /*!

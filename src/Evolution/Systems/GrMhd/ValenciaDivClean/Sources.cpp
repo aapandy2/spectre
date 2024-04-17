@@ -29,7 +29,7 @@ void densitized_stress(
     const tnsr::II<DataVector, 3, Frame::Inertial>& inv_spatial_metric,
     const Scalar<DataVector>& magnetic_field_dot_spatial_velocity,
     const Scalar<DataVector>& one_over_w_squared,
-    const Scalar<DataVector>& pressure_star,
+    const Scalar<DataVector>& pressure_star_with_bulk,
     const Scalar<DataVector>& h_rho_w_squared_plus_b_squared,
     const tnsr::I<DataVector, 3, Frame::Inertial>& spatial_velocity,
     const tnsr::I<DataVector, 3, Frame::Inertial>& magnetic_field,
@@ -37,7 +37,7 @@ void densitized_stress(
   *result = inv_spatial_metric;
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = i; j < 3; ++j) {
-      result->get(i, j) *= get(pressure_star);
+      result->get(i, j) *= get(pressure_star_with_bulk);
       result->get(i, j) +=
           get(h_rho_w_squared_plus_b_squared) * spatial_velocity.get(i) *
               spatial_velocity.get(j) -
@@ -63,7 +63,7 @@ struct DensitizedStress : db::SimpleTag {
 struct OneOverLorentzFactorSquared : db::SimpleTag {
   using type = Scalar<DataVector>;
 };
-struct PressureStar : db::SimpleTag {
+struct PressureStarWithBulk : db::SimpleTag {
   using type = Scalar<DataVector>;
 };
 struct EnthalpyTimesDensityWSquaredPlusBSquared : db::SimpleTag {
@@ -90,12 +90,11 @@ void sources_impl(
     const Scalar<DataVector>& magnetic_field_dot_spatial_velocity,
     const Scalar<DataVector>& magnetic_field_squared,
     const Scalar<DataVector>& one_over_w_squared,
-    const Scalar<DataVector>& pressure_star,
+    const Scalar<DataVector>& pressure_star_with_bulk,
     const tnsr::I<DataVector, 3, Frame::Inertial>&
         trace_spatial_christoffel_second,
 
-    const Scalar<DataVector>& tilde_d,
-    const Scalar<DataVector>& /* tilde_ye */,
+    const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& /* tilde_ye */,
     const Scalar<DataVector>& /* tilde_vb */,
     const Scalar<DataVector>& tilde_tau,
     const tnsr::i<DataVector, 3, Frame::Inertial>& tilde_s,
@@ -116,10 +115,10 @@ void sources_impl(
     const Scalar<DataVector>& pressure,
     const Scalar<DataVector>& specific_internal_energy,
     const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
-    const double constraint_damping_parameter,
-    const double bulk_viscosity,
-    const double bulk_relaxation_time,
-    const double bulk_nonlinear_coupling) {
+    const double constraint_damping_parameter, const double bulk_viscosity,
+    const double bulk_relaxation_time, const double bulk_nonlinear_coupling) {
+  // TODO: note that h_rho_... also gets a factor of bulk (not just
+  // pressure_star_with_bulk)
   get(*h_rho_w_squared_plus_b_squared) =
       get(magnetic_field_squared) +
       (get(rest_mass_density) * (1.0 + get(specific_internal_energy)) +
@@ -127,7 +126,7 @@ void sources_impl(
           square(get(lorentz_factor));
   ::densitized_stress(densitized_stress, inv_spatial_metric,
                       magnetic_field_dot_spatial_velocity, one_over_w_squared,
-                      pressure_star, *h_rho_w_squared_plus_b_squared,
+                      pressure_star_with_bulk, *h_rho_w_squared_plus_b_squared,
                       spatial_velocity, magnetic_field,
                       sqrt_det_spatial_metric);
   raise_or_lower_index(tilde_s_up, tilde_s, inv_spatial_metric);
@@ -225,7 +224,7 @@ void ComputeSources::apply(
       tmpl::list<TildeSUp, DensitizedStress, MagneticFieldOneForm,
                  hydro::Tags::MagneticFieldDotSpatialVelocity<DataVector>,
                  hydro::Tags::MagneticFieldSquared<DataVector>,
-                 OneOverLorentzFactorSquared, PressureStar,
+                 OneOverLorentzFactorSquared, PressureStarWithBulk,
                  EnthalpyTimesDensityWSquaredPlusBSquared,
                  gr::Tags::SpatialChristoffelFirstKind<DataVector, 3>,
                  gr::Tags::SpatialChristoffelSecondKind<DataVector, 3>,
@@ -250,8 +249,8 @@ void ComputeSources::apply(
   auto& one_over_w_squared = get<OneOverLorentzFactorSquared>(temp_tensors);
   get(one_over_w_squared) = 1.0 / square(get(lorentz_factor));
 
-  auto& pressure_star = get<PressureStar>(temp_tensors);
-  get(pressure_star) =
+  auto& pressure_star_with_bulk = get<PressureStarWithBulk>(temp_tensors);
+  get(pressure_star_with_bulk) =
       get(pressure) + 0.5 * square(get(magnetic_field_dot_spatial_velocity)) +
       0.5 * get(magnetic_field_squared) * get(one_over_w_squared);
 
@@ -280,7 +279,8 @@ void ComputeSources::apply(
           &get<EnthalpyTimesDensityWSquaredPlusBSquared>(temp_tensors)),
 
       magnetic_field_dot_spatial_velocity, magnetic_field_squared,
-      one_over_w_squared, pressure_star, trace_spatial_christoffel_second,
+      one_over_w_squared, pressure_star_with_bulk,
+      trace_spatial_christoffel_second,
 
       tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
       lapse, sqrt_det_spatial_metric, inv_spatial_metric, d_lapse, d_shift,

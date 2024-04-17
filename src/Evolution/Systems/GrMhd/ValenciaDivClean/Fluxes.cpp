@@ -40,7 +40,8 @@ void fluxes_impl(
         transport_velocity,
     const tnsr::i<DataVector, 3, Frame::Inertial>& lapse_b_over_w,
     const Scalar<DataVector>& magnetic_field_dot_spatial_velocity,
-    const Scalar<DataVector>& pressure_star_lapse_sqrt_det_spatial_metric,
+    const Scalar<DataVector>&
+        pressure_star_with_bulk_lapse_sqrt_det_spatial_metric,
 
     // Extra args
     const Scalar<DataVector>& tilde_d, const Scalar<DataVector>& tilde_ye,
@@ -58,7 +59,7 @@ void fluxes_impl(
     tilde_vb_flux->get(i) = get(tilde_vb) * transport_velocity->get(i);
     tilde_tau_flux->get(i) =
         get(tilde_tau) * transport_velocity->get(i) +
-        get(pressure_star_lapse_sqrt_det_spatial_metric) *
+        get(pressure_star_with_bulk_lapse_sqrt_det_spatial_metric) *
             spatial_velocity.get(i) -
         get(lapse) * get(magnetic_field_dot_spatial_velocity) * tilde_b.get(i);
     tilde_phi_flux->get(i) =
@@ -71,7 +72,8 @@ void fluxes_impl(
           get(lapse) * (get(tilde_phi) * inv_spatial_metric.get(i, j) -
                         spatial_velocity.get(j) * tilde_b.get(i));
     }
-    tilde_s_flux->get(i, i) += get(pressure_star_lapse_sqrt_det_spatial_metric);
+    tilde_s_flux->get(i, i) +=
+        get(pressure_star_with_bulk_lapse_sqrt_det_spatial_metric);
   }
 }
 }  // namespace detail
@@ -129,9 +131,9 @@ void ComputeFluxes::apply(
       get(get<::Tags::TempScalar<0>>(temp_tensors));
   one_over_w_squared = 1.0 / square(get(lorentz_factor));
   // p_star = p + p_m = p + b^2/2 = p + ((B^m v_m)^2 + (B^m B_m)/W^2)/2
-  Scalar<DataVector>& pressure_star_lapse_sqrt_det_spatial_metric =
+  Scalar<DataVector>& pressure_star_with_bulk_lapse_sqrt_det_spatial_metric =
       get<::Tags::TempScalar<1>>(temp_tensors);
-  get(pressure_star_lapse_sqrt_det_spatial_metric) =
+  get(pressure_star_with_bulk_lapse_sqrt_det_spatial_metric) =
       get(sqrt_det_spatial_metric) * get(lapse) *
       (get(pressure) + 0.5 * square(get(magnetic_field_dot_spatial_velocity)) +
        0.5 * get(magnetic_field_squared) * one_over_w_squared);
@@ -153,7 +155,7 @@ void ComputeFluxes::apply(
       // Temporaries
       make_not_null(&get<::Tags::TempI<2, 3, Frame::Inertial>>(temp_tensors)),
       lapse_b_over_w, magnetic_field_dot_spatial_velocity,
-      pressure_star_lapse_sqrt_det_spatial_metric,
+      pressure_star_with_bulk_lapse_sqrt_det_spatial_metric,
       // Extra args
       tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
       lapse, shift, inv_spatial_metric, spatial_velocity);

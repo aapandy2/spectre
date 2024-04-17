@@ -40,10 +40,10 @@ struct TimeDerivativeTerms {
   struct OneOverLorentzFactorSquared : db::SimpleTag {
     using type = Scalar<DataVector>;
   };
-  struct PressureStarLapseSqrtDetSpatialMetric : db::SimpleTag {
+  struct PressureStarWithBulkLapseSqrtDetSpatialMetric : db::SimpleTag {
     using type = Scalar<DataVector>;
   };
-  struct PressureStar : db::SimpleTag {
+  struct PressureStarWithBulk : db::SimpleTag {
     using type = Scalar<DataVector>;
   };
   struct EnthalpyTimesDensityWSquaredPlusBSquared : db::SimpleTag {
@@ -59,8 +59,8 @@ struct TimeDerivativeTerms {
       hydro::Tags::MagneticFieldOneForm<DataVector, 3, Frame::Inertial>,
       hydro::Tags::MagneticFieldDotSpatialVelocity<DataVector>,
       hydro::Tags::MagneticFieldSquared<DataVector>,
-      OneOverLorentzFactorSquared, PressureStar,
-      PressureStarLapseSqrtDetSpatialMetric,
+      OneOverLorentzFactorSquared, PressureStarWithBulk,
+      PressureStarWithBulkLapseSqrtDetSpatialMetric,
       hydro::Tags::TransportVelocity<DataVector, 3, Frame::Inertial>,
       LapseTimesbOverW,
 
@@ -133,9 +133,9 @@ struct TimeDerivativeTerms {
       gsl::not_null<Scalar<DataVector>*> magnetic_field_dot_spatial_velocity,
       gsl::not_null<Scalar<DataVector>*> magnetic_field_squared,
       gsl::not_null<Scalar<DataVector>*> one_over_w_squared,
-      gsl::not_null<Scalar<DataVector>*> pressure_star,
+      gsl::not_null<Scalar<DataVector>*> pressure_star_with_bulk,
       gsl::not_null<Scalar<DataVector>*>
-          pressure_star_lapse_sqrt_det_spatial_metric,
+          pressure_star_with_bulk_lapse_sqrt_det_spatial_metric,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>
           transport_velocity,
       gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*> lapse_b_over_w,
@@ -178,9 +178,7 @@ struct TimeDerivativeTerms {
       const Scalar<DataVector>& transformed_bulk_scalar,
       const Scalar<DataVector>& specific_internal_energy,
       const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
-      double constraint_damping_parameter,
-      double bulk_viscosity,
-      double bulk_relaxation_time,
-      double bulk_nonlinear_coupling);
+      double constraint_damping_parameter, double bulk_viscosity,
+      double bulk_relaxation_time, double bulk_nonlinear_coupling);
 };
 }  // namespace grmhd::ValenciaDivClean
