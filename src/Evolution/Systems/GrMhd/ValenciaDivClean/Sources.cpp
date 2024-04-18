@@ -63,6 +63,9 @@ struct DensitizedStress : db::SimpleTag {
 struct OneOverLorentzFactorSquared : db::SimpleTag {
   using type = Scalar<DataVector>;
 };
+struct BulkScalar : db::SimpleTag {
+  using type = Scalar<DataVector>;
+};
 struct PressureStarWithBulk : db::SimpleTag {
   using type = Scalar<DataVector>;
 };
@@ -117,12 +120,14 @@ void sources_impl(
     const tnsr::ii<DataVector, 3, Frame::Inertial>& extrinsic_curvature,
     const double constraint_damping_parameter, const double bulk_viscosity,
     const double bulk_relaxation_time, const double bulk_nonlinear_coupling) {
-  // TODO: note that h_rho_... also gets a factor of bulk (not just
-  // pressure_star_with_bulk)
+
+  // NOTE: added bulk viscous correction here, and had to do it directly
+  // using the definition.  Is there a cleaner way to do this?
   get(*h_rho_w_squared_plus_b_squared) =
       get(magnetic_field_squared) +
       (get(rest_mass_density) * (1.0 + get(specific_internal_energy)) +
-       get(pressure)) *
+       get(pressure) +
+       bulk_viscosity/bulk_relaxation_time*log(get(transformed_bulk_scalar))) *
           square(get(lorentz_factor));
   ::densitized_stress(densitized_stress, inv_spatial_metric,
                       magnetic_field_dot_spatial_velocity, one_over_w_squared,
@@ -224,7 +229,7 @@ void ComputeSources::apply(
       tmpl::list<TildeSUp, DensitizedStress, MagneticFieldOneForm,
                  hydro::Tags::MagneticFieldDotSpatialVelocity<DataVector>,
                  hydro::Tags::MagneticFieldSquared<DataVector>,
-                 OneOverLorentzFactorSquared, PressureStarWithBulk,
+                 OneOverLorentzFactorSquared, BulkScalar, PressureStarWithBulk,
                  EnthalpyTimesDensityWSquaredPlusBSquared,
                  gr::Tags::SpatialChristoffelFirstKind<DataVector, 3>,
                  gr::Tags::SpatialChristoffelSecondKind<DataVector, 3>,
@@ -249,9 +254,16 @@ void ComputeSources::apply(
   auto& one_over_w_squared = get<OneOverLorentzFactorSquared>(temp_tensors);
   get(one_over_w_squared) = 1.0 / square(get(lorentz_factor));
 
+  //define bulk scalar
+  auto& bulk_scalar = get<BulkScalar>(temp_tensors);
+  get(bulk_scalar) = bulk_viscosity/bulk_relaxation_time *
+                     log(get(transformed_bulk_scalar));
+
+  //define pressure_star_with_bulk
   auto& pressure_star_with_bulk = get<PressureStarWithBulk>(temp_tensors);
   get(pressure_star_with_bulk) =
-      get(pressure) + 0.5 * square(get(magnetic_field_dot_spatial_velocity)) +
+      get(pressure) + get(bulk_scalar) +
+      0.5 * square(get(magnetic_field_dot_spatial_velocity)) +
       0.5 * get(magnetic_field_squared) * get(one_over_w_squared);
 
   auto& spatial_christoffel_first_kind =
