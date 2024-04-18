@@ -40,10 +40,13 @@ struct TimeDerivativeTerms {
   struct OneOverLorentzFactorSquared : db::SimpleTag {
     using type = Scalar<DataVector>;
   };
-  struct PressureStarWithBulkLapseSqrtDetSpatialMetric : db::SimpleTag {
+  struct BulkScalar : db::SimpleTag {
     using type = Scalar<DataVector>;
   };
   struct PressureStarWithBulk : db::SimpleTag {
+    using type = Scalar<DataVector>;
+  };
+  struct PressureStarWithBulkLapseSqrtDetSpatialMetric : db::SimpleTag {
     using type = Scalar<DataVector>;
   };
   struct EnthalpyTimesDensityWSquaredPlusBSquared : db::SimpleTag {
@@ -59,7 +62,7 @@ struct TimeDerivativeTerms {
       hydro::Tags::MagneticFieldOneForm<DataVector, 3, Frame::Inertial>,
       hydro::Tags::MagneticFieldDotSpatialVelocity<DataVector>,
       hydro::Tags::MagneticFieldSquared<DataVector>,
-      OneOverLorentzFactorSquared, PressureStarWithBulk,
+      OneOverLorentzFactorSquared, BulkScalar, PressureStarWithBulk,
       PressureStarWithBulkLapseSqrtDetSpatialMetric,
       hydro::Tags::TransportVelocity<DataVector, 3, Frame::Inertial>,
       LapseTimesbOverW,
@@ -133,6 +136,7 @@ struct TimeDerivativeTerms {
       gsl::not_null<Scalar<DataVector>*> magnetic_field_dot_spatial_velocity,
       gsl::not_null<Scalar<DataVector>*> magnetic_field_squared,
       gsl::not_null<Scalar<DataVector>*> one_over_w_squared,
+      gsl::not_null<Scalar<DataVector>*> bulk_scalar,
       gsl::not_null<Scalar<DataVector>*> pressure_star_with_bulk,
       gsl::not_null<Scalar<DataVector>*>
           pressure_star_with_bulk_lapse_sqrt_det_spatial_metric,

@@ -49,6 +49,7 @@ void TimeDerivativeTerms::apply(
         magnetic_field_dot_spatial_velocity,
     const gsl::not_null<Scalar<DataVector>*> magnetic_field_squared,
     const gsl::not_null<Scalar<DataVector>*> one_over_w_squared,
+    const gsl::not_null<Scalar<DataVector>*> bulk_scalar,
     const gsl::not_null<Scalar<DataVector>*> pressure_star_with_bulk,
     const gsl::not_null<Scalar<DataVector>*>
         pressure_star_with_bulk_lapse_sqrt_det_spatial_metric,
@@ -110,9 +111,18 @@ void TimeDerivativeTerms::apply(
               *spatial_velocity_one_form);
   dot_product(magnetic_field_squared, magnetic_field, *magnetic_field_one_form);
   get(*one_over_w_squared) = 1.0 / square(get(lorentz_factor));
+
+  //compute bulk scalar = zeta/tau_pi*ln(Pi_hat)
+  get(*bulk_scalar) = bulk_viscosity/bulk_relaxation_time *
+                      log(get(transformed_bulk_scalar));
+
+  //compute pressure star including bulk contribution
   get(*pressure_star_with_bulk) =
-      get(pressure) + 0.5 * square(get(*magnetic_field_dot_spatial_velocity)) +
+      get(pressure) + get(*bulk_scalar) +
+      0.5 * square(get(*magnetic_field_dot_spatial_velocity)) +
       0.5 * get(*magnetic_field_squared) * get(*one_over_w_squared);
+
+  //compute pressure_star_with_bulk_lapse_sqrt_det_spatial_metric
   get(*pressure_star_with_bulk_lapse_sqrt_det_spatial_metric) =
       get(sqrt_det_spatial_metric) * get(lapse) * get(*pressure_star_with_bulk);
 
