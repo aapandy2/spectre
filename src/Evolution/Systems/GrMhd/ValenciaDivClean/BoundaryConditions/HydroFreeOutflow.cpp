@@ -166,6 +166,7 @@ std::optional<std::string> HydroFreeOutflow::dg_ghost(
                        *tilde_tau, *tilde_s, *tilde_b, *tilde_phi,
                        *lapse, *shift, interior_sqrt_det_spatial_metric,
                        interior_spatial_metric, *inv_spatial_metric,
+                       interior_transformed_bulk_scalar,
                        interior_pressure, exterior_spatial_velocity,
                        interior_lorentz_factor, interior_magnetic_field);
 
@@ -284,7 +285,8 @@ void HydroFreeOutflow::fd_ghost(
 
         get<Lapse>(temp_vars), get<Shift>(temp_vars),
         get<SqrtDetSpatialMetric>(temp_vars), get<SpatialMetric>(temp_vars),
-        get<InvSpatialMetric>(temp_vars), get<Pressure>(temp_vars),
+        get<InvSpatialMetric>(temp_vars), *transformed_bulk_scalar,
+        get<Pressure>(temp_vars),
         get<SpatialVelocity>(temp_vars), get<LorentzFactor>(temp_vars),
         *magnetic_field);
   }

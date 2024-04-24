@@ -358,7 +358,8 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
           get<Lapse>(ghost_fluxes_vars), get<Shift>(ghost_fluxes_vars),
           get<SqrtDetSpatialMetric>(ghost_fluxes_vars),
           get<SpatialMetric>(ghost_fluxes_vars),
-          get<InvSpatialMetric>(ghost_fluxes_vars), *pressure,
+          get<InvSpatialMetric>(ghost_fluxes_vars), *transformed_bulk_scalar,
+          *pressure,
           get<SpatialVelocity>(ghost_fluxes_vars),
           get<LorentzFactor>(ghost_fluxes_vars), *magnetic_field);
     }

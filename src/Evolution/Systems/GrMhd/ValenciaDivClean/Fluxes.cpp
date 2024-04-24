@@ -97,6 +97,7 @@ void ComputeFluxes::apply(
     const Scalar<DataVector>& sqrt_det_spatial_metric,
     const tnsr::ii<DataVector, 3, Frame::Inertial>& spatial_metric,
     const tnsr::II<DataVector, 3, Frame::Inertial>& inv_spatial_metric,
+    const Scalar<DataVector>& transformed_bulk_scalar,
     const Scalar<DataVector>& pressure,
     const tnsr::I<DataVector, 3, Frame::Inertial>& spatial_velocity,
     const Scalar<DataVector>& lorentz_factor,
@@ -130,12 +131,18 @@ void ComputeFluxes::apply(
   DataVector& one_over_w_squared =
       get(get<::Tags::TempScalar<0>>(temp_tensors));
   one_over_w_squared = 1.0 / square(get(lorentz_factor));
+
   // p_star = p + p_m = p + b^2/2 = p + ((B^m v_m)^2 + (B^m B_m)/W^2)/2
+  // NOTE: adding bulk here
+  // NOTE: HARDCODING PARAMETER XI
+  double xi = 1.0;
   Scalar<DataVector>& pressure_star_with_bulk_lapse_sqrt_det_spatial_metric =
       get<::Tags::TempScalar<1>>(temp_tensors);
   get(pressure_star_with_bulk_lapse_sqrt_det_spatial_metric) =
       get(sqrt_det_spatial_metric) * get(lapse) *
-      (get(pressure) + 0.5 * square(get(magnetic_field_dot_spatial_velocity)) +
+      (get(pressure) +
+       xi*log(get(transformed_bulk_scalar)) +
+       0.5 * square(get(magnetic_field_dot_spatial_velocity)) +
        0.5 * get(magnetic_field_squared) * one_over_w_squared);
 
   // lapse b_i / W = lapse (B_i / W^2 + v_i (B^m v_m)
