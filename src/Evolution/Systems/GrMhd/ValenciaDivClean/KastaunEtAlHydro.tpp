@@ -26,6 +26,7 @@ struct Primitives {
   const double rest_mass_density;
   const double lorentz_factor;
   const double pressure;
+  const double bulk_scalar;
   const double specific_internal_energy;
 };
 
@@ -36,6 +37,7 @@ class FunctionOfZ {
               const double /* momentum_density_dot_magnetic_field */,
               const double /* magnetic_field_squared */,
               const double rest_mass_density_times_lorentz_factor,
+              const double transformed_bulk_scalar_times_lorentz_factor,
               const double electron_fraction, const EosType& equation_of_state,
               const double lorentz_max)
       : q_(tau / rest_mass_density_times_lorentz_factor),
@@ -44,6 +46,8 @@ class FunctionOfZ {
         r_(std::sqrt(r_squared_)),
         rest_mass_density_times_lorentz_factor_(
             rest_mass_density_times_lorentz_factor),
+        transformed_bulk_scalar_times_lorentz_factor_(
+            transformed_bulk_scalar_times_lorentz_factor),
         electron_fraction_(electron_fraction),
         equation_of_state_(equation_of_state) {
     // Internal consistency check
@@ -86,6 +90,7 @@ class FunctionOfZ {
   double r_;
   bool state_is_unphysical_ = false;
   const double rest_mass_density_times_lorentz_factor_;
+  const double transformed_bulk_scalar_times_lorentz_factor_;
   const double electron_fraction_;
   const EosType& equation_of_state_;
 };
@@ -125,6 +130,15 @@ Primitives FunctionOfZ<EosType, EnforcePhysicality>::primitives(
                  equation_of_state_.rest_mass_density_lower_bound(),
                  equation_of_state_.rest_mass_density_upper_bound());
 
+  // Compute transformed bulk scalar hat; TODO: require this to be positive
+  const double transformed_bulk_scalar_hat =
+      transformed_bulk_scalar_times_lorentz_factor_ / w_hat;
+
+  // Compute bulk scalar hat; TODO: hardcoding xi
+  const double xi = 1.0;
+  const double bulk_scalar_hat =
+      xi * std::log(transformed_bulk_scalar_hat);
+
   // Equation (C14) and (C16)
   double epsilon_hat = w_hat * q_ - z * (r_ - z / (1. + w_hat));
   if constexpr (EosType::thermodynamic_dim == 3) {
@@ -159,14 +173,16 @@ Primitives FunctionOfZ<EosType, EnforcePhysicality>::primitives(
         Scalar<double>(rho_hat), Scalar<double>(epsilon_hat),
         Scalar<double>(electron_fraction_)));
   }
-  return Primitives{rho_hat, w_hat, p_hat, epsilon_hat};
+  return Primitives{rho_hat, w_hat, p_hat, bulk_scalar_hat, epsilon_hat};
 }
 
 template <typename EosType, bool EnforcePhysicality>
 double FunctionOfZ<EosType, EnforcePhysicality>::operator()(double z) const {
-  const auto [rho_hat, w_hat, p_hat, epsilon_hat] = primitives(z);
-  // Equation (C5)
-  const double a_hat = p_hat / (rho_hat * (1.0 + epsilon_hat));
+  const auto [rho_hat, w_hat, p_hat,
+        bulk_scalar_hat, epsilon_hat] = primitives(z);
+  // Equation (C5); NOTE: a_hat now includes bulk
+  const double a_hat = (p_hat + bulk_scalar_hat) /
+                       (rho_hat * (1.0 + epsilon_hat));
   const double h_hat = (1.0 + epsilon_hat) * (1.0 + a_hat);
 
   // Equations (C22)
@@ -181,6 +197,7 @@ std::optional<PrimitiveRecoveryData> KastaunEtAlHydro::apply(
     const double momentum_density_dot_magnetic_field,
     const double magnetic_field_squared,
     const double rest_mass_density_times_lorentz_factor,
+    const double transformed_bulk_scalar_times_lorentz_factor,
     const double electron_fraction, const EosType& equation_of_state,
     const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
         primitive_from_conservative_options) {
@@ -192,6 +209,7 @@ std::optional<PrimitiveRecoveryData> KastaunEtAlHydro::apply(
           momentum_density_dot_magnetic_field,
           magnetic_field_squared,
           rest_mass_density_times_lorentz_factor,
+          transformed_bulk_scalar_times_lorentz_factor,
           electron_fraction,
           equation_of_state,
           primitive_from_conservative_options.kastaun_max_lorentz_factor()};
@@ -216,15 +234,17 @@ std::optional<PrimitiveRecoveryData> KastaunEtAlHydro::apply(
     return std::nullopt;
   }
 
-  const auto [rest_mass_density, lorentz_factor, pressure,
+  const auto [rest_mass_density, lorentz_factor, pressure, bulk_scalar,
               specific_internal_energy] = f_of_z.primitives(z);
 
+  //NOTE: updated rho_h_w_squared (fifth argument) to include bulk
   return PrimitiveRecoveryData{
       rest_mass_density,
       lorentz_factor,
       pressure,
       specific_internal_energy,
-      (rest_mass_density * (1. + specific_internal_energy) + pressure) *
+      (rest_mass_density * (1. + specific_internal_energy) +
+       pressure + bulk_scalar) *
           (1. + z * z),
       electron_fraction};
 }

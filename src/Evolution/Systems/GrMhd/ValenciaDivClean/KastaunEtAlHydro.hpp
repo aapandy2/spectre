@@ -54,7 +54,9 @@ class KastaunEtAlHydro {
       double initial_guess_pressure, double tau,
       double momentum_density_squared,
       double momentum_density_dot_magnetic_field, double magnetic_field_squared,
-      double rest_mass_density_times_lorentz_factor, double electron_fraction,
+      double rest_mass_density_times_lorentz_factor,
+      double transformed_bulk_scalar_times_lorentz_factor,
+      double electron_fraction,
       const EosType& equation_of_state,
       const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
           primitive_from_conservative_options);

@@ -121,7 +121,8 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
   Variables<
       tmpl::list<::Tags::TempScalar<0>, ::Tags::TempScalar<1>,
                  ::Tags::TempScalar<2>, ::Tags::TempScalar<3>,
-                 ::Tags::TempScalar<4>, ::Tags::TempI<5, 3, Frame::Inertial>>>
+                 ::Tags::TempScalar<4>, ::Tags::TempI<5, 3, Frame::Inertial>,
+                 ::Tags::TempScalar<6>>>
       temp_buffer(number_of_points);
 
   DataVector& tau = get(get<::Tags::TempScalar<0>>(temp_buffer));
@@ -152,6 +153,12 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
       get(get<::Tags::TempScalar<4>>(temp_buffer));
   rest_mass_density_times_lorentz_factor =
       get(tilde_d) / get(sqrt_det_spatial_metric);
+
+  //compute transformed_bulk_scalar_times_lorentz_factor
+  DataVector& transformed_bulk_scalar_times_lorentz_factor =
+      get(get<::Tags::TempScalar<6>>(temp_buffer));
+  transformed_bulk_scalar_times_lorentz_factor =
+      get(tilde_vb) / get(sqrt_det_spatial_metric);
 
   // Parameters for quick exit from inversion
   const double cutoffD =
@@ -204,6 +211,7 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
                            &momentum_density_dot_magnetic_field,
                            &magnetic_field_squared,
                            &rest_mass_density_times_lorentz_factor,
+                           &transformed_bulk_scalar_times_lorentz_factor,
                            &equation_of_state, &s, &electron_fraction,
                            &primitive_from_conservative_options](auto scheme) {
         using primitive_recovery_scheme = tmpl::type_from<decltype(scheme)>;
@@ -214,6 +222,7 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
                   get(momentum_density_dot_magnetic_field)[s],
                   get(magnetic_field_squared)[s],
                   rest_mass_density_times_lorentz_factor[s],
+                  transformed_bulk_scalar_times_lorentz_factor[s],
                   get(*electron_fraction)[s], equation_of_state,
                   primitive_from_conservative_options);
         }
