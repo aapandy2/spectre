@@ -79,13 +79,17 @@ void ConservativeFromPrimitive::apply(
                    get(transformed_bulk_scalar) *
                    get(lorentz_factor);
 
+  //NOTE: including bulk, but with HARDCODED parameter xi = 1
+  double xi = 1.0;
   get(*tilde_tau) = get(sqrt_det_spatial_metric) *
                       (square(get(lorentz_factor)) *
                         (get(rest_mass_density) *
                           (get(specific_internal_energy) +
                            get(spatial_velocity_squared) * get(lorentz_factor) /
                               (get(lorentz_factor) + 1.)) +
-                         get(pressure) * get(spatial_velocity_squared)) +
+                         (get(pressure)
+                          + xi*log(get(transformed_bulk_scalar))) *
+                         get(spatial_velocity_squared)) +
                        0.5 * get(magnetic_field_squared) *
                         (1.0 + get(spatial_velocity_squared)) -
                        0.5 * square(get(magnetic_field_dot_spatial_velocity)));
@@ -93,9 +97,10 @@ void ConservativeFromPrimitive::apply(
   // Reuse allocation
   Scalar<DataVector>& common_factor =
       get<hydro::Tags::MagneticFieldSquared<DataVector>>(temp_tensors);
+  //NOTE: using bulk again here, with xi hardcoded above
   get(common_factor) +=
       (get(rest_mass_density) * (1.0 + get(specific_internal_energy)) +
-       get(pressure)) *
+       ( get(pressure) + xi*log(get(transformed_bulk_scalar)) ) ) *
       square(get(lorentz_factor));
   get(common_factor) *= get(sqrt_det_spatial_metric);
 
