@@ -35,10 +35,10 @@ InitialData: &initial_data
   RiemannProblem:
     AdiabaticIndex: 1.4
     LeftDensity: 1.0
-    LeftVelocity: [0.0, 0.5, -0.3]
+    LeftVelocity: [0.0, 0.0, 0.0]
     LeftPressure: 1.0
     RightDensity: 0.125
-    RightVelocity: [0.0, 0.2, 0.1]
+    RightVelocity: [0.0, 0.0, 0.0]
     RightPressure: 0.1
     LeftMagneticField: [0.0, 0.0, 0.0]
     RightMagneticField: [0.0, 0.0, 0.0]
@@ -47,9 +47,9 @@ InitialData: &initial_data
 
 DomainCreator:
   Brick:
-    LowerBound: [-1.0, -1.0, -1.0]
-    UpperBound: [1.0, 1.0, 1.0]
-    InitialRefinement: [2, 0, 0]
+    LowerBound: [-3.0, -1.0, -1.0]
+    UpperBound: [3.0, 1.0, 1.0]
+    InitialRefinement: [5, 0, 0]
     InitialGridPoints: [3, 3, 3]
     TimeDependence: None
     BoundaryConditionInX:
@@ -140,7 +140,7 @@ EventsAndTriggers:
   - Trigger:
       Slabs:
         Specified:
-          Values: [100]
+          Values: [200]
     Events:
       - Completion
   - Trigger:
