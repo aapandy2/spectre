@@ -51,6 +51,7 @@ PUP::able::PUP_ID Reflective::my_PUP_ID = 0;
 std::optional<std::string> Reflective::dg_ghost(
     const gsl::not_null<Scalar<DataVector>*> tilde_d,
     const gsl::not_null<Scalar<DataVector>*> tilde_ye,
+    const gsl::not_null<Scalar<DataVector>*> tilde_vb,
     const gsl::not_null<Scalar<DataVector>*> tilde_tau,
     const gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*> tilde_s,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_b,
@@ -58,6 +59,7 @@ std::optional<std::string> Reflective::dg_ghost(
 
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_d_flux,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_ye_flux,
+    const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_vb_flux,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>
         tilde_tau_flux,
     const gsl::not_null<tnsr::Ij<DataVector, 3, Frame::Inertial>*> tilde_s_flux,
@@ -79,6 +81,7 @@ std::optional<std::string> Reflective::dg_ghost(
 
     const Scalar<DataVector>& interior_rest_mass_density,
     const Scalar<DataVector>& interior_electron_fraction,
+    const Scalar<DataVector>& interior_transformed_bulk_scalar,
     const Scalar<DataVector>& interior_specific_internal_energy,
     const tnsr::I<DataVector, 3, Frame::Inertial>& interior_spatial_velocity,
     const tnsr::I<DataVector, 3, Frame::Inertial>& interior_magnetic_field,
@@ -218,18 +221,22 @@ std::optional<std::string> Reflective::dg_ghost(
   get(exterior_divergence_cleaning_field) = 0.0;
 
   ConservativeFromPrimitive::apply(
-      tilde_d, tilde_ye, tilde_tau, tilde_s, tilde_b, tilde_phi,
+      tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
       interior_rest_mass_density, interior_electron_fraction,
+      interior_transformed_bulk_scalar,
       interior_specific_internal_energy, interior_pressure,
       exterior_spatial_velocity, interior_lorentz_factor,
       exterior_magnetic_field, interior_sqrt_det_spatial_metric,
       interior_spatial_metric, exterior_divergence_cleaning_field);
 
-  ComputeFluxes::apply(tilde_d_flux, tilde_ye_flux, tilde_tau_flux,
+  ComputeFluxes::apply(tilde_d_flux, tilde_ye_flux, tilde_vb_flux,
+                       tilde_tau_flux,
                        tilde_s_flux, tilde_b_flux, tilde_phi_flux, *tilde_d,
-                       *tilde_ye, *tilde_tau, *tilde_s, *tilde_b, *tilde_phi,
+                       *tilde_ye, *tilde_vb, *tilde_tau, *tilde_s, *tilde_b,
+                       *tilde_phi,
                        *lapse, *shift, interior_sqrt_det_spatial_metric,
                        interior_spatial_metric, *inv_spatial_metric,
+                       interior_transformed_bulk_scalar,
                        interior_pressure, exterior_spatial_velocity,
                        interior_lorentz_factor, exterior_magnetic_field);
 
@@ -239,6 +246,7 @@ std::optional<std::string> Reflective::dg_ghost(
 void Reflective::fd_ghost(
     const gsl::not_null<Scalar<DataVector>*> rest_mass_density,
     const gsl::not_null<Scalar<DataVector>*> electron_fraction,
+    const gsl::not_null<Scalar<DataVector>*> transformed_bulk_scalar,
     const gsl::not_null<Scalar<DataVector>*> temperature,
     const gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>
         lorentz_factor_times_spatial_velocity,
@@ -261,6 +269,7 @@ void Reflective::fd_ghost(
     // fd_interior_primitive_variables_tags
     const Scalar<DataVector>& interior_rest_mass_density,
     const Scalar<DataVector>& interior_electron_fraction,
+    const Scalar<DataVector>& interior_transformed_bulk_scalar,
     const Scalar<DataVector>& interior_temperature,
     const Scalar<DataVector>& interior_pressure,
     const Scalar<DataVector>& interior_specific_internal_energy,
@@ -275,7 +284,8 @@ void Reflective::fd_ghost(
                             SpecificInternalEnergy, SqrtDetSpatialMetric,
                             SpatialMetric, InvSpatialMetric, Lapse, Shift>>
       temp_vars{get(*rest_mass_density).size()};
-  fd_ghost_impl(rest_mass_density, electron_fraction, temperature,
+  fd_ghost_impl(rest_mass_density, electron_fraction, transformed_bulk_scalar,
+                temperature,
                 make_not_null(&get<Pressure>(temp_vars)),
                 make_not_null(&get<SpecificInternalEnergy>(temp_vars)),
                 lorentz_factor_times_spatial_velocity,
@@ -295,6 +305,7 @@ void Reflective::fd_ghost(
 
                 // fd_interior_primitive_variables_tags
                 interior_rest_mass_density, interior_electron_fraction,
+                interior_transformed_bulk_scalar,
                 interior_temperature, interior_pressure,
                 interior_specific_internal_energy, interior_lorentz_factor,
                 interior_spatial_velocity, interior_magnetic_field,
@@ -307,13 +318,14 @@ void Reflective::fd_ghost(
     ConservativeFromPrimitive::apply(
         make_not_null(&get<Tags::TildeD>(temp_vars)),
         make_not_null(&get<Tags::TildeYe>(temp_vars)),
+        make_not_null(&get<Tags::TildeVB>(temp_vars)),
         make_not_null(&get<Tags::TildeTau>(temp_vars)),
         make_not_null(&get<Tags::TildeS<>>(temp_vars)),
         make_not_null(&get<Tags::TildeB<>>(temp_vars)),
         make_not_null(&get<Tags::TildePhi>(temp_vars)),
 
         // Note: Only the spatial velocity changes.
-        *rest_mass_density, *electron_fraction,
+        *rest_mass_density, *electron_fraction, *transformed_bulk_scalar,
         get<SpecificInternalEnergy>(temp_vars), get<Pressure>(temp_vars),
         get<SpatialVelocity>(temp_vars), get<LorentzFactor>(temp_vars),
         *magnetic_field,
@@ -327,6 +339,8 @@ void Reflective::fd_ghost(
         make_not_null(
             &get<Flux<Tags::TildeYe>>(cell_centered_ghost_fluxes->value())),
         make_not_null(
+            &get<Flux<Tags::TildeVB>>(cell_centered_ghost_fluxes->value())),
+        make_not_null(
             &get<Flux<Tags::TildeTau>>(cell_centered_ghost_fluxes->value())),
         make_not_null(
             &get<Flux<Tags::TildeS<>>>(cell_centered_ghost_fluxes->value())),
@@ -336,12 +350,15 @@ void Reflective::fd_ghost(
             &get<Flux<Tags::TildePhi>>(cell_centered_ghost_fluxes->value())),
 
         get<Tags::TildeD>(temp_vars), get<Tags::TildeYe>(temp_vars),
+        get<Tags::TildeVB>(temp_vars),
         get<Tags::TildeTau>(temp_vars), get<Tags::TildeS<>>(temp_vars),
         get<Tags::TildeB<>>(temp_vars), get<Tags::TildePhi>(temp_vars),
 
         get<Lapse>(temp_vars), get<Shift>(temp_vars),
         get<SqrtDetSpatialMetric>(temp_vars), get<SpatialMetric>(temp_vars),
-        get<InvSpatialMetric>(temp_vars), get<Pressure>(temp_vars),
+        get<InvSpatialMetric>(temp_vars),
+        *transformed_bulk_scalar,
+        get<Pressure>(temp_vars),
         get<SpatialVelocity>(temp_vars), get<LorentzFactor>(temp_vars),
         *magnetic_field);
   }
@@ -350,6 +367,7 @@ void Reflective::fd_ghost(
 void Reflective::fd_ghost_impl(
     const gsl::not_null<Scalar<DataVector>*> rest_mass_density,
     const gsl::not_null<Scalar<DataVector>*> electron_fraction,
+    const gsl::not_null<Scalar<DataVector>*> transformed_bulk_scalar,
     const gsl::not_null<Scalar<DataVector>*> temperature,
     const gsl::not_null<Scalar<DataVector>*> pressure,
     const gsl::not_null<Scalar<DataVector>*> specific_internal_energy,
@@ -377,6 +395,7 @@ void Reflective::fd_ghost_impl(
     // fd_interior_primitive_variables_tags
     const Scalar<DataVector>& interior_rest_mass_density,
     const Scalar<DataVector>& interior_electron_fraction,
+    const Scalar<DataVector>& interior_transformed_bulk_scalar,
     const Scalar<DataVector>& interior_temperature,
     const Scalar<DataVector>& interior_pressure,
     const Scalar<DataVector>& interior_specific_internal_energy,
@@ -395,7 +414,8 @@ void Reflective::fd_ghost_impl(
       subcell_extents.slice_away(dim_direction).product()};
 
   using prim_tags_without_cleaning_field =
-      tmpl::list<RestMassDensity, ElectronFraction, Temperature,
+      tmpl::list<RestMassDensity, ElectronFraction, TransformedBulkScalar,
+                 Temperature,
                  LorentzFactorTimesSpatialVelocity, MagneticField>;
 
   // Create a single large DV to reduce the number of Variables allocations
@@ -430,6 +450,8 @@ void Reflective::fd_ghost_impl(
       get_boundary_val(interior_rest_mass_density);
   get<ElectronFraction>(outermost_prim_vars) =
       get_boundary_val(interior_electron_fraction);
+  get<TransformedBulkScalar>(outermost_prim_vars) =
+      get_boundary_val(interior_transformed_bulk_scalar);
   get<Temperature>(outermost_prim_vars) =
       get_boundary_val(interior_temperature);
 
@@ -499,6 +521,7 @@ void Reflective::fd_ghost_impl(
 
   *rest_mass_density = get<RestMassDensity>(ghost_prim_vars);
   *electron_fraction = get<ElectronFraction>(ghost_prim_vars);
+  *transformed_bulk_scalar = get<TransformedBulkScalar>(ghost_prim_vars);
   *temperature = get<Temperature>(ghost_prim_vars);
   *lorentz_factor_times_spatial_velocity =
       get<LorentzFactorTimesSpatialVelocity>(ghost_prim_vars);

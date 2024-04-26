@@ -69,6 +69,7 @@ class Reflective final : public BoundaryCondition {
 
   using RestMassDensity = hydro::Tags::RestMassDensity<DataVector>;
   using ElectronFraction = hydro::Tags::ElectronFraction<DataVector>;
+  using TransformedBulkScalar = hydro::Tags::TransformedBulkScalar<DataVector>;
   using Temperature = hydro::Tags::Temperature<DataVector>;
   using Pressure = hydro::Tags::Pressure<DataVector>;
   using LorentzFactorTimesSpatialVelocity =
@@ -87,7 +88,8 @@ class Reflective final : public BoundaryCondition {
   using Shift = gr::Tags::Shift<DataVector, 3>;
 
   using prim_tags_for_reconstruction =
-      tmpl::list<RestMassDensity, ElectronFraction, Temperature,
+      tmpl::list<RestMassDensity, ElectronFraction, TransformedBulkScalar,
+                 Temperature,
                  LorentzFactorTimesSpatialVelocity, MagneticField,
                  DivergenceCleaningField>;
 
@@ -133,6 +135,7 @@ class Reflective final : public BoundaryCondition {
   using dg_interior_primitive_variables_tags =
       tmpl::list<hydro::Tags::RestMassDensity<DataVector>,
                  hydro::Tags::ElectronFraction<DataVector>,
+                 hydro::Tags::TransformedBulkScalar<DataVector>,
                  hydro::Tags::SpecificInternalEnergy<DataVector>,
                  hydro::Tags::SpatialVelocity<DataVector, 3>,
                  hydro::Tags::MagneticField<DataVector, 3>,
@@ -144,6 +147,7 @@ class Reflective final : public BoundaryCondition {
   std::optional<std::string> dg_ghost(
       gsl::not_null<Scalar<DataVector>*> tilde_d,
       gsl::not_null<Scalar<DataVector>*> tilde_ye,
+      gsl::not_null<Scalar<DataVector>*> tilde_vb,
       gsl::not_null<Scalar<DataVector>*> tilde_tau,
       gsl::not_null<tnsr::i<DataVector, 3, Frame::Inertial>*> tilde_s,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_b,
@@ -151,6 +155,7 @@ class Reflective final : public BoundaryCondition {
 
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_d_flux,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_ye_flux,
+      gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_vb_flux,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_tau_flux,
       gsl::not_null<tnsr::Ij<DataVector, 3, Frame::Inertial>*> tilde_s_flux,
       gsl::not_null<tnsr::IJ<DataVector, 3, Frame::Inertial>*> tilde_b_flux,
@@ -170,6 +175,7 @@ class Reflective final : public BoundaryCondition {
 
       const Scalar<DataVector>& interior_rest_mass_density,
       const Scalar<DataVector>& interior_electron_fraction,
+      const Scalar<DataVector>& interior_transformed_bulk_scalar,
       const Scalar<DataVector>& interior_specific_internal_energy,
       const tnsr::I<DataVector, 3, Frame::Inertial>& interior_spatial_velocity,
       const tnsr::I<DataVector, 3, Frame::Inertial>& interior_magnetic_field,
@@ -186,7 +192,8 @@ class Reflective final : public BoundaryCondition {
       tmpl::list<evolution::dg::subcell::Tags::Mesh<3>, Shift, Lapse,
                  SpatialMetric>;
   using fd_interior_primitive_variables_tags =
-      tmpl::list<RestMassDensity, ElectronFraction, Temperature,
+      tmpl::list<RestMassDensity, ElectronFraction, TransformedBulkScalar,
+                 Temperature,
                  hydro::Tags::Pressure<DataVector>,
                  hydro::Tags::SpecificInternalEnergy<DataVector>,
                  hydro::Tags::LorentzFactor<DataVector>,
@@ -197,6 +204,7 @@ class Reflective final : public BoundaryCondition {
   void fd_ghost(
       gsl::not_null<Scalar<DataVector>*> rest_mass_density,
       gsl::not_null<Scalar<DataVector>*> electron_fraction,
+      gsl::not_null<Scalar<DataVector>*> transformed_bulk_scalar,
       gsl::not_null<Scalar<DataVector>*> temperature,
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*>
           lorentz_factor_times_spatial_velocity,
@@ -218,6 +226,7 @@ class Reflective final : public BoundaryCondition {
       // interior prim vars tags
       const Scalar<DataVector>& interior_rest_mass_density,
       const Scalar<DataVector>& interior_electron_fraction,
+      const Scalar<DataVector>& interior_transformed_bulk_scalar,
       const Scalar<DataVector>& interior_temperature,
       const Scalar<DataVector>& interior_pressure,
       const Scalar<DataVector>& interior_specific_internal_energy,
@@ -232,6 +241,7 @@ class Reflective final : public BoundaryCondition {
   void fd_ghost_impl(
       gsl::not_null<Scalar<DataVector>*> rest_mass_density,
       gsl::not_null<Scalar<DataVector>*> electron_fraction,
+      gsl::not_null<Scalar<DataVector>*> transformed_bulk_scalar,
       gsl::not_null<Scalar<DataVector>*> temperature,
       gsl::not_null<Scalar<DataVector>*> pressure,
       gsl::not_null<Scalar<DataVector>*> specific_internal_energy,
@@ -256,6 +266,7 @@ class Reflective final : public BoundaryCondition {
       // fd_interior_primitive_variables_tags
       const Scalar<DataVector>& interior_rest_mass_density,
       const Scalar<DataVector>& interior_electron_fraction,
+      const Scalar<DataVector>& interior_transformed_bulk_scalar,
       const Scalar<DataVector>& interior_temperature,
       const Scalar<DataVector>& interior_pressure,
       const Scalar<DataVector>& interior_specific_internal_energy,
