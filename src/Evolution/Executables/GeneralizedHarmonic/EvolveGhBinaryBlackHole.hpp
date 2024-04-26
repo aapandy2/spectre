@@ -10,12 +10,15 @@
 #include "ControlSystem/Actions/LimitTimeStep.hpp"
 #include "ControlSystem/Actions/PrintCurrentMeasurement.hpp"
 #include "ControlSystem/Component.hpp"
+#include "ControlSystem/ControlErrors/Size/Factory.hpp"
+#include "ControlSystem/ControlErrors/Size/State.hpp"
 #include "ControlSystem/Measurements/BothHorizons.hpp"
 #include "ControlSystem/Metafunctions.hpp"
 #include "ControlSystem/Systems/Expansion.hpp"
 #include "ControlSystem/Systems/Rotation.hpp"
 #include "ControlSystem/Systems/Shape.hpp"
 #include "ControlSystem/Systems/Size.hpp"
+#include "ControlSystem/Systems/Translation.hpp"
 #include "ControlSystem/Trigger.hpp"
 #include "DataStructures/DataBox/PrefixHelpers.hpp"
 #include "DataStructures/DataBox/Tag.hpp"
@@ -24,7 +27,6 @@
 #include "Domain/Creators/CylindricalBinaryCompactObject.hpp"
 #include "Domain/FunctionsOfTime/OutputTimeBounds.hpp"
 #include "Domain/FunctionsOfTime/Tags.hpp"
-#include "Domain/Protocols/Metavariables.hpp"
 #include "Domain/Tags.hpp"
 #include "Domain/TagsCharacteristicSpeeds.hpp"
 #include "Evolution/Actions/RunEventsAndDenseTriggers.hpp"
@@ -81,7 +83,7 @@
 #include "Parallel/PhaseControl/Factory.hpp"
 #include "Parallel/PhaseControl/VisitAndReturn.hpp"
 #include "Parallel/PhaseDependentActionList.hpp"
-#include "Parallel/Printf.hpp"
+#include "Parallel/Printf/Printf.hpp"
 #include "Parallel/Protocols/RegistrationMetavariables.hpp"
 #include "Parallel/Reduction.hpp"
 #include "ParallelAlgorithms/Actions/AddComputeTags.hpp"
@@ -154,10 +156,11 @@
 #include "PointwiseFunctions/GeneralRelativity/WeylTypeD1.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/InitialData.hpp"
 #include "Time/Actions/AdvanceTime.hpp"
-#include "Time/Actions/ChangeSlabSize.hpp"
 #include "Time/Actions/RecordTimeStepperData.hpp"
 #include "Time/Actions/SelfStartActions.hpp"
 #include "Time/Actions/UpdateU.hpp"
+#include "Time/ChangeSlabSize/Action.hpp"
+#include "Time/ChangeSlabSize/Tags.hpp"
 #include "Time/StepChoosers/Cfl.hpp"
 #include "Time/StepChoosers/Constant.hpp"
 #include "Time/StepChoosers/Factory.hpp"
@@ -251,9 +254,6 @@ struct EvolutionMetavars {
 
   // NOLINTNEXTLINE(google-runtime-references)
   void pup(PUP::er& /*p*/) {}
-  struct domain : tt::ConformsTo<::domain::protocols::Metavariables> {
-    static constexpr bool enable_time_dependent_maps = true;
-  };
 
   template <::domain::ObjectLabel Horizon, typename Frame>
   struct Ah : tt::ConformsTo<intrp::protocols::InterpolationTargetTag> {
@@ -318,6 +318,7 @@ struct EvolutionMetavars {
   using control_systems =
       tmpl::list<control_system::Systems::Rotation<3, both_horizons>,
                  control_system::Systems::Expansion<2, both_horizons>,
+                 control_system::Systems::Translation<2, both_horizons>,
                  control_system::Systems::Shape<::domain::ObjectLabel::A, 2,
                                                 both_horizons>,
                  control_system::Systems::Shape<::domain::ObjectLabel::B, 2,
@@ -473,6 +474,8 @@ struct EvolutionMetavars {
                 control_system::metafunctions::control_system_events<
                     control_systems>,
                 Events::time_events<system>>>>,
+        tmpl::pair<control_system::size::State,
+                   control_system::size::States::factory_creatable_states>,
         tmpl::pair<
             gh::BoundaryConditions::BoundaryCondition<volume_dim>,
             tmpl::list<
@@ -688,7 +691,9 @@ struct EvolutionMetavars {
         ::amr::projectors::CopyFromCreatorOrLeaveAsIs<tmpl::push_back<
             typename control_system::Actions::InitializeMeasurements<
                 control_systems>::simple_tags,
-            intrp::Tags::InterpPointInfo<EvolutionMetavars>>>>;
+            intrp::Tags::InterpPointInfo<EvolutionMetavars>,
+            Tags::ChangeSlabSize::NumberOfExpectedMessages,
+            Tags::ChangeSlabSize::NewSlabSize>>>;
   };
 
   using component_list = tmpl::flatten<tmpl::list<

@@ -69,8 +69,9 @@ def extract_dat_files(
     """Extract dat files from an H5 file
 
     Extract all Dat files inside a SpECTRE HDF5 file. The resulting files will
-    be put into the 'OUT_DIR'. The directory structure will be identical to the
-    group structure inside the HDF5 file.
+    be put into the 'OUT_DIR' if specified, or printed to standard output. The
+    directory structure will be identical to the group structure inside the
+    HDF5 file.
     """
     if list:
         import rich.columns
@@ -166,7 +167,11 @@ def extract_dat_files(
     "-d",
     "subfiles",
     multiple=True,
-    help="Full path of subfile to extract (including extension).",
+    help=(
+        "Full path of subfile to extract (including extension). Can be"
+        " specified multiple times to extract several subfiles at once. If"
+        " unspecified, all subfiles will be extracted."
+    ),
 )
 def extract_dat_command(**kwargs):
     _rich_traceback_guard = True  # Hide traceback until here

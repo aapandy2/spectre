@@ -32,7 +32,6 @@
 #include "Domain/FunctionsOfTime/FixedSpeedCubic.hpp"
 #include "Domain/FunctionsOfTime/PiecewisePolynomial.hpp"
 #include "Domain/FunctionsOfTime/QuaternionFunctionOfTime.hpp"
-#include "Domain/Protocols/Metavariables.hpp"
 #include "Domain/Structure/BlockNeighbor.hpp"  // IWYU pragma: keep
 #include "Framework/TestCreation.hpp"
 #include "Helpers/Domain/BoundaryConditions/BoundaryCondition.hpp"
@@ -231,7 +230,7 @@ std::string stringize(const std::array<double, 3>& t) {
 }
 
 std::string create_option_string(
-    const bool enable_time_dependence, const bool add_time_dependence,
+    const bool add_time_dependence,
     const bool with_additional_outer_radial_refinement,
     const bool with_additional_grid_points, const bool include_outer_sphere,
     const bool include_inner_sphere_A, const bool include_inner_sphere_B,
@@ -241,21 +240,21 @@ std::string create_option_string(
     const double inner_radius_objectA, const double inner_radius_objectB,
     const double outer_radius) {
   const std::string time_dependence{
-      enable_time_dependence
-          ? (add_time_dependence
-                 ? "  TimeDependentMaps:\n"
-                   "    InitialTime: 1.0\n"
-                   "    ExpansionMap: None\n"
-                   "    RotationMap:\n"
-                   "      InitialAngularVelocity: [0.0, 0.0, -0.2]\n"
-                   "    ShapeMapA:\n"
-                   "      LMax: 8\n"
-                   "      SizeInitialValues: [1.1, 0.0, 0.0]\n"
-                   "    ShapeMapB:\n"
-                   "      LMax: 8\n"
-                   "      SizeInitialValues: [1.2, 0.0, 0.0]\n"
-                 : "  TimeDependentMaps: None\n")
-          : ""};
+      add_time_dependence ? "  TimeDependentMaps:\n"
+                            "    InitialTime: 1.0\n"
+                            "    ExpansionMap: None\n"
+                            "    RotationMap:\n"
+                            "      InitialAngularVelocity: [0.0, 0.0, -0.2]\n"
+                            "    TranslationMap: None\n"
+                            "    ShapeMapA:\n"
+                            "      LMax: 8\n"
+                            "      InitialValues: Spherical\n"
+                            "      SizeInitialValues: [1.1, 0.0, 0.0]\n"
+                            "    ShapeMapB:\n"
+                            "      LMax: 8\n"
+                            "      InitialValues: Spherical\n"
+                            "      SizeInitialValues: [1.2, 0.0, 0.0]\n"
+                          : "  TimeDependentMaps: None\n"};
 
   const std::string boundary_conditions{
       add_boundary_condition ? std::string{"  BoundaryConditions:\n"
@@ -399,84 +398,97 @@ TimeDepOptions construct_time_dependent_options() {
 
   // No expansion map options because of above option string
   return TimeDepOptions{
-      expected_time, std::nullopt,
+      expected_time,
+      std::nullopt,
       TimeDepOptions::RotationMapOptions{{initial_angular_velocity[0],
                                           initial_angular_velocity[1],
                                           initial_angular_velocity[2]}},
+      std::nullopt,
       TimeDepOptions::ShapeMapOptions<domain::ObjectLabel::A>{
           8_st,
-          {initial_size_A_coefs[0][0], initial_size_A_coefs[1][0],
-           initial_size_A_coefs[1][0]}},
+          std::nullopt,
+          {{initial_size_A_coefs[0][0], initial_size_A_coefs[1][0],
+            initial_size_A_coefs[1][0]}}},
       TimeDepOptions::ShapeMapOptions<domain::ObjectLabel::B>{
           8_st,
-          {initial_size_B_coefs[0][0], initial_size_B_coefs[1][0],
-           initial_size_B_coefs[1][0]}}};
+          std::nullopt,
+          {{initial_size_B_coefs[0][0], initial_size_B_coefs[1][0],
+            initial_size_B_coefs[1][0]}}}};
 }
 
 void test_parse_errors() {
   CHECK_THROWS_WITH(
       domain::creators::CylindricalBinaryCompactObject(
           {{2.0, 0.05, 0.0}}, {-5.0, 0.05, 0.0}, 1.0, 0.4, false, false, false,
-          1.0, false, 1_st, 3_st, create_inner_boundary_condition(),
-          create_outer_boundary_condition(), Options::Context{false, {}, 1, 1}),
+          1.0, false, 1_st, 3_st, std::nullopt,
+          create_inner_boundary_condition(), create_outer_boundary_condition(),
+          Options::Context{false, {}, 1, 1}),
       Catch::Matchers::ContainsSubstring("OuterRadius is too small"));
   CHECK_THROWS_WITH(
       domain::creators::CylindricalBinaryCompactObject(
           {{-2.0, 0.05, 0.0}}, {-5.0, 0.05, 0.0}, 1.0, 0.4, false, false, false,
-          25.0, false, 1_st, 3_st, create_inner_boundary_condition(),
-          create_outer_boundary_condition(), Options::Context{false, {}, 1, 1}),
+          25.0, false, 1_st, 3_st, std::nullopt,
+          create_inner_boundary_condition(), create_outer_boundary_condition(),
+          Options::Context{false, {}, 1, 1}),
       Catch::Matchers::ContainsSubstring(
           "The x-coordinate of the input CenterA is expected to be positive"));
   CHECK_THROWS_WITH(
       domain::creators::CylindricalBinaryCompactObject(
           {{2.0, 0.05, 0.0}}, {5.0, 0.05, 0.0}, 1.0, 0.4, false, false, false,
-          25.0, false, 1_st, 3_st, create_inner_boundary_condition(),
-          create_outer_boundary_condition(), Options::Context{false, {}, 1, 1}),
+          25.0, false, 1_st, 3_st, std::nullopt,
+          create_inner_boundary_condition(), create_outer_boundary_condition(),
+          Options::Context{false, {}, 1, 1}),
       Catch::Matchers::ContainsSubstring(
           "The x-coordinate of the input CenterB is expected to be negative"));
   CHECK_THROWS_WITH(
       domain::creators::CylindricalBinaryCompactObject(
           {{2.0, 0.05, 0.0}}, {-5.0, 0.05, 0.0}, -1.0, 0.4, false, false, false,
-          25.0, false, 1_st, 3_st, create_inner_boundary_condition(),
-          create_outer_boundary_condition(), Options::Context{false, {}, 1, 1}),
+          25.0, false, 1_st, 3_st, std::nullopt,
+          create_inner_boundary_condition(), create_outer_boundary_condition(),
+          Options::Context{false, {}, 1, 1}),
       Catch::Matchers::ContainsSubstring("RadiusA and RadiusB are expected "
                                          "to be positive"));
   CHECK_THROWS_WITH(
       domain::creators::CylindricalBinaryCompactObject(
           {{2.0, 0.05, 0.0}}, {-5.0, 0.05, 0.0}, 1.0, -0.4, false, false, false,
-          25.0, false, 1_st, 3_st, create_inner_boundary_condition(),
-          create_outer_boundary_condition(), Options::Context{false, {}, 1, 1}),
+          25.0, false, 1_st, 3_st, std::nullopt,
+          create_inner_boundary_condition(), create_outer_boundary_condition(),
+          Options::Context{false, {}, 1, 1}),
       Catch::Matchers::ContainsSubstring("RadiusA and RadiusB are expected "
                                          "to be positive"));
   CHECK_THROWS_WITH(
       domain::creators::CylindricalBinaryCompactObject(
           {{2.0, 0.05, 0.0}}, {-5.0, 0.05, 0.0}, 0.15, 0.4, false, false, false,
-          25.0, false, 1_st, 3_st, create_inner_boundary_condition(),
-          create_outer_boundary_condition(), Options::Context{false, {}, 1, 1}),
+          25.0, false, 1_st, 3_st, std::nullopt,
+          create_inner_boundary_condition(), create_outer_boundary_condition(),
+          Options::Context{false, {}, 1, 1}),
       Catch::Matchers::ContainsSubstring(
           "RadiusA should not be smaller than RadiusB"));
   CHECK_THROWS_WITH(
       domain::creators::CylindricalBinaryCompactObject(
           {{2.0, 0.05, 0.0}}, {-1.0, 0.05, 0.0}, 1.0, 0.4, false, false, false,
-          25.0, false, 1_st, 3_st, create_inner_boundary_condition(),
-          create_outer_boundary_condition(), Options::Context{false, {}, 1, 1}),
+          25.0, false, 1_st, 3_st, std::nullopt,
+          create_inner_boundary_condition(), create_outer_boundary_condition(),
+          Options::Context{false, {}, 1, 1}),
       Catch::Matchers::ContainsSubstring("We expect |x_A| <= |x_B|"));
   CHECK_THROWS_WITH(
       domain::creators::CylindricalBinaryCompactObject(
+          {{4.0, 0.0, 0.0}}, {-4.0, 0.0, 0.0}, 1.0, 1.0, false, false, false,
+          25.0, false, 1_st, 3_st,
           TimeDepOptions{
               0.0, std::nullopt,
               TimeDepOptions::RotationMapOptions{std::array{0.0, 0.0, 0.0}},
-              std::nullopt, std::nullopt},
-          {{4.0, 0.0, 0.0}}, {-4.0, 0.0, 0.0}, 1.0, 1.0, false, false, false,
-          25.0, false, 1_st, 3_st, create_inner_boundary_condition(),
-          create_outer_boundary_condition(), Options::Context{false, {}, 1, 1}),
+              std::nullopt, std::nullopt, std::nullopt},
+          create_inner_boundary_condition(), create_outer_boundary_condition(),
+          Options::Context{false, {}, 1, 1}),
       Catch::Matchers::ContainsSubstring(
           "To use the CylindricalBBH domain with time-dependent maps"));
   // Boundary condition errors
   CHECK_THROWS_WITH(
       domain::creators::CylindricalBinaryCompactObject(
           {{2.0, 0.05, 0.0}}, {-5.0, 0.05, 0.0}, 1.0, 0.4, false, false, false,
-          25.0, false, 1_st, 3_st, create_inner_boundary_condition(),
+          25.0, false, 1_st, 3_st, std::nullopt,
+          create_inner_boundary_condition(),
           std::make_unique<TestHelpers::domain::BoundaryConditions::
                                TestPeriodicBoundaryCondition<3>>(),
           Options::Context{false, {}, 1, 1}),
@@ -485,7 +497,7 @@ void test_parse_errors() {
   CHECK_THROWS_WITH(
       domain::creators::CylindricalBinaryCompactObject(
           {{2.0, 0.05, 0.0}}, {-5.0, 0.05, 0.0}, 1.0, 0.4, false, false, false,
-          25.0, false, 1_st, 3_st,
+          25.0, false, 1_st, 3_st, std::nullopt,
           std::make_unique<TestHelpers::domain::BoundaryConditions::
                                TestPeriodicBoundaryCondition<3>>(),
           create_outer_boundary_condition(), Options::Context{false, {}, 1, 1}),
@@ -494,19 +506,19 @@ void test_parse_errors() {
   CHECK_THROWS_WITH(
       domain::creators::CylindricalBinaryCompactObject(
           {{2.0, 0.05, 0.0}}, {-5.0, 0.05, 0.0}, 1.0, 0.4, false, false, false,
-          25.0, false, 1_st, 3_st, nullptr, create_outer_boundary_condition(),
-          Options::Context{false, {}, 1, 1}),
+          25.0, false, 1_st, 3_st, std::nullopt, nullptr,
+          create_outer_boundary_condition(), Options::Context{false, {}, 1, 1}),
       Catch::Matchers::ContainsSubstring(
           "Must specify either both inner and outer boundary "
           "conditions or neither."));
-  CHECK_THROWS_WITH(
-      domain::creators::CylindricalBinaryCompactObject(
-          {{2.0, 0.05, 0.0}}, {-5.0, 0.05, 0.0}, 1.0, 0.4, false, false, false,
-          25.0, false, 1_st, 3_st, create_inner_boundary_condition(), nullptr,
-          Options::Context{false, {}, 1, 1}),
-      Catch::Matchers::ContainsSubstring(
-          "Must specify either both inner and outer boundary "
-          "conditions or neither."));
+  CHECK_THROWS_WITH(domain::creators::CylindricalBinaryCompactObject(
+                        {{2.0, 0.05, 0.0}}, {-5.0, 0.05, 0.0}, 1.0, 0.4, false,
+                        false, false, 25.0, false, 1_st, 3_st, std::nullopt,
+                        create_inner_boundary_condition(), nullptr,
+                        Options::Context{false, {}, 1, 1}),
+                    Catch::Matchers::ContainsSubstring(
+                        "Must specify either both inner and outer boundary "
+                        "conditions or neither."));
 }
 
 // This matches the structure in the option string
@@ -550,15 +562,14 @@ void test_cylindrical_bbh() {
   for (auto [include_outer_sphere, include_inner_sphere_A,
              include_inner_sphere_B, use_equiangular_map,
              with_additional_outer_radial_refinement,
-             with_additional_grid_points, enable_time_dependence,
-             with_time_dependence, with_control_systems,
-             with_boundary_conditions] :
+             with_additional_grid_points, with_time_dependence,
+             with_control_systems, with_boundary_conditions] :
        random_sample<5>(
            cartesian_product(make_array(true, false), make_array(true, false),
                              make_array(true, false), make_array(true, false),
                              make_array(true, false), make_array(true, false),
                              make_array(true, false), make_array(true, false),
-                             make_array(true, false), make_array(true, false)),
+                             make_array(true, false)),
            make_not_null(&gen))) {
     CAPTURE(with_sphere_e);
     CAPTURE(include_outer_sphere);
@@ -570,6 +581,7 @@ void test_cylindrical_bbh() {
     if (with_time_dependence) {
       include_inner_sphere_A = true;
       include_inner_sphere_B = true;
+      include_outer_sphere = true;
     } else {
       // With no time dependence, can't have control systems
       with_control_systems = false;
@@ -611,46 +623,25 @@ void test_cylindrical_bbh() {
     }
 
     CylBCO cyl_binary_compact_object{};
-    if (enable_time_dependence) {
-      std::optional<TimeDepOptions> time_dep_opts{};
-      if (with_time_dependence) {
-        time_dep_opts = construct_time_dependent_options();
-      }
-      cyl_binary_compact_object =
-          CylBCO{std::move(time_dep_opts),
-                 center_objectA,
-                 center_objectB,
-                 inner_radius_objectA,
-                 inner_radius_objectB,
-                 include_inner_sphere_A,
-                 include_inner_sphere_B,
-                 include_outer_sphere,
-                 outer_radius,
-                 use_equiangular_map,
-                 initial_refinement,
-                 initial_grid_points,
-                 with_boundary_conditions ? create_inner_boundary_condition()
-                                          : nullptr,
-                 with_boundary_conditions ? create_outer_boundary_condition()
-                                          : nullptr};
-    } else {
-      cyl_binary_compact_object =
-          CylBCO{center_objectA,
-                 center_objectB,
-                 inner_radius_objectA,
-                 inner_radius_objectB,
-                 include_inner_sphere_A,
-                 include_inner_sphere_B,
-                 include_outer_sphere,
-                 outer_radius,
-                 use_equiangular_map,
-                 initial_refinement,
-                 initial_grid_points,
-                 with_boundary_conditions ? create_inner_boundary_condition()
-                                          : nullptr,
-                 with_boundary_conditions ? create_outer_boundary_condition()
-                                          : nullptr};
+    std::optional<TimeDepOptions> time_dep_opts{};
+    if (with_time_dependence) {
+      time_dep_opts = construct_time_dependent_options();
     }
+    cyl_binary_compact_object = CylBCO{
+        center_objectA,
+        center_objectB,
+        inner_radius_objectA,
+        inner_radius_objectB,
+        include_inner_sphere_A,
+        include_inner_sphere_B,
+        include_outer_sphere,
+        outer_radius,
+        use_equiangular_map,
+        initial_refinement,
+        initial_grid_points,
+        std::move(time_dep_opts),
+        with_boundary_conditions ? create_inner_boundary_condition() : nullptr,
+        with_boundary_conditions ? create_outer_boundary_condition() : nullptr};
 
     test_construction(cyl_binary_compact_object, with_boundary_conditions,
                       include_inner_sphere_A, include_inner_sphere_B,
@@ -658,16 +649,14 @@ void test_cylindrical_bbh() {
                       inner_radius_objectB, center_objectA, center_objectB,
                       times_to_check);
     TestHelpers::domain::creators::test_creation(
-        create_option_string(enable_time_dependence, with_time_dependence,
-                             with_additional_outer_radial_refinement,
-                             with_additional_grid_points, include_outer_sphere,
-                             include_inner_sphere_A, include_inner_sphere_B,
-                             with_boundary_conditions, use_equiangular_map,
-                             center_objectA, center_objectB,
-                             inner_radius_objectA, inner_radius_objectB,
-                             outer_radius),
-        cyl_binary_compact_object, with_boundary_conditions,
-        enable_time_dependence);
+        create_option_string(
+            with_time_dependence, with_additional_outer_radial_refinement,
+            with_additional_grid_points, include_outer_sphere,
+            include_inner_sphere_A, include_inner_sphere_B,
+            with_boundary_conditions, use_equiangular_map, center_objectA,
+            center_objectB, inner_radius_objectA, inner_radius_objectB,
+            outer_radius),
+        cyl_binary_compact_object, with_boundary_conditions);
   }
 }
 }  // namespace

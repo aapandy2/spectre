@@ -32,7 +32,7 @@ struct ElectronFraction;
 template <typename DataType>
 struct TransformedBulkScalar;
 struct EquationOfStateBase;
-template <typename EquationOfStateType>
+template <bool IsRelativistic, size_t ThermodynamicDim>
 struct EquationOfState;
 struct GrmhdEquationOfState;
 template <typename DataType>

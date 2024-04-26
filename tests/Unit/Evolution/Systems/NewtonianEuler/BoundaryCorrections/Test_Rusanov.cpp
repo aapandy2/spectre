@@ -24,31 +24,9 @@
 #include "Utilities/TaggedTuple.hpp"
 
 namespace {
-struct ConvertPolytropic {
-  using unpacked_container = bool;
-  using packed_container = EquationsOfState::PolytropicFluid<false>;
-  using packed_type = bool;
-
-  static inline unpacked_container unpack(const packed_container& /*packed*/,
-                                          const size_t /*grid_point_index*/) {
-    return true;
-  }
-
-  [[noreturn]] static inline void pack(
-      const gsl::not_null<packed_container*> /*packed*/,
-      const unpacked_container& /*unpacked*/,
-      const size_t /*grid_point_index*/) {
-    ERROR("Should not be converting an EOS from an unpacked to a packed type");
-  }
-
-  static inline size_t get_size(const packed_container& /*packed*/) {
-    return 1;
-  }
-};
-
 struct ConvertIdeal {
   using unpacked_container = bool;
-  using packed_container = EquationsOfState::IdealFluid<false>;
+  using packed_container = EquationsOfState::EquationOfState<false, 2>;
   using packed_type = bool;
 
   static inline unpacked_container unpack(const packed_container& /*packed*/,
@@ -81,8 +59,9 @@ namespace helpers = TestHelpers::evolution::dg;
 template <size_t Dim, typename EosType>
 void test(const gsl::not_null<std::mt19937*> gen, const size_t num_pts,
           const EosType& equation_of_state) {
-  tuples::TaggedTuple<hydro::Tags::EquationOfState<EosType>> volume_data{
-      equation_of_state};
+  tuples::TaggedTuple<
+      hydro::Tags::EquationOfState<false, EosType::thermodynamic_dim>>
+      volume_data{equation_of_state.get_clone()};
   tuples::TaggedTuple<
       helpers::Tags::Range<NewtonianEuler::Tags::MassDensityCons>,
       helpers::Tags::Range<hydro::Tags::SpecificInternalEnergy<DataVector>>>
@@ -95,8 +74,8 @@ void test(const gsl::not_null<std::mt19937*> gen, const size_t num_pts,
                     Spectral::Quadrature::Gauss},
       volume_data, ranges);
 
-  helpers::test_boundary_correction_with_python<
-      NewtonianEuler::System<Dim>, tmpl::list<ConvertPolytropic, ConvertIdeal>>(
+  helpers::test_boundary_correction_with_python<NewtonianEuler::System<Dim>,
+                                                tmpl::list<ConvertIdeal>>(
       gen, "Rusanov", "dg_package_data", "dg_boundary_terms",
       NewtonianEuler::BoundaryCorrections::Rusanov<Dim>{},
       Mesh<Dim - 1>{num_pts, Spectral::Basis::Legendre,
@@ -107,8 +86,8 @@ void test(const gsl::not_null<std::mt19937*> gen, const size_t num_pts,
       NewtonianEuler::BoundaryCorrections::BoundaryCorrection<Dim>>>(
       "Rusanov:");
 
-  helpers::test_boundary_correction_with_python<
-      NewtonianEuler::System<Dim>, tmpl::list<ConvertPolytropic, ConvertIdeal>>(
+  helpers::test_boundary_correction_with_python<NewtonianEuler::System<Dim>,
+                                                tmpl::list<ConvertIdeal>>(
       gen, "Rusanov", "dg_package_data", "dg_boundary_terms",
       dynamic_cast<const NewtonianEuler::BoundaryCorrections::Rusanov<Dim>&>(
           *rusanov),
@@ -127,13 +106,6 @@ SPECTRE_TEST_CASE("Unit.NewtonianEuler.BoundaryCorrections.Rusanov",
   pypp::SetupLocalPythonEnvironment local_python_env{
       "Evolution/Systems/NewtonianEuler/BoundaryCorrections"};
   MAKE_GENERATOR(gen);
-
-  test<1>(make_not_null(&gen), 1,
-          EquationsOfState::PolytropicFluid<false>{1.0e-3, 2.0});
-  test<2>(make_not_null(&gen), 5,
-          EquationsOfState::PolytropicFluid<false>{1.0e-3, 2.0});
-  test<3>(make_not_null(&gen), 5,
-          EquationsOfState::PolytropicFluid<false>{1.0e-3, 2.0});
 
   test<1>(make_not_null(&gen), 1, EquationsOfState::IdealFluid<false>{1.3});
   test<2>(make_not_null(&gen), 5, EquationsOfState::IdealFluid<false>{1.3});

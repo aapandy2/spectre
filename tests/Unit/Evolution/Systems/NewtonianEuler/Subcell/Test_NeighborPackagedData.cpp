@@ -52,9 +52,11 @@
 #include "Evolution/Systems/NewtonianEuler/FiniteDifference/MonotonisedCentral.hpp"
 #include "Evolution/Systems/NewtonianEuler/FiniteDifference/Tag.hpp"
 #include "Evolution/Systems/NewtonianEuler/Subcell/NeighborPackagedData.hpp"
+#include "Evolution/Systems/NewtonianEuler/System.hpp"
 #include "Evolution/Systems/NewtonianEuler/Tags.hpp"
 #include "NumericalAlgorithms/Spectral/LogicalCoordinates.hpp"
 #include "NumericalAlgorithms/Spectral/Mesh.hpp"
+#include "Parallel/Tags/Metavariables.hpp"
 #include "PointwiseFunctions/AnalyticSolutions/NewtonianEuler/SmoothFlow.hpp"
 #include "PointwiseFunctions/Hydro/EquationsOfState/EquationOfState.hpp"
 #include "PointwiseFunctions/Hydro/EquationsOfState/IdealFluid.hpp"
@@ -237,7 +239,7 @@ double test(const size_t num_dg_pts) {
           evolution::dg::subcell::Tags::Mesh<Dim>,
           NewtonianEuler::fd::Tags::Reconstructor<Dim>,
           evolution::Tags::BoundaryCorrection<system>,
-          hydro::Tags::EquationOfState<eos>,
+          hydro::Tags::EquationOfState<false, eos::thermodynamic_dim>,
           typename system::primitive_variables_tag, variables_tag,
           evolution::dg::subcell::Tags::GhostDataForReconstruction<Dim>,
           evolution::dg::Tags::MortarData<Dim>, domain::Tags::MeshVelocity<Dim>,
@@ -251,7 +253,7 @@ double test(const size_t num_dg_pts) {
       std::unique_ptr<
           NewtonianEuler::BoundaryCorrections::BoundaryCorrection<Dim>>{
           std::make_unique<NewtonianEuler::BoundaryCorrections::Hll<Dim>>()},
-      soln.equation_of_state(), dg_prim_vars,
+      soln.equation_of_state().get_clone(), dg_prim_vars,
       typename variables_tag::type{dg_mesh.number_of_grid_points()},
       neighbor_data, typename evolution::dg::Tags::MortarData<Dim>::type{},
       std::optional<tnsr::I<DataVector, Dim, Frame::Inertial>>{},

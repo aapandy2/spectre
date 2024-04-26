@@ -1,14 +1,14 @@
 # Distributed under the MIT License.
 # See LICENSE.txt for details.
 
-Executable: ExportTimeDependentCoordinates3D
+Executable: ExportCoordinates3D
 Testing:
   Check: parse;execute
   Timeout: 10
   Priority: High
 ExpectedOutput:
-  - ExportTimeDependentCoordinates3DVolume0.h5
-  - ExportTimeDependentCoordinates3DReductions.h5
+  - ExportCoordinates3DVolume0.h5
+  - ExportCoordinates3DReductions.h5
 
 ---
 
@@ -70,12 +70,16 @@ DomainCreator:
         DecayTimescaleOuterBoundaryVelocity: 50.0
       RotationMap:
         InitialAngularVelocity: [0.0, 0.0, 1.5264577062000000e-02]
+      TranslationMap:
+        InitialValues: [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
       ShapeMapA:
         LMax: 8
+        InitialValues: Spherical
         SizeInitialValues: [0.0, 0.0, 0.0]
         TransitionEndsAtCube: true
       ShapeMapB:
         LMax: 8
+        InitialValues: Spherical
         SizeInitialValues: [0.0, 0.0, 0.0]
         TransitionEndsAtCube: true
 
@@ -98,9 +102,20 @@ EventsAndTriggers:
         Value: 0.5
     Events:
       - Completion
+  - Trigger: Always
+    Events:
+      - MonitorMemory:
+          ComponentsToMonitor: All
 
 Observers:
-  VolumeFileName: "ExportTimeDependentCoordinates3DVolume"
-  ReductionFileName: "ExportTimeDependentCoordinates3DReductions"
+  VolumeFileName: "ExportCoordinates3DVolume"
+  ReductionFileName: "ExportCoordinates3DReductions"
 
+# Intentionally after the completion time to avoid writing checkpoints on CI
 PhaseChangeAndTriggers:
+  - Trigger:
+      SlabCompares:
+        Comparison: EqualTo
+        Value: 2
+    PhaseChanges:
+      - VisitAndReturn(WriteCheckpoint)

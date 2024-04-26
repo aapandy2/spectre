@@ -159,10 +159,9 @@ Sphere::Sphere(
       tnsr::I<double, 3, Frame::Grid>{std::array{0.0, 0.0, 0.0}};
 
   // Determine number of blocks
-  num_blocks_per_shell_ =
-      which_wedges_ == ShellWedges::All
-          ? 6
-          : which_wedges_ == ShellWedges::FourOnEquator ? 4 : 1;
+  num_blocks_per_shell_ = which_wedges_ == ShellWedges::All             ? 6
+                          : which_wedges_ == ShellWedges::FourOnEquator ? 4
+                                                                        : 1;
   num_blocks_ = num_blocks_per_shell_ * num_shells_ + (fill_interior_ ? 1 : 0);
 
   // Create block names and groups
@@ -310,7 +309,8 @@ Domain<3> Sphere::create_domain() const {
           inner_radius_, outer_radius_,
           fill_interior_ ? std::get<InnerCube>(interior_).sphericity : 1.0, 1.0,
           use_equiangular_map_, false, radial_partitioning_,
-          radial_distribution_, which_wedges_), compression);
+          radial_distribution_, which_wedges_),
+      compression);
 
   std::unordered_map<std::string, ExcisionSphere<3>> excision_spheres{};
 
@@ -390,9 +390,11 @@ Domain<3> Sphere::create_domain() const {
       // First shell gets the distorted maps.
       // Last shell gets the transition region for the rotation, expansion and
       // translation maps
+      const bool include_distorted_frame =
+          hard_coded_options.using_distorted_frame();
       for (size_t block_id = 0; block_id < num_blocks_; block_id++) {
         const bool include_distorted_map_in_first_shell =
-            block_id < num_blocks_per_shell_;
+            include_distorted_frame and block_id < num_blocks_per_shell_;
         // False if block_id is in the last shell
         const bool use_rigid =
             block_id + num_blocks_per_shell_ + (fill_interior_ ? 1 : 0) <

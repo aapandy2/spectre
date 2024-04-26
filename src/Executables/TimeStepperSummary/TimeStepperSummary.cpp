@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-#include "Parallel/Printf.hpp"
+#include "Parallel/Printf/Printf.hpp"
 #include "Time/TimeSteppers/Factory.hpp"
 #include "Utilities/Algorithm.hpp"
 #include "Utilities/ErrorHandling/Assert.hpp"
@@ -26,6 +26,7 @@ class ImexTimeStepper;
 class LtsTimeStepper;
 namespace TimeSteppers {
 class AdamsBashforth;
+template <bool Monotonic>
 class AdamsMoultonPc;
 }  // namespace TimeSteppers
 
@@ -35,7 +36,9 @@ extern "C" void CkRegisterMainModule(void) {}
 
 namespace {
 using time_steppers_taking_order =
-    tmpl::list<TimeSteppers::AdamsBashforth, TimeSteppers::AdamsMoultonPc>;
+    tmpl::list<TimeSteppers::AdamsBashforth,
+               TimeSteppers::AdamsMoultonPc<false>,
+               TimeSteppers::AdamsMoultonPc<true>>;
 
 const char* const program_help =
     "Print various properties about SpECTRE's time steppers.  Abbreviations\n"

@@ -9,6 +9,7 @@ import click
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.ticker import MaxNLocator
 
 import spectre.IO.H5 as spectre_h5
 from spectre.DataStructures import DataVector
@@ -243,10 +244,13 @@ def plot_power_monitors(
             loc="right",
         )
 
-    # Draw grid lines
     for axes_row in axes:
         for ax in axes_row:
+            # Draw grid lines
             ax.grid(which="both", zorder=0)
+            # Allow only integer ticks for modes
+            if not plot_over_time:
+                ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
     # Add x-label spanning all subplots
     ax_colspan = fig.add_subplot(111, frameon=False)
@@ -270,8 +274,8 @@ def plot_power_monitors(
     "block_or_group_names",
     multiple=True,
     help=(
-        "Names of blocks or block groups to analyze. "
-        "Can be specified multiple times."
+        "Name of block or block group to analyze. "
+        "Can be specified multiple times to plot several block(groups) at once."
     ),
 )
 @click.option(
@@ -284,7 +288,7 @@ def plot_power_monitors(
         "pattern, like 'B*,(L1I*,L0I0,L0I0)'. "
         "Can be specified multiple times, in which case elements "
         "are included that match _any_ of the specified "
-        "patterns."
+        "patterns. If unspecified, include all elements in the blocks."
     ),
 )
 @click.option(

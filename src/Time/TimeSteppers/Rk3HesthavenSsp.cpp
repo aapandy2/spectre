@@ -23,6 +23,8 @@ double Rk3HesthavenSsp::stable_step() const {
   return 0.5 * (1. + cbrt(4. + sqrt(17.)) - 1. / cbrt(4. + sqrt(17.)));
 }
 
+bool Rk3HesthavenSsp::monotonic() const { return false; }
+
 uint64_t Rk3HesthavenSsp::number_of_substeps() const { return 3; }
 
 uint64_t Rk3HesthavenSsp::number_of_substeps_for_error() const { return 3; }
@@ -113,11 +115,6 @@ bool Rk3HesthavenSsp::dense_update_u_impl(const gsl::not_null<T*> u,
   }
   const double step_start = history.front().time_step_id.step_time().value();
   const double step_end = history.back().time_step_id.step_time().value();
-  if (history.size() == 1 and time == step_end) {
-    // Special case necessary for dense output at the initial time,
-    // before taking a step.
-    return true;
-  }
   const evolution_less<double> before{step_end > step_start};
   if (history.size() == 1 or before(step_end, time)) {
     return false;

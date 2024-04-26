@@ -382,7 +382,7 @@ def schedule(
             executable = metadata["Executable"]
         except (KeyError, TypeError) as err:
             raise ValueError(
-                "Specify an 'executable' ('--executable' / '-e') "
+                "Specify an 'executable' ('--executable' / '-E') "
                 "or list one in the input file metadata "
                 "as 'Executable:'."
             ) from err
@@ -767,7 +767,7 @@ def scheduler_options(f):
 
     @click.option(
         "--executable",
-        "-e",
+        "-E",
         show_default="executable listed in input file",
         help=(
             "The executable to run. Can be a path, or just the name of the"
@@ -955,7 +955,7 @@ def scheduler_options(f):
     multiple=True,
     callback=_parse_params,
     help=(
-        "Forward additional parameters to input file "
+        "Forward an additional parameter to the input file "
         "and submit script templates. "
         "Can be specified multiple times. "
         "Each entry must be a 'key=value' pair, where the key is "

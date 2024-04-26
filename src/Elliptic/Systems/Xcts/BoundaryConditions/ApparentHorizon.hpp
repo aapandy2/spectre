@@ -50,7 +50,7 @@ namespace Xcts::BoundaryConditions {
  * \\
  * \label{eq:ah_beta}
  * \beta_\mathrm{excess}^i &= \frac{\alpha}{\psi^2}\bar{s}^i
- * + \epsilon_{ijk}\Omega^j x^k
+ * + \epsilon_{ijk}\Omega^j x^k - \beta_\mathrm{background}^i
  * \f}
  *
  * following section 7.2 of \cite Pfeiffer2005zm, section 12.3.2 of
@@ -238,6 +238,9 @@ class ApparentHorizon
       gsl::not_null<Scalar<DataVector>*>
           n_dot_lapse_times_conformal_factor_gradient,
       gsl::not_null<tnsr::I<DataVector, 3>*> n_dot_longitudinal_shift_excess,
+      const tnsr::i<DataVector, 3>& deriv_conformal_factor,
+      const tnsr::i<DataVector, 3>& deriv_lapse_times_conformal_factor,
+      const tnsr::iJ<DataVector, 3>& deriv_shift_excess,
       const tnsr::i<DataVector, 3>& face_normal,
       const tnsr::ij<DataVector, 3>& deriv_unnormalized_face_normal,
       const Scalar<DataVector>& face_normal_magnitude,
@@ -254,6 +257,9 @@ class ApparentHorizon
       gsl::not_null<Scalar<DataVector>*>
           n_dot_lapse_times_conformal_factor_gradient,
       gsl::not_null<tnsr::I<DataVector, 3>*> n_dot_longitudinal_shift_excess,
+      const tnsr::i<DataVector, 3>& deriv_conformal_factor,
+      const tnsr::i<DataVector, 3>& deriv_lapse_times_conformal_factor,
+      const tnsr::iJ<DataVector, 3>& deriv_shift_excess,
       const tnsr::i<DataVector, 3>& face_normal,
       const tnsr::ij<DataVector, 3>& deriv_unnormalized_face_normal,
       const Scalar<DataVector>& face_normal_magnitude,
@@ -297,6 +303,10 @@ class ApparentHorizon
           n_dot_lapse_times_conformal_factor_gradient_correction,
       gsl::not_null<tnsr::I<DataVector, 3>*>
           n_dot_longitudinal_shift_excess_correction,
+      const tnsr::i<DataVector, 3>& deriv_conformal_factor_correction,
+      const tnsr::i<DataVector, 3>&
+          deriv_lapse_times_conformal_factor_correction,
+      const tnsr::iJ<DataVector, 3>& deriv_shift_excess_correction,
       const tnsr::i<DataVector, 3>& face_normal,
       const tnsr::ij<DataVector, 3>& deriv_unnormalized_face_normal,
       const Scalar<DataVector>& face_normal_magnitude,
@@ -318,6 +328,10 @@ class ApparentHorizon
           n_dot_lapse_times_conformal_factor_gradient_correction,
       gsl::not_null<tnsr::I<DataVector, 3>*>
           n_dot_longitudinal_shift_excess_correction,
+      const tnsr::i<DataVector, 3>& deriv_conformal_factor_correction,
+      const tnsr::i<DataVector, 3>&
+          deriv_lapse_times_conformal_factor_correction,
+      const tnsr::iJ<DataVector, 3>& deriv_shift_excess_correction,
       const tnsr::i<DataVector, 3>& face_normal,
       const tnsr::ij<DataVector, 3>& deriv_unnormalized_face_normal,
       const Scalar<DataVector>& face_normal_magnitude,

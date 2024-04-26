@@ -62,6 +62,7 @@ CylindricalBinaryCompactObject::CylindricalBinaryCompactObject(
     bool use_equiangular_map,
     const typename InitialRefinement::type& initial_refinement,
     const typename InitialGridPoints::type& initial_grid_points,
+    std::optional<bco::TimeDependentMapOptions<true>> time_dependent_options,
     std::unique_ptr<domain::BoundaryConditions::BoundaryCondition>
         inner_boundary_condition,
     std::unique_ptr<domain::BoundaryConditions::BoundaryCondition>
@@ -77,7 +78,8 @@ CylindricalBinaryCompactObject::CylindricalBinaryCompactObject(
       outer_radius_(outer_radius),
       use_equiangular_map_(use_equiangular_map),
       inner_boundary_condition_(std::move(inner_boundary_condition)),
-      outer_boundary_condition_(std::move(outer_boundary_condition)) {
+      outer_boundary_condition_(std::move(outer_boundary_condition)),
+      time_dependent_options_(std::move(time_dependent_options)) {
   if (center_A_[2] <= 0.0) {
     PARSE_ERROR(
         context,
@@ -276,6 +278,8 @@ CylindricalBinaryCompactObject::CylindricalBinaryCompactObject(
   // 4 blocks: 42 thru 45
   add_cylinder_name("CB", "Outer");
 
+  first_outer_shell_block = 46;
+
   if (include_inner_sphere_A) {
     // 5 blocks
     add_filled_cylinder_name("InnerSphereEA", "InnerSphereA");
@@ -283,6 +287,7 @@ CylindricalBinaryCompactObject::CylindricalBinaryCompactObject(
     add_filled_cylinder_name("InnerSphereMA", "InnerSphereA");
     // 4 blocks
     add_cylinder_name("InnerSphereEA", "InnerSphereA");
+    first_outer_shell_block += 14;
   }
   if (include_inner_sphere_B) {
     // 5 blocks
@@ -291,6 +296,7 @@ CylindricalBinaryCompactObject::CylindricalBinaryCompactObject(
     add_filled_cylinder_name("InnerSphereMB", "InnerSphereB");
     // 4 blocks
     add_cylinder_name("InnerSphereEB", "InnerSphereB");
+    first_outer_shell_block += 14;
   }
   if (include_outer_sphere) {
     // 5 blocks
@@ -384,48 +390,34 @@ CylindricalBinaryCompactObject::CylindricalBinaryCompactObject(
       swap_refinement_and_grid_points_xi_zeta(current_block++);
     }
   }
-}
 
-CylindricalBinaryCompactObject::CylindricalBinaryCompactObject(
-    std::optional<bco::TimeDependentMapOptions<true>> time_dependent_options,
-    std::array<double, 3> center_A, std::array<double, 3> center_B,
-    double radius_A, double radius_B, bool include_inner_sphere_A,
-    bool include_inner_sphere_B, bool include_outer_sphere, double outer_radius,
-    bool use_equiangular_map,
-    const typename InitialRefinement::type& initial_refinement,
-    const typename InitialGridPoints::type& initial_grid_points,
-    std::unique_ptr<domain::BoundaryConditions::BoundaryCondition>
-        inner_boundary_condition,
-    std::unique_ptr<domain::BoundaryConditions::BoundaryCondition>
-        outer_boundary_condition,
-    const Options::Context& context)
-    : CylindricalBinaryCompactObject(
-          center_A, center_B, radius_A, radius_B, include_inner_sphere_A,
-          include_inner_sphere_B, include_outer_sphere, outer_radius,
-          use_equiangular_map, initial_refinement, initial_grid_points,
-          std::move(inner_boundary_condition),
-          std::move(outer_boundary_condition), context) {
-  time_dependent_options_ = std::move(time_dependent_options);
-
+  // Build time-dependent maps
   // The size map, which is applied from the grid to distorted frame, currently
   // needs to start and stop at certain radii around each excision. If the inner
   // spheres aren't included, the outer radii would have to be in the middle of
   // a block. With the inner spheres, the outer radii can be at block
-  // boundaries.
+  // boundaries. The outer sphere must be specified because the time-dependent
+  // maps use piecewise functions for `Expansion` and `Translation`. This means
+  // an inner common radius must be specified for the piecewise bounds.
   if (time_dependent_options_.has_value() and
-      not(include_inner_sphere_A and include_inner_sphere_B)) {
+      not(include_inner_sphere_A and include_inner_sphere_B) and
+      not include_outer_sphere) {
     PARSE_ERROR(context,
                 "To use the CylindricalBBH domain with time-dependent maps, "
-                "you must include the inner spheres for both objects. "
-                "Currently, one or both objects is missing the inner spheres.");
+                "you must include the inner spheres for both objects and "
+                "the outer sphere. "
+                "Currently, one or both objects is missing the inner spheres or"
+                " the outer sphere is missing.");
   }
 
   if (time_dependent_options_.has_value()) {
+    const double inner_common_radius = 3.0 * (center_A_[2] - center_B_[2]);
     time_dependent_options_->build_maps(
         std::array{rotate_from_z_to_x_axis(center_A_),
                    rotate_from_z_to_x_axis(center_B_)},
         std::array{radius_A_, outer_radius_A_},
-        std::array{radius_B_, outer_radius_B_}, outer_radius_);
+        std::array{radius_B_, outer_radius_B_}, inner_common_radius,
+        outer_radius_);
   }
 }
 
@@ -910,45 +902,53 @@ Domain<3> CylindricalBinaryCompactObject::create_domain() const {
         domain::CoordinateMapBase<Frame::Distorted, Frame::Inertial, 3>>>
         distorted_to_inertial_block_maps{number_of_blocks_};
 
-    // The 0th block always exists and will only need an expansion + rotation
-    // map from the grid to inertial frame. No maps to the distorted frame
+    // The 0th block always exists and will only need an rigid expansion +
+    // rotation + translation map from the grid to inertial frame. No maps to
+    // the distorted frame
     grid_to_inertial_block_maps[0] =
         time_dependent_options_
-            ->grid_to_inertial_map<domain::ObjectLabel::None>(false);
+            ->grid_to_inertial_map<domain::ObjectLabel::None>(false, true);
 
-    // Inside the excision sphere we add the grid to inertial map from the outer
-    // shell. This allows the center of the excisions/horizons to be mapped
-    // properly to the inertial frame.
+    // The first block in the outer shell needs the transition expansion +
+    // rotation + translation map from the grid to inertial frame. No maps to
+    // the distorted frame
+    grid_to_inertial_block_maps[first_outer_shell_block] =
+        time_dependent_options_
+            ->grid_to_inertial_map<domain::ObjectLabel::None>(false, false);
+
+    // Inside the excision sphere we add the grid to inertial map from the
+    // outer shell. This allows the center of the excisions/horizons to be
+    // mapped properly to the inertial frame.
     domain.inject_time_dependent_map_for_excision_sphere(
         "ExcisionSphereA", grid_to_inertial_block_maps[0]->get_clone());
     domain.inject_time_dependent_map_for_excision_sphere(
         "ExcisionSphereB", grid_to_inertial_block_maps[0]->get_clone());
 
     // Because we require that both objects have inner shells, object A
-    // corresponds to blocks 46-59 and object B corresponds to blocks 60-73. If
-    // we have extra outer shells, those will have the same maps as
-    // block 0, and will start at block 74. The `true` being passed to
-    // the functions specifies that the size map *should* be included in the
-    // distorted frame.
+    // corresponds to blocks 46-59 and object B corresponds to blocks 60-73.
+    // If we have extra outer shells, those will have the same maps as block
+    // 0, and will start at block 74. The `true` being passed to the functions
+    // specifies that the size map *should* be included in the distorted
+    // frame.
     grid_to_inertial_block_maps[46] =
         time_dependent_options_->grid_to_inertial_map<domain::ObjectLabel::A>(
-            true);
+            true, true);
     grid_to_distorted_block_maps[46] =
         time_dependent_options_->grid_to_distorted_map<domain::ObjectLabel::A>(
             true);
     distorted_to_inertial_block_maps[46] =
         time_dependent_options_
-            ->distorted_to_inertial_map<domain::ObjectLabel::A>(true);
+            ->distorted_to_inertial_map<domain::ObjectLabel::A>(true, true);
 
     grid_to_inertial_block_maps[60] =
         time_dependent_options_->grid_to_inertial_map<domain::ObjectLabel::B>(
-            true);
+            true, true);
     grid_to_distorted_block_maps[60] =
         time_dependent_options_->grid_to_distorted_map<domain::ObjectLabel::B>(
             true);
     distorted_to_inertial_block_maps[60] =
         time_dependent_options_
-            ->distorted_to_inertial_map<domain::ObjectLabel::B>(true);
+            ->distorted_to_inertial_map<domain::ObjectLabel::B>(true, true);
 
     for (size_t block = 1; block < number_of_blocks_; ++block) {
       if (block == 46 or block == 60) {
@@ -971,6 +971,9 @@ Domain<3> CylindricalBinaryCompactObject::create_domain() const {
           distorted_to_inertial_block_maps[block] =
               distorted_to_inertial_block_maps[60]->get_clone();
         }
+      } else if (block > 74) {
+        grid_to_inertial_block_maps[block] =
+            grid_to_inertial_block_maps[first_outer_shell_block]->get_clone();
       } else {
         grid_to_inertial_block_maps[block] =
             grid_to_inertial_block_maps[0]->get_clone();

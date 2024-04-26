@@ -14,7 +14,7 @@
 #include "DataStructures/DataVector.hpp"
 #include "Options/Options.hpp"
 #include "Options/ParseOptions.hpp"
-#include "Parallel/Printf.hpp"
+#include "Parallel/Printf/Printf.hpp"
 #include "PointwiseFunctions/Hydro/EquationsOfState/EquationOfState.hpp"
 #include "PointwiseFunctions/Hydro/Tags.hpp"
 #include "PointwiseFunctions/Hydro/Units.hpp"
@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
   }
 
   using option_list =
-      tmpl::list<hydro::OptionTags::EquationOfState<true, 1>,
+      tmpl::list<hydro::OptionTags::InitialDataEquationOfState<true, 1>,
                  OptionTags::NumberOfPoints, OptionTags::OutputFileName,
                  OptionTags::LowerBoundRestMassDensityCgs,
                  OptionTags::UpperBoundRestMassDensityCgs>;
@@ -184,7 +184,7 @@ int main(int argc, char** argv) {
       });
 
   dump_barotropic_eos(
-      *get<hydro::OptionTags::EquationOfState<true, 1>>(options),
+      *get<hydro::OptionTags::InitialDataEquationOfState<true, 1>>(options),
       get<OptionTags::NumberOfPoints>(options),
       get<OptionTags::OutputFileName>(options),
       get<OptionTags::LowerBoundRestMassDensityCgs>(options),

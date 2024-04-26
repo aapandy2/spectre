@@ -13,9 +13,12 @@
 #include "Domain/CoordinateMaps/CoordinateMap.hpp"
 #include "Domain/CoordinateMaps/Identity.hpp"
 #include "Domain/CoordinateMaps/TimeDependent/CubicScale.hpp"
+#include "Domain/CoordinateMaps/TimeDependent/RotScaleTrans.hpp"
 #include "Domain/CoordinateMaps/TimeDependent/Rotation.hpp"
 #include "Domain/CoordinateMaps/TimeDependent/Shape.hpp"
 #include "Domain/CoordinateMaps/TimeDependent/ShapeMapTransitionFunctions/ShapeMapTransitionFunction.hpp"
+#include "Domain/Creators/ShapeMapOptions.hpp"
+#include "Domain/Creators/SphereTimeDependentMaps.hpp"
 #include "Domain/FunctionsOfTime/FunctionOfTime.hpp"
 #include "Domain/Structure/ObjectLabel.hpp"
 #include "Options/Auto.hpp"
@@ -36,20 +39,6 @@ struct Inertial;
 /// Namespace used to hold things used in both the BinaryCompactObject and
 /// CylindricalBinaryCompactObject domain creators.
 namespace domain::creators::bco {
-// If `Metavariables` has a `domain` member struct and
-// `domain::enable_time_dependent_maps` is `true`, then
-// inherit from `std::true_type`; otherwise, inherit from `std::false_type`.
-template <typename Metavariables, typename = std::void_t<>>
-struct enable_time_dependent_maps : std::false_type {};
-
-template <typename Metavariables>
-struct enable_time_dependent_maps<Metavariables,
-                                  std::void_t<typename Metavariables::domain>>
-    : std::bool_constant<Metavariables::domain::enable_time_dependent_maps> {};
-
-template <typename Metavariables>
-constexpr bool enable_time_dependent_maps_v =
-    enable_time_dependent_maps<Metavariables>::value;
 
 /*!
  * \brief Create a set of centers of objects for the binary domains.
@@ -65,47 +54,6 @@ constexpr bool enable_time_dependent_maps_v =
 std::unordered_map<std::string, tnsr::I<double, 3, Frame::Grid>>
 create_grid_anchors(const std::array<double, 3>& center_a,
                     const std::array<double, 3>& center_b);
-
-template <bool IsCylindrical, domain::ObjectLabel Object>
-struct ShapeMapOptions {
-  using type = Options::Auto<ShapeMapOptions, Options::AutoLabel::None>;
-  static std::string name() { return "ShapeMap" + get_output(Object); }
-  static constexpr Options::String help = {
-      "Options for a time-dependent distortion (shape) map about the "
-      "specified object. Specify 'None' to not use this map."};
-
-  struct LMax {
-    using type = size_t;
-    static constexpr Options::String help = {
-        "LMax used for the number of spherical harmonic coefficients of the "
-        "distortion map. Currently, all coefficients are initialized to "
-        "zero."};
-  };
-
-  struct SizeInitialValues {
-    using type = std::array<double, 3>;
-    static constexpr Options::String help = {
-        "Initial value and two derivatives of the size map."};
-  };
-
-  struct TransitionEndsAtCube {
-    using type = bool;
-    static constexpr Options::String help = {
-        "If 'true', the shape map transition function will be 0 at the cubical "
-        "boundary around the object. If 'false' the transition function will "
-        "be 0 at the outer radius of the inner sphere around the object"};
-  };
-
-  using common_options = tmpl::list<LMax, SizeInitialValues>;
-
-  using options = tmpl::conditional_t<
-      IsCylindrical, common_options,
-      tmpl::push_back<common_options, TransitionEndsAtCube>>;
-
-  size_t l_max{};
-  std::array<double, 3> initial_size_values{};
-  bool transition_ends_at_cube{false};
-};
 
 namespace detail {
 // Convenience type alias
@@ -180,6 +128,7 @@ struct TimeDependentMapOptions {
   // Time-dependent maps
   using Expansion = domain::CoordinateMaps::TimeDependent::CubicScale<3>;
   using Rotation = domain::CoordinateMaps::TimeDependent::Rotation<3>;
+  using RotScaleTrans = domain::CoordinateMaps::TimeDependent::RotScaleTrans<3>;
   using Shape = domain::CoordinateMaps::TimeDependent::Shape;
   using Identity = domain::CoordinateMaps::Identity<3>;
 
@@ -196,7 +145,11 @@ struct TimeDependentMapOptions {
                                Rotation>,
       detail::produce_all_maps<Frame::Grid, Frame::Distorted, Shape>,
       detail::produce_all_maps<Frame::Distorted, Frame::Inertial, Expansion,
-                               Rotation>>;
+                               Rotation>,
+      detail::produce_all_maps<Frame::Grid, Frame::Inertial, Shape,
+                               RotScaleTrans>,
+      detail::produce_all_maps<Frame::Distorted, Frame::Inertial,
+                               RotScaleTrans>>;
 
   /// \brief The initial time of the functions of time.
   struct InitialTime {
@@ -259,6 +212,27 @@ struct TimeDependentMapOptions {
     std::array<double, 3> initial_angular_velocity{};
   };
 
+  /// \brief Options for the Translation Map, the outer radius is always set to
+  /// the outer boundary of the Domain, so there's no option needed for outer
+  /// boundary.
+  struct TranslationMapOptions {
+    using type = Options::Auto<TranslationMapOptions, Options::AutoLabel::None>;
+    static std::string name() { return "TranslationMap"; }
+    static constexpr Options::String help = {
+        "Options for a time-dependent translation map. Specify 'None' to not "
+        "use this map."};
+
+    struct InitialValues {
+      using type = std::array<std::array<double, 3>, 3>;
+      static constexpr Options::String help = {
+          "Initial position, velocity and acceleration."};
+    };
+
+    using options = tmpl::list<InitialValues>;
+
+    std::array<std::array<double, 3>, 3> initial_values{};
+  };
+
   // We use a type alias here instead of defining the ShapeMapOptions struct
   // because there appears to be a bug in clang-10. If the definition of
   // ShapeMapOptions is here inside TimeDependentMapOptions, on clang-10 there
@@ -269,11 +243,12 @@ struct TimeDependentMapOptions {
   // goes away.
   template <domain::ObjectLabel Object>
   using ShapeMapOptions =
-      domain::creators::bco::ShapeMapOptions<IsCylindrical, Object>;
+      domain::creators::time_dependent_options::ShapeMapOptions<
+          not IsCylindrical, Object>;
 
   using options =
       tmpl::list<InitialTime, ExpansionMapOptions, RotationMapOptions,
-                 ShapeMapOptions<domain::ObjectLabel::A>,
+                 TranslationMapOptions, ShapeMapOptions<domain::ObjectLabel::A>,
                  ShapeMapOptions<domain::ObjectLabel::B>>;
   static constexpr Options::String help{
       "The options for all time dependent maps in a binary compact object "
@@ -285,6 +260,7 @@ struct TimeDependentMapOptions {
       double initial_time,
       std::optional<ExpansionMapOptions> expansion_map_options,
       std::optional<RotationMapOptions> rotation_options,
+      std::optional<TranslationMapOptions> translation_options,
       std::optional<ShapeMapOptions<domain::ObjectLabel::A>> shape_options_A,
       std::optional<ShapeMapOptions<domain::ObjectLabel::B>> shape_options_B,
       const Options::Context& context = {});
@@ -298,6 +274,7 @@ struct TimeDependentMapOptions {
    * - Expansion: `PiecewisePolynomial<2>`
    * - ExpansionOuterBoundary: `FixedSpeedCubic`
    * - Rotation: `QuaternionFunctionOfTime<3>`
+   * - Translation: `PiecewisePolynomial<3>`
    * - SizeA/B: `PiecewisePolynomial<3>`
    * - ShapeA/B: `PiecewisePolynomial<2>`
    */
@@ -311,8 +288,7 @@ struct TimeDependentMapOptions {
    *
    * Currently, this constructs a:
    *
-   * - Expansion: `CubicScale<3>`
-   * - Rotation: `Rotation<3>`
+   * - Rotation, Expansion, Translation: `RotScaleTrans<3>`
    * - ShapeA/B: `Shape` (with size FunctionOfTime)
    *
    * If the radii for an object are `std::nullopt`, this means that a Shape map
@@ -328,7 +304,7 @@ struct TimeDependentMapOptions {
           object_A_radii,
       const std::optional<std::array<double, IsCylindrical ? 2 : 3>>&
           object_B_radii,
-      double domain_outer_radius);
+      double envelope_radius, double domain_outer_radius);
 
   /*!
    * \brief Check whether options were specified in the constructor for the
@@ -353,14 +329,15 @@ struct TimeDependentMapOptions {
    * \brief This will construct the map from `Frame::Distorted` to
    * `Frame::Inertial`
    *
-   * If we are including a shape map, then this will be a composition of an
-   * `CubicScale` and `Rotation` map. If we aren't, this returns a `nullptr`.
+   * If we are including a shape map, then this will be a `RotScaleTrans` map.
+   * If we aren't, this returns a `nullptr`.
    *
    * \see IncludeDistortedMapType
    */
   template <domain::ObjectLabel Object>
   MapType<Frame::Distorted, Frame::Inertial> distorted_to_inertial_map(
-      const IncludeDistortedMapType& include_distorted_map) const;
+      const IncludeDistortedMapType& include_distorted_map,
+      bool use_rigid_map) const;
 
   /*!
    * \brief This will construct the maps from the `Frame::Grid` to the
@@ -381,14 +358,15 @@ struct TimeDependentMapOptions {
    * `Frame::Inertial`.
    *
    * If we are including a shape map, then this map will have a composition of a
-   * `Shape` (with size FunctionOfTime), `CubicScale`, and `Rotation` map. If
-   * not, there will only be `CubicScale` and `Rotation` maps.
+   * `Shape` (with size FunctionOfTime) and `RotScaleTrans` map. If
+   * not, there will only be a `RotScaleTrans` map.
    *
    * \see IncludeDistortedMapType
    */
   template <domain::ObjectLabel Object>
   MapType<Frame::Grid, Frame::Inertial> grid_to_inertial_map(
-      const IncludeDistortedMapType& include_distorted_map) const;
+      const IncludeDistortedMapType& include_distorted_map,
+      bool use_rigid_map) const;
 
   // Names are public because they need to be used when constructing maps in the
   // BCO domain creators themselves
@@ -396,6 +374,7 @@ struct TimeDependentMapOptions {
   inline static const std::string expansion_outer_boundary_name{
       "ExpansionOuterBoundary"};
   inline static const std::string rotation_name{"Rotation"};
+  inline static const std::string translation_name{"Translation"};
   inline static const std::array<std::string, 2> size_names{{"SizeA", "SizeB"}};
   inline static const std::array<std::string, 2> shape_names{
       {"ShapeA", "ShapeB"}};
@@ -406,12 +385,15 @@ struct TimeDependentMapOptions {
   double initial_time_{std::numeric_limits<double>::signaling_NaN()};
   std::optional<ExpansionMapOptions> expansion_map_options_{};
   std::optional<RotationMapOptions> rotation_options_{};
+  std::optional<TranslationMapOptions> translation_options_{};
   std::optional<ShapeMapOptions<domain::ObjectLabel::A>> shape_options_A_{};
   std::optional<ShapeMapOptions<domain::ObjectLabel::B>> shape_options_B_{};
+  std::array<std::optional<double>, 2> inner_radii_{};
 
   // Maps
   std::optional<Expansion> expansion_map_{};
   std::optional<Rotation> rotation_map_{};
+  std::optional<std::pair<RotScaleTrans, RotScaleTrans>> rot_scale_trans_map_{};
   using ShapeMapType =
       tmpl::conditional_t<IsCylindrical, std::array<std::optional<Shape>, 2>,
                           std::array<std::array<std::optional<Shape>, 6>, 2>>;

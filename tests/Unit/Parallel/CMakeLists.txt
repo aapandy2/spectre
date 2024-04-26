@@ -2,6 +2,7 @@
 # See LICENSE.txt for details.
 
 add_subdirectory(PhaseControl)
+add_subdirectory(Printf)
 
 set(ALGORITHM_TEST_LINK_LIBRARIES
   Actions
@@ -16,6 +17,7 @@ set(ALGORITHM_TEST_LINK_LIBRARIES
   Parallel
   ParallelHelpers
   PhaseControl
+  Printf
   Serialization
   Spectral
   SystemUtilities
@@ -173,6 +175,7 @@ set(LIBRARY_SOURCES
   Test_TypeTraits.cpp
   )
 
+add_subdirectory(ArrayCollection)
 add_subdirectory(Tags)
 
 add_test_library(${LIBRARY} "${LIBRARY_SOURCES}" WITH_CHARM)

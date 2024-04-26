@@ -13,6 +13,7 @@
 #include "ControlSystem/Metafunctions.hpp"
 #include "ControlSystem/Systems/Expansion.hpp"
 #include "ControlSystem/Systems/Rotation.hpp"
+#include "ControlSystem/Systems/Translation.hpp"
 #include "ControlSystem/Trigger.hpp"
 #include "DataStructures/DataBox/PrefixHelpers.hpp"
 #include "DataStructures/DataBox/Tag.hpp"
@@ -20,7 +21,6 @@
 #include "DataStructures/Tensor/IndexType.hpp"
 #include "Domain/Creators/BinaryCompactObject.hpp"
 #include "Domain/Creators/Factory3D.hpp"
-#include "Domain/Protocols/Metavariables.hpp"
 #include "Domain/Tags.hpp"
 #include "Evolution/Actions/RunEventsAndDenseTriggers.hpp"
 #include "Evolution/Actions/RunEventsAndTriggers.hpp"
@@ -214,11 +214,11 @@
 #include "PointwiseFunctions/Hydro/TransportVelocity.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/Tags/InitialData.hpp"
 #include "Time/Actions/AdvanceTime.hpp"
-#include "Time/Actions/ChangeSlabSize.hpp"
 #include "Time/Actions/RecordTimeStepperData.hpp"
 #include "Time/Actions/SelfStartActions.hpp"
 #include "Time/Actions/SelfStartActions.hpp"  // IWYU pragma: keep
 #include "Time/Actions/UpdateU.hpp"
+#include "Time/ChangeSlabSize/Action.hpp"
 #include "Time/StepChoosers/Cfl.hpp"
 #include "Time/StepChoosers/Constant.hpp"
 #include "Time/StepChoosers/Factory.hpp"
@@ -325,9 +325,6 @@ struct GhValenciaDivCleanDefaults {
 
   // NOLINTNEXTLINE(google-runtime-references)
   void pup(PUP::er& /*p*/) {}
-  struct domain : tt::ConformsTo<::domain::protocols::Metavariables> {
-    static constexpr bool enable_time_dependent_maps = true;
-  };
 };
 
 template <typename EvolutionMetavarsDerived, bool UseDgSubcell,
@@ -345,7 +342,6 @@ struct GhValenciaDivCleanTemplateBase<
       EvolutionMetavarsDerived<UseControlSystems, InterpolationTargetTags...>;
   using defaults = GhValenciaDivCleanDefaults<UseDgSubcell>;
   static constexpr size_t volume_dim = defaults::volume_dim;
-  using domain = typename defaults::domain;
   using domain_frame = typename defaults::domain_frame;
   static constexpr bool use_damped_harmonic_rollon =
       defaults::use_damped_harmonic_rollon;
@@ -373,7 +369,8 @@ struct GhValenciaDivCleanTemplateBase<
   using control_systems = tmpl::conditional_t<
       use_control_systems,
       tmpl::list<control_system::Systems::Rotation<3, measurement>,
-                 control_system::Systems::Expansion<2, measurement>>,
+                 control_system::Systems::Expansion<2, measurement>,
+                 control_system::Systems::Translation<2, measurement>>,
       tmpl::list<>>;
 
   using interpolator_source_vars =

@@ -3,11 +3,15 @@
 
 import logging
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Sequence, Union
 
 import click
+import numpy as np
 from rich.pretty import pretty_repr
 
+from spectre.Pipelines.EccentricityControl.InitialOrbitalParameters import (
+    initial_orbital_parameters,
+)
 from spectre.support.Schedule import schedule, scheduler_options
 
 logger = logging.getLogger(__name__)
@@ -15,8 +19,15 @@ logger = logging.getLogger(__name__)
 ID_INPUT_FILE_TEMPLATE = Path(__file__).parent / "InitialData.yaml"
 
 
+def L1_distance(m1, m2, separation):
+    """Distance of the L1 Lagrangian point from m1, in Newtonian gravity"""
+    return separation * (0.5 - 0.227 * np.log10(m2 / m1))
+
+
 def id_parameters(
     mass_ratio: float,
+    dimensionless_spin_a: Sequence[float],
+    dimensionless_spin_b: Sequence[float],
     separation: float,
     orbital_angular_velocity: float,
     radial_expansion_velocity: float,
@@ -29,6 +40,8 @@ def id_parameters(
 
     Arguments:
       mass_ratio: Defined as q = M_A / M_B >= 1.
+      dimensionless_spin_a: Dimensionless spin of the larger black hole, chi_A.
+      dimensionless_spin_b: Dimensionless spin of the smaller black hole, chi_B.
       separation: Coordinate separation D of the black holes.
       orbital_angular_velocity: Omega_0.
       radial_expansion_velocity: adot_0.
@@ -44,15 +57,43 @@ def id_parameters(
     M_B = 1.0 / (1.0 + mass_ratio)
     x_A = separation / (1.0 + mass_ratio)
     x_B = x_A - separation
+    # Spins
+    chi_A = np.asarray(dimensionless_spin_a)
+    r_plus_A = M_A * (1.0 + np.sqrt(1 - np.dot(chi_A, chi_A)))
+    Omega_A = -0.5 * chi_A / r_plus_A
+    Omega_A[2] += orbital_angular_velocity
+    chi_B = np.asarray(dimensionless_spin_b)
+    r_plus_B = M_B * (1.0 + np.sqrt(1 - np.dot(chi_B, chi_B)))
+    Omega_B = -0.5 * chi_B / r_plus_B
+    Omega_B[2] += orbital_angular_velocity
+    # Falloff widths of superposition
+    L1_dist_A = L1_distance(M_A, M_B, separation)
+    L1_dist_B = separation - L1_dist_A
+    falloff_width_A = 3.0 / 5.0 * L1_dist_A
+    falloff_width_B = 3.0 / 5.0 * L1_dist_B
     return {
         "MassRight": M_A,
         "MassLeft": M_B,
         "XRight": x_A,
         "XLeft": x_B,
-        "ExcisionRadiusRight": 0.89 * 2.0 * M_A,
-        "ExcisionRadiusLeft": 0.89 * 2.0 * M_B,
+        "ExcisionRadiusRight": 0.89 * r_plus_A,
+        "ExcisionRadiusLeft": 0.89 * r_plus_B,
         "OrbitalAngularVelocity": orbital_angular_velocity,
         "RadialExpansionVelocity": radial_expansion_velocity,
+        "DimensionlessSpinRight_x": chi_A[0],
+        "DimensionlessSpinRight_y": chi_A[1],
+        "DimensionlessSpinRight_z": chi_A[2],
+        "DimensionlessSpinLeft_x": chi_B[0],
+        "DimensionlessSpinLeft_y": chi_B[1],
+        "DimensionlessSpinLeft_z": chi_B[2],
+        "HorizonRotationRight_x": Omega_A[0],
+        "HorizonRotationRight_y": Omega_A[1],
+        "HorizonRotationRight_z": Omega_A[2],
+        "HorizonRotationLeft_x": Omega_B[0],
+        "HorizonRotationLeft_y": Omega_B[1],
+        "HorizonRotationLeft_z": Omega_B[2],
+        "FalloffWidthRight": falloff_width_A,
+        "FalloffWidthLeft": falloff_width_B,
         # Resolution
         "L": refinement_level,
         "P": polynomial_order,
@@ -61,11 +102,16 @@ def id_parameters(
 
 def generate_id(
     mass_ratio: float,
+    dimensionless_spin_a: Sequence[float],
+    dimensionless_spin_b: Sequence[float],
+    # Orbital parameters
     separation: float,
     orbital_angular_velocity: float,
     radial_expansion_velocity: float,
+    # Resolution
     refinement_level: int,
     polynomial_order: int,
+    # Scheduling options
     id_input_file_template: Union[str, Path] = ID_INPUT_FILE_TEMPLATE,
     evolve: bool = False,
     pipeline_dir: Optional[Union[str, Path]] = None,
@@ -78,6 +124,29 @@ def generate_id(
     Parameters for the initial data will be inserted into the
     'id_input_file_template'. The remaining options are forwarded to the
     'schedule' command. See 'schedule' docs for details.
+
+    The orbital parameters can be computed with the function
+    'initial_orbital_parameters' in
+    'support.Pipelines.EccentricityControl.InitialOrbitalParameters'.
+
+    Intrinsic parameters:
+      mass_ratio: Defined as q = M_A / M_B >= 1.
+      dimensionless_spin_a: Dimensionless spin of the larger black hole, chi_A.
+      dimensionless_spin_b: Dimensionless spin of the smaller black hole, chi_B.
+
+    Orbital parameters:
+      separation: Coordinate separation D of the black holes.
+      orbital_angular_velocity: Omega_0.
+      radial_expansion_velocity: adot_0.
+
+    Scheduling options:
+      id_input_file_template: Input file template where parameters are inserted.
+      evolve: Set to True to evolve the initial data after generation.
+      pipeline_dir: Directory where steps in the pipeline are created. Required
+        when 'evolve' is set to True. The initial data will be created in a
+        subdirectory '001_InitialData'.
+      run_dir: Directory where the initial data is generated. Mutually exclusive
+        with 'pipeline_dir'.
     """
     logger.warning(
         "The BBH pipeline is still experimental. Please review the"
@@ -109,6 +178,8 @@ def generate_id(
     # Determine initial data parameters from options
     id_params = id_parameters(
         mass_ratio=mass_ratio,
+        dimensionless_spin_a=dimensionless_spin_a,
+        dimensionless_spin_b=dimensionless_spin_b,
         separation=separation,
         orbital_angular_velocity=orbital_angular_velocity,
         radial_expansion_velocity=radial_expansion_velocity,
@@ -133,23 +204,38 @@ def generate_id(
 @click.option(
     "--mass-ratio",
     "-q",
-    type=float,
+    type=click.FloatRange(1.0, None),
     help="Mass ratio of the binary, defined as q = M_A / M_B >= 1.",
     required=True,
 )
 @click.option(
+    "--dimensionless-spin-A",
+    "--chi-A",
+    type=click.FloatRange(-1.0, 1.0),
+    nargs=3,
+    help="Dimensionless spin of the larger black hole, chi_A.",
+    required=True,
+)
+@click.option(
+    "--dimensionless-spin-B",
+    "--chi-B",
+    type=click.FloatRange(-1.0, 1.0),
+    nargs=3,
+    help="Dimensionless spin of the smaller black hole, chi_B.",
+    required=True,
+)
+# Orbital parameters
+@click.option(
     "--separation",
     "-D",
-    type=float,
+    type=click.FloatRange(0.0, None, min_open=True),
     help="Coordinate separation D of the black holes.",
-    required=True,
 )
 @click.option(
     "--orbital-angular-velocity",
     "-w",
     type=float,
     help="Orbital angular velocity Omega_0.",
-    required=True,
 )
 @click.option(
     "--radial-expansion-velocity",
@@ -158,12 +244,50 @@ def generate_id(
     help=(
         "Radial expansion velocity adot0 which is radial velocity over radius."
     ),
-    required=True,
 )
+@click.option(
+    "--eccentricity",
+    "-e",
+    type=click.FloatRange(0.0, 1.0),
+    help=(
+        "Eccentricity of the orbit. Specify together with _one_ of the other"
+        " orbital parameters. Currently only an eccentricity of 0 is supported"
+        " (circular orbit)."
+    ),
+)
+@click.option(
+    "--mean-anomaly-fraction",
+    "-l",
+    type=click.FloatRange(0.0, 1.0, max_open=True),
+    help=(
+        "Mean anomaly of the orbit divided by 2 pi, so it is a number between 0"
+        " and 1. The value 0 corresponds to the pericenter of the orbit"
+        " (closest approach), and the value 0.5 corresponds to the apocenter of"
+        " the orbit (farthest distance)."
+    ),
+)
+@click.option(
+    "--num-orbits",
+    type=click.FloatRange(0.0, None, min_open=True),
+    help=(
+        "Number of orbits until merger. Specify together with a zero"
+        " eccentricity to compute initial orbital parameters for a circular"
+        " orbit."
+    ),
+)
+@click.option(
+    "--time-to-merger",
+    type=click.FloatRange(0.0, None, min_open=True),
+    help=(
+        "Time to merger. Specify together with a zero eccentricity to compute"
+        " initial orbital parameters for a circular orbit."
+    ),
+)
+# Resolution
 @click.option(
     "--refinement-level",
     "-L",
-    type=int,
+    type=click.IntRange(0, None),
     help="h-refinement level.",
     default=0,
     show_default=True,
@@ -171,11 +295,12 @@ def generate_id(
 @click.option(
     "--polynomial-order",
     "-P",
-    type=int,
+    type=click.IntRange(1, None),
     help="p-refinement level.",
     default=5,
     show_default=True,
 )
+# Scheduling options
 @click.option(
     "--id-input-file-template",
     type=click.Path(
@@ -204,9 +329,44 @@ def generate_id(
     help="Directory where steps in the pipeline are created.",
 )
 @scheduler_options
-def generate_id_command(**kwargs):
+def generate_id_command(
+    mass_ratio,
+    dimensionless_spin_a,
+    dimensionless_spin_b,
+    separation,
+    orbital_angular_velocity,
+    radial_expansion_velocity,
+    eccentricity,
+    mean_anomaly_fraction,
+    num_orbits,
+    time_to_merger,
+    **kwargs,
+):
     _rich_traceback_guard = True  # Hide traceback until here
-    generate_id(**kwargs)
+    # Determine orbital parameters
+    separation, orbital_angular_velocity, radial_expansion_velocity = (
+        initial_orbital_parameters(
+            mass_ratio=mass_ratio,
+            dimensionless_spin_a=dimensionless_spin_a,
+            dimensionless_spin_b=dimensionless_spin_b,
+            separation=separation,
+            orbital_angular_velocity=orbital_angular_velocity,
+            radial_expansion_velocity=radial_expansion_velocity,
+            eccentricity=eccentricity,
+            mean_anomaly_fraction=mean_anomaly_fraction,
+            num_orbits=num_orbits,
+            time_to_merger=time_to_merger,
+        )
+    )
+    generate_id(
+        mass_ratio=mass_ratio,
+        dimensionless_spin_a=dimensionless_spin_a,
+        dimensionless_spin_b=dimensionless_spin_b,
+        separation=separation,
+        orbital_angular_velocity=orbital_angular_velocity,
+        radial_expansion_velocity=radial_expansion_velocity,
+        **kwargs,
+    )
 
 
 if __name__ == "__main__":

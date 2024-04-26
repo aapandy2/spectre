@@ -40,6 +40,7 @@
 #include "Evolution/Initialization/Evolution.hpp"
 #include "Evolution/Initialization/Limiter.hpp"
 #include "Evolution/Initialization/SetVariables.hpp"
+#include "Evolution/Systems/NewtonianEuler/AllSolutions.hpp"
 #include "Evolution/Systems/NewtonianEuler/BoundaryConditions/Factory.hpp"
 #include "Evolution/Systems/NewtonianEuler/BoundaryCorrections/Factory.hpp"
 #include "Evolution/Systems/NewtonianEuler/FiniteDifference/Factory.hpp"
@@ -98,10 +99,10 @@
 #include "PointwiseFunctions/Hydro/EquationsOfState/RegisterDerivedWithCharm.hpp"
 #include "PointwiseFunctions/Hydro/Tags.hpp"
 #include "Time/Actions/AdvanceTime.hpp"
-#include "Time/Actions/ChangeSlabSize.hpp"
 #include "Time/Actions/RecordTimeStepperData.hpp"
 #include "Time/Actions/SelfStartActions.hpp"
 #include "Time/Actions/UpdateU.hpp"
+#include "Time/ChangeSlabSize/Action.hpp"
 #include "Time/StepChoosers/Factory.hpp"
 #include "Time/StepChoosers/StepChooser.hpp"
 #include "Time/Tags/Time.hpp"
@@ -125,7 +126,7 @@ class CProxy_GlobalCache;
 }  // namespace Parallel
 /// \endcond
 
-template <size_t Dim, typename InitialData>
+template <size_t Dim>
 struct EvolutionMetavars {
   static constexpr size_t volume_dim = Dim;
   // The use_dg_subcell flag controls whether to use "standard" limiting (false)
@@ -133,15 +134,6 @@ struct EvolutionMetavars {
   static constexpr bool use_dg_subcell = true;
   static constexpr dg::Formulation dg_formulation =
       dg::Formulation::StrongInertial;
-
-  using initial_data = InitialData;
-  static_assert(
-      is_analytic_data_v<initial_data> xor is_analytic_solution_v<initial_data>,
-      "initial_data must be either an analytic_data or an analytic_solution");
-
-  using eos_base = EquationsOfState::get_eos_base<
-      typename initial_data::equation_of_state_type>;
-  using equation_of_state_type = typename std::unique_ptr<eos_base>;
 
   using system = NewtonianEuler::System<Dim>;
 
@@ -151,21 +143,18 @@ struct EvolutionMetavars {
   static constexpr bool local_time_stepping =
       TimeStepperBase::local_time_stepping;
 
-  using initial_data_tag =
-      tmpl::conditional_t<is_analytic_solution_v<initial_data>,
-                          Tags::AnalyticSolution<initial_data>,
-                          Tags::AnalyticData<initial_data>>;
+  using initial_data_tag = evolution::initial_data::Tags::InitialData;
+  using initial_data_list = NewtonianEuler::InitialData::initial_data_list<Dim>;
 
   using analytic_variables_tags =
       typename system::primitive_variables_tag::tags_list;
 
-  using equation_of_state_tag =
-      hydro::Tags::EquationOfState<equation_of_state_type>;
+  using equation_of_state_tag = hydro::Tags::EquationOfState<false, 2>;
 
   using limiter = Tags::Limiter<NewtonianEuler::Limiters::Minmod<Dim>>;
 
   using analytic_compute = evolution::Tags::AnalyticSolutionsCompute<
-      volume_dim, analytic_variables_tags, use_dg_subcell>;
+      volume_dim, analytic_variables_tags, use_dg_subcell, initial_data_list>;
   using error_compute = Tags::ErrorsCompute<analytic_variables_tags>;
   using error_tags = db::wrap_tags_in<Tags::Error, analytic_variables_tags>;
   using observe_fields = tmpl::push_back<
@@ -218,6 +207,8 @@ struct EvolutionMetavars {
         tmpl::pair<DomainCreator<volume_dim>, domain_creators<volume_dim>>,
         tmpl::pair<NewtonianEuler::Sources::Source<Dim>,
                    NewtonianEuler::Sources::all_sources<Dim>>,
+        tmpl::pair<evolution::initial_data::InitialData,
+                   NewtonianEuler::InitialData::initial_data_list<Dim>>,
         tmpl::pair<Event,
                    tmpl::flatten<tmpl::list<
                        Events::Completion,

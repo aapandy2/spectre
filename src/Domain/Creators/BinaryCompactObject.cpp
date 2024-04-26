@@ -64,6 +64,7 @@ BinaryCompactObject::BinaryCompactObject(
     const CoordinateMaps::Distribution radial_distribution_envelope,
     const CoordinateMaps::Distribution radial_distribution_outer_shell,
     const double opening_angle_in_degrees,
+    std::optional<bco::TimeDependentMapOptions<false>> time_dependent_options,
     std::unique_ptr<domain::BoundaryConditions::BoundaryCondition>
         outer_boundary_condition,
     const Options::Context& context)
@@ -75,6 +76,7 @@ BinaryCompactObject::BinaryCompactObject(
       radial_distribution_envelope_(radial_distribution_envelope),
       radial_distribution_outer_shell_(radial_distribution_outer_shell),
       outer_boundary_condition_(std::move(outer_boundary_condition)),
+      time_dependent_options_(std::move(time_dependent_options)),
       opening_angle_(M_PI * opening_angle_in_degrees / 180.0) {
   // Get useful information about the type of grid used around each compact
   // object
@@ -241,19 +243,26 @@ BinaryCompactObject::BinaryCompactObject(
       }
     }
   };
+  // Finding the first block of outer shell
+  first_outer_shell_block_ = 0;
   if (use_single_block_a_) {
     block_names_.emplace_back("ObjectA");
+    first_outer_shell_block_ += 1;
   } else {
     add_object_region("ObjectA", "Shell");  // 6 blocks
     add_object_region("ObjectA", "Cube");   // 6 blocks
+    first_outer_shell_block_ += 12;
   }
   if (use_single_block_b_) {
     block_names_.emplace_back("ObjectB");
+    first_outer_shell_block_ += 1;
   } else {
     add_object_region("ObjectB", "Shell");  // 6 blocks
     add_object_region("ObjectB", "Cube");   // 6 blocks
+    first_outer_shell_block_ += 12;
   }
   add_outer_region("Envelope");    // 10 blocks
+  first_outer_shell_block_ += 10;
   add_outer_region("OuterShell");  // 10 blocks
 
   if ((not use_single_block_a_) and (not is_excised_a_)) {
@@ -283,29 +292,8 @@ BinaryCompactObject::BinaryCompactObject(
   } catch (const std::exception& error) {
     PARSE_ERROR(context, "Invalid 'InitialGridPoints': " << error.what());
   }
-}
 
-BinaryCompactObject::BinaryCompactObject(
-    std::optional<bco::TimeDependentMapOptions<false>> time_dependent_options,
-    typename ObjectA::type object_A, typename ObjectB::type object_B,
-    double envelope_radius, double outer_radius,
-    const typename InitialRefinement::type& initial_refinement,
-    const typename InitialGridPoints::type& initial_number_of_grid_points,
-    const bool use_equiangular_map,
-    const CoordinateMaps::Distribution radial_distribution_envelope,
-    const CoordinateMaps::Distribution radial_distribution_outer_shell,
-    const double opening_angle_in_degrees,
-    std::unique_ptr<domain::BoundaryConditions::BoundaryCondition>
-        outer_boundary_condition,
-    const Options::Context& context)
-    : BinaryCompactObject(
-          std::move(object_A), std::move(object_B), envelope_radius,
-          outer_radius, initial_refinement, initial_number_of_grid_points,
-          use_equiangular_map, radial_distribution_envelope,
-          radial_distribution_outer_shell, opening_angle_in_degrees,
-          std::move(outer_boundary_condition), context) {
-  time_dependent_options_ = std::move(time_dependent_options);
-
+  // Build time-dependent maps
   std::optional<std::array<double, 3>> radii_A{};
   std::optional<std::array<double, 3>> radii_B{};
 
@@ -324,7 +312,7 @@ BinaryCompactObject::BinaryCompactObject(
     time_dependent_options_->build_maps(
         std::array{std::array{x_coord_a_, 0.0, 0.0},
                    std::array{x_coord_b_, 0.0, 0.0}},
-        radii_A, radii_B, outer_radius_);
+        radii_A, radii_B, envelope_radius_, outer_radius_);
   }
 }
 
@@ -571,27 +559,52 @@ Domain<3> BinaryCompactObject::create_domain() const {
     // distinct combinations of time-dependent maps that will be applied. This
     // should largely be taken care of by the TimeDependentOptions.
 
+    // Single blocks are added after the outer shell if an object's interior is
+    // not excised, so to find the final outer shell block, subtract the single
+    // blocks that may have been added.
+    size_t final_block_outer_shell = number_of_blocks_ - 1;
+    if ((not use_single_block_a_) and (not is_excised_a_)) {
+      --final_block_outer_shell;
+    }
+    if ((not use_single_block_b_) and (not is_excised_b_)) {
+      --final_block_outer_shell;
+    }
+
     // All blocks except possibly the first 6 or 12 blocks of each object get
     // the same map from the Grid to the Inertial frame, so initialize the final
     // block with the "base" map (here a composition of an expansion and a
     // rotation). When covering the inner regions with cubes, all blocks will
     // use the same time-dependent map instead.
-    grid_to_inertial_block_maps[number_of_blocks_ - 1] =
+    grid_to_inertial_block_maps[final_block_outer_shell] =
         time_dependent_options_
-            ->grid_to_inertial_map<domain::ObjectLabel::None>(std::nullopt);
+            ->grid_to_inertial_map<domain::ObjectLabel::None>(std::nullopt,
+                                                              false);
+    if (final_block_outer_shell < number_of_blocks_ - 1) {
+      grid_to_inertial_block_maps[number_of_blocks_ - 1] =
+          time_dependent_options_
+              ->grid_to_inertial_map<domain::ObjectLabel::None>(std::nullopt,
+                                                                true);
+    }
+    size_t final_block_envelope = first_outer_shell_block_ - 1;
 
-    // Inside the excision sphere we add the grid to inertial map from the outer
-    // shell. This allows the center of the excisions/horizons to be mapped
+    grid_to_inertial_block_maps[final_block_envelope] =
+        time_dependent_options_
+            ->grid_to_inertial_map<domain::ObjectLabel::None>(std::nullopt,
+                                                              true);
+    // Inside the excision sphere we add the grid to inertial map from the
+    // envelope. This allows the center of the excisions/horizons to be mapped
     // properly to the inertial frame.
-    if (is_excised_a_) {
+    if (is_excised_a_ and
+        grid_to_inertial_block_maps[number_of_blocks_ - 1] != nullptr) {
       domain.inject_time_dependent_map_for_excision_sphere(
           "ExcisionSphereA",
-          grid_to_inertial_block_maps[number_of_blocks_ - 1]->get_clone());
+          grid_to_inertial_block_maps[final_block_envelope]->get_clone());
     }
-    if (is_excised_b_) {
+    if (is_excised_b_ and
+        grid_to_inertial_block_maps[number_of_blocks_ - 1] != nullptr) {
       domain.inject_time_dependent_map_for_excision_sphere(
           "ExcisionSphereB",
-          grid_to_inertial_block_maps[number_of_blocks_ - 1]->get_clone());
+          grid_to_inertial_block_maps[final_block_envelope]->get_clone());
     }
 
     const size_t first_block_object_B = use_single_block_a_ ? 1 : 12;
@@ -613,7 +626,7 @@ Domain<3> BinaryCompactObject::create_domain() const {
         grid_to_inertial_block_maps[block] =
             time_dependent_options_
                 ->grid_to_inertial_map<domain::ObjectLabel::A>(
-                    block_for_distorted_frame);
+                    block_for_distorted_frame, true);
         grid_to_distorted_block_maps[block] =
             time_dependent_options_
                 ->grid_to_distorted_map<domain::ObjectLabel::A>(
@@ -621,7 +634,7 @@ Domain<3> BinaryCompactObject::create_domain() const {
         distorted_to_inertial_block_maps[block] =
             time_dependent_options_
                 ->distorted_to_inertial_map<domain::ObjectLabel::A>(
-                    block_for_distorted_frame);
+                    block_for_distorted_frame, true);
       } else if ((not use_single_block_b_) and block >= first_block_object_B and
                  block < first_block_object_B + 12) {
         const std::optional<size_t> block_for_distorted_frame =
@@ -630,7 +643,7 @@ Domain<3> BinaryCompactObject::create_domain() const {
         grid_to_inertial_block_maps[block] =
             time_dependent_options_
                 ->grid_to_inertial_map<domain::ObjectLabel::B>(
-                    block_for_distorted_frame);
+                    block_for_distorted_frame, true);
         grid_to_distorted_block_maps[block] =
             time_dependent_options_
                 ->grid_to_distorted_map<domain::ObjectLabel::B>(
@@ -638,15 +651,39 @@ Domain<3> BinaryCompactObject::create_domain() const {
         distorted_to_inertial_block_maps[block] =
             time_dependent_options_
                 ->distorted_to_inertial_map<domain::ObjectLabel::B>(
-                    block_for_distorted_frame);
-      } else {
+                    block_for_distorted_frame, true);
+        // check if block is less than outer shell block for rigid
+        // expansion/translation, but no distorted map
+      } else if (block < first_outer_shell_block_ and
+                 grid_to_inertial_block_maps[number_of_blocks_ - 1] !=
+                     nullptr) {
+        grid_to_inertial_block_maps[block] =
+            grid_to_inertial_block_maps[final_block_envelope]->get_clone();
+      } else if (block > final_block_outer_shell and
+                 grid_to_inertial_block_maps[number_of_blocks_ - 1] !=
+                     nullptr) {
+        // the inner cube blocks are after outershell and we want to copy the
+        // corresponding object blocks.
+        if ((not use_single_block_a_) and (not is_excised_a_)) {
+          grid_to_inertial_block_maps[block] =
+              grid_to_inertial_block_maps[0]->get_clone();
+        }
+        if ((not use_single_block_b_) and (not is_excised_b_)) {
+          grid_to_inertial_block_maps[block] =
+              grid_to_inertial_block_maps[first_block_object_B]->get_clone();
+        }
+      } else if (grid_to_inertial_block_maps[number_of_blocks_ - 1] !=
+                 nullptr) {
         // No distorted frame
         grid_to_inertial_block_maps[block] =
-            grid_to_inertial_block_maps[number_of_blocks_ - 1]->get_clone();
+            grid_to_inertial_block_maps[final_block_outer_shell]->get_clone();
       }
     }
     // Finally, inject the time dependent maps into the corresponding blocks
     for (size_t block = 0; block < number_of_blocks_; ++block) {
+      if (grid_to_inertial_block_maps[block] == nullptr) {
+        continue;
+      }
       domain.inject_time_dependent_map_for_block(
           block, std::move(grid_to_inertial_block_maps[block]),
           std::move(grid_to_distorted_block_maps[block]),

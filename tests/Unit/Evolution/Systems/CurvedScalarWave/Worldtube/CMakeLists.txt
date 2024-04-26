@@ -4,12 +4,14 @@
 set(LIBRARY "Test_ScalarWaveWorldtube")
 
 set(LIBRARY_SOURCES
+  Test_KerrSchildDerivatives.cpp
   Test_PunctureField.cpp
   Test_SelfForce.cpp
   Test_Tags.cpp
   ElementActions/Test_SendToWorldtube.cpp
   ElementActions/Test_ReceiveWorldtubeData.cpp
   ElementActions/Test_InitializeConstraintGammas.cpp
+  ElementActions/Test_InitializeCurrentIteration.cpp
   SingletonActions/Test_ChangeSlabSize.cpp
   SingletonActions/Test_InitializeElementFacesGridCoordinates.cpp
   SingletonActions/Test_InitializeEvolvedVariables.cpp

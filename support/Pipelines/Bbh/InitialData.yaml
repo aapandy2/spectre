@@ -2,6 +2,9 @@
 # See LICENSE.txt for details.
 
 Executable: SolveXcts
+ExpectedOutput:
+  - BbhReductions.h5
+  - BbhVolume*.h5
 {% if evolve %}
 Next:
   Run: spectre.Pipelines.Bbh.Inspiral:start_inspiral
@@ -28,18 +31,26 @@ Background: &background
     XCoords: [&x_left {{ XLeft }}, &x_right {{ XRight }}]
     ObjectLeft: &kerr_left
       KerrSchild:
-        Mass: {{ MassLeft }}
-        Spin: [0., 0., 0.]
+        Mass: &mass_left {{ MassLeft }}
+        Spin: &spin_left
+          - {{ DimensionlessSpinLeft_x }}
+          - {{ DimensionlessSpinLeft_y }}
+          - {{ DimensionlessSpinLeft_z }}
         Center: [0., 0., 0.]
     ObjectRight: &kerr_right
       KerrSchild:
-        Mass: {{ MassRight }}
-        Spin: [0., 0., 0.]
+        Mass: &mass_right {{ MassRight }}
+        Spin: &spin_right
+          - {{ DimensionlessSpinRight_x }}
+          - {{ DimensionlessSpinRight_y }}
+          - {{ DimensionlessSpinRight_z }}
         Center: [0., 0., 0.]
     AngularVelocity: {{ OrbitalAngularVelocity }}
     Expansion: {{ RadialExpansionVelocity }}
     LinearVelocity: [0., 0., 0.]
-    FalloffWidths: [4.8, 4.8]
+    FalloffWidths:
+      - {{ FalloffWidthLeft }}
+      - {{ FalloffWidthRight }}
 
 InitialGuess: *background
 
@@ -53,7 +64,10 @@ DomainCreator:
         ExciseWithBoundaryCondition:
           ApparentHorizon:
             Center: [*x_right, 0., 0.]
-            Rotation: [0., 0., 0.]
+            Rotation:
+              - {{ HorizonRotationRight_x }}
+              - {{ HorizonRotationRight_y }}
+              - {{ HorizonRotationRight_z }}
             Lapse: *kerr_right
             NegativeExpansion: *kerr_right
       UseLogarithmicMap: True
@@ -65,7 +79,10 @@ DomainCreator:
         ExciseWithBoundaryCondition:
           ApparentHorizon:
             Center: [*x_left, 0., 0.]
-            Rotation: [0., 0., 0.]
+            Rotation:
+              - {{ HorizonRotationLeft_x }}
+              - {{ HorizonRotationLeft_y }}
+              - {{ HorizonRotationLeft_z }}
             Lapse: *kerr_left
             NegativeExpansion: *kerr_left
       UseLogarithmicMap: True
@@ -73,18 +90,18 @@ DomainCreator:
       Radius: &outer_shell_inner_radius 60.
       RadialDistribution: Projective
     OuterShell:
-      Radius: &outer_radius 1e9
+      Radius: &outer_radius 1e5
       RadialDistribution: &outer_shell_distribution Inverse
       OpeningAngle: 120.0
-      BoundaryCondition: Flatness
+      BoundaryCondition: Robin
     UseEquiangularMap: True
     InitialRefinement:
       ObjectAShell:     [{{ L }}, {{ L }}, {{ L }}]
       ObjectBShell:     [{{ L }}, {{ L }}, {{ L }}]
       ObjectACube:      [{{ L }}, {{ L }}, {{ L }}]
       ObjectBCube:      [{{ L }}, {{ L }}, {{ L }}]
-      Envelope:         [{{ L }}, {{ L }}, {{ L }}]
-      OuterShell:       [{{ L }}, {{ L }}, {{ L + 2}}]
+      Envelope:         [{{ L }}, {{ L }}, {{ L + 1 }}]
+      OuterShell:       [{{ L }}, {{ L }}, {{ L }}]
     # This p-refinement represents a crude manual optimization of the domain. We
     # will need AMR to optimize the domain further.
     InitialGridPoints:
@@ -94,6 +111,25 @@ DomainCreator:
       ObjectBCube:    [{{ P + 1}}, {{ P + 1}}, {{ P + 2}}]
       Envelope:       [{{ P + 1}}, {{ P + 1}}, {{ P + 1}}]
       OuterShell:     [{{ P + 1}}, {{ P + 1}}, {{ P + 1}}]
+    TimeDependentMaps:
+      InitialTime: 0.
+      ExpansionMap: None
+      RotationMap: None
+      TranslationMap: None
+      ShapeMapA:
+        LMax: 20
+        InitialValues:
+          Mass: *mass_right
+          Spin: *spin_right
+        SizeInitialValues: [0, 0, 0]
+        TransitionEndsAtCube: False
+      ShapeMapB:
+        LMax: 20
+        InitialValues:
+          Mass: *mass_left
+          Spin: *spin_left
+        SizeInitialValues: [0, 0, 0]
+        TransitionEndsAtCube: False
 
 Amr:
   Verbosity: Verbose
@@ -109,7 +145,7 @@ PhaseChangeAndTriggers: []
 
 Discretization:
   DiscontinuousGalerkin:
-    PenaltyParameter: 1.
+    PenaltyParameter: 1.5
     Massive: True
     Quadrature: GaussLobatto
     Formulation: WeakInertial
@@ -134,7 +170,7 @@ LinearSolver:
     ConvergenceCriteria:
       MaxIterations: 100
       RelativeResidual: 1.e-3
-      AbsoluteResidual: 1.e-10
+      AbsoluteResidual: 1.e-9
     Verbosity: Quiet
 
   Multigrid:
@@ -182,6 +218,8 @@ EventsAndTriggers:
             - Shift
             - ShiftExcess
             - SpatialMetric
+            - InverseSpatialMetric
+            - SpatialChristoffelSecondKind
             - ExtrinsicCurvature
             - RadiallyCompressedCoordinates
           InterpolateToMesh: None
