@@ -256,9 +256,9 @@ struct TimeDerivative {
             auto& vars_upper_face = gsl::at(package_data_argvars_upper_face, i);
             auto& vars_lower_face = gsl::at(package_data_argvars_lower_face, i);
             grmhd::ValenciaDivClean::subcell::compute_fluxes(
-                make_not_null(&vars_upper_face));
+                make_not_null(&vars_upper_face), *box);
             grmhd::ValenciaDivClean::subcell::compute_fluxes(
-                make_not_null(&vars_lower_face));
+                make_not_null(&vars_lower_face), *box);
 
             // Add moving mesh corrections to the fluxes, if needed
             std::optional<tnsr::I<DataVector, 3, Frame::Inertial>>

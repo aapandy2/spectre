@@ -100,7 +100,9 @@ class DirichletAnalytic final : public BoundaryCondition {
   using dg_interior_temporary_tags =
       tmpl::list<domain::Tags::Coordinates<3, Frame::Inertial>>;
   using dg_interior_primitive_variables_tags = tmpl::list<>;
-  using dg_gridless_tags = tmpl::list<::Tags::Time>;
+  using dg_gridless_tags =
+      tmpl::list<::Tags::Time, grmhd::ValenciaDivClean::Tags::BulkViscosity,
+                 grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   std::optional<std::string> dg_ghost(
       gsl::not_null<Scalar<DataVector>*> tilde_d,
@@ -129,7 +131,8 @@ class DirichletAnalytic final : public BoundaryCondition {
       const tnsr::i<DataVector, 3, Frame::Inertial>& /*normal_covector*/,
       const tnsr::I<DataVector, 3, Frame::Inertial>& /*normal_vector*/,
       const tnsr::I<DataVector, 3, Frame::Inertial>& coords,
-      [[maybe_unused]] double time) const;
+      [[maybe_unused]] double time, const double bulk_viscosity,
+      const double bulk_relaxation_time) const;
 
   using fd_interior_evolved_variables_tags = tmpl::list<>;
   using fd_interior_temporary_tags =
@@ -140,7 +143,9 @@ class DirichletAnalytic final : public BoundaryCondition {
                  domain::Tags::ElementMap<3, Frame::Grid>,
                  domain::CoordinateMaps::Tags::CoordinateMap<3, Frame::Grid,
                                                              Frame::Inertial>,
-                 fd::Tags::Reconstructor>;
+                 fd::Tags::Reconstructor,
+                 grmhd::ValenciaDivClean::Tags::BulkViscosity,
+                 grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
   void fd_ghost(
       gsl::not_null<Scalar<DataVector>*> rest_mass_density,
       gsl::not_null<Scalar<DataVector>*> electron_fraction,
@@ -169,7 +174,8 @@ class DirichletAnalytic final : public BoundaryCondition {
       const ElementMap<3, Frame::Grid>& logical_to_grid_map,
       const domain::CoordinateMapBase<Frame::Grid, Frame::Inertial, 3>&
           grid_to_inertial_map,
-      const fd::Reconstructor& reconstructor) const;
+      const fd::Reconstructor& reconstructor, const double bulk_viscosity,
+      const double bulk_relaxation_time) const;
 
  private:
   std::unique_ptr<evolution::initial_data::InitialData> analytic_prescription_;

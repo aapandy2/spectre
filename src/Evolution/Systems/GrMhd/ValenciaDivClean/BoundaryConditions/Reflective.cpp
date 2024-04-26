@@ -90,8 +90,9 @@ std::optional<std::string> Reflective::dg_ghost(
 
     const tnsr::I<DataVector, 3, Frame::Inertial>& interior_shift,
     const Scalar<DataVector>& interior_lapse,
-    const tnsr::II<DataVector, 3, Frame::Inertial>& interior_inv_spatial_metric)
-    const {
+    const tnsr::II<DataVector, 3, Frame::Inertial>& interior_inv_spatial_metric,
+
+    const double bulk_viscosity, const double bulk_relaxation_time) const {
   const size_t number_of_grid_points = get(interior_rest_mass_density).size();
 
   // temp buffer to store
@@ -229,16 +230,14 @@ std::optional<std::string> Reflective::dg_ghost(
       exterior_magnetic_field, interior_sqrt_det_spatial_metric,
       interior_spatial_metric, exterior_divergence_cleaning_field);
 
-  ComputeFluxes::apply(tilde_d_flux, tilde_ye_flux, tilde_vb_flux,
-                       tilde_tau_flux,
-                       tilde_s_flux, tilde_b_flux, tilde_phi_flux, *tilde_d,
-                       *tilde_ye, *tilde_vb, *tilde_tau, *tilde_s, *tilde_b,
-                       *tilde_phi,
-                       *lapse, *shift, interior_sqrt_det_spatial_metric,
-                       interior_spatial_metric, *inv_spatial_metric,
-                       interior_transformed_bulk_scalar,
-                       interior_pressure, exterior_spatial_velocity,
-                       interior_lorentz_factor, exterior_magnetic_field);
+  ComputeFluxes::apply(
+      tilde_d_flux, tilde_ye_flux, tilde_vb_flux, tilde_tau_flux, tilde_s_flux,
+      tilde_b_flux, tilde_phi_flux, *tilde_d, *tilde_ye, *tilde_vb, *tilde_tau,
+      *tilde_s, *tilde_b, *tilde_phi, *lapse, *shift,
+      interior_sqrt_det_spatial_metric, interior_spatial_metric,
+      *inv_spatial_metric, interior_transformed_bulk_scalar, interior_pressure,
+      exterior_spatial_velocity, interior_lorentz_factor,
+      exterior_magnetic_field, bulk_viscosity, bulk_relaxation_time);
 
   return {};
 }
@@ -278,7 +277,8 @@ void Reflective::fd_ghost(
     const tnsr::I<DataVector, 3, Frame::Inertial>& interior_magnetic_field,
 
     // fd_gridless_tags
-    const fd::Reconstructor& reconstructor) const {
+    const fd::Reconstructor& reconstructor, const double bulk_viscosity,
+    const double bulk_relaxation_time) const {
   Variables<tmpl::push_back<typename System::variables_tag::tags_list,
                             SpatialVelocity, LorentzFactor, Pressure,
                             SpecificInternalEnergy, SqrtDetSpatialMetric,
@@ -350,17 +350,16 @@ void Reflective::fd_ghost(
             &get<Flux<Tags::TildePhi>>(cell_centered_ghost_fluxes->value())),
 
         get<Tags::TildeD>(temp_vars), get<Tags::TildeYe>(temp_vars),
-        get<Tags::TildeVB>(temp_vars),
-        get<Tags::TildeTau>(temp_vars), get<Tags::TildeS<>>(temp_vars),
-        get<Tags::TildeB<>>(temp_vars), get<Tags::TildePhi>(temp_vars),
+        get<Tags::TildeVB>(temp_vars), get<Tags::TildeTau>(temp_vars),
+        get<Tags::TildeS<>>(temp_vars), get<Tags::TildeB<>>(temp_vars),
+        get<Tags::TildePhi>(temp_vars),
 
         get<Lapse>(temp_vars), get<Shift>(temp_vars),
         get<SqrtDetSpatialMetric>(temp_vars), get<SpatialMetric>(temp_vars),
-        get<InvSpatialMetric>(temp_vars),
-        *transformed_bulk_scalar,
-        get<Pressure>(temp_vars),
-        get<SpatialVelocity>(temp_vars), get<LorentzFactor>(temp_vars),
-        *magnetic_field);
+        get<InvSpatialMetric>(temp_vars), *transformed_bulk_scalar,
+        get<Pressure>(temp_vars), get<SpatialVelocity>(temp_vars),
+        get<LorentzFactor>(temp_vars), *magnetic_field, bulk_viscosity,
+        bulk_relaxation_time);
   }
 }
 

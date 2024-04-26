@@ -118,7 +118,9 @@ struct ComputeFluxes {
                  hydro::Tags::Pressure<DataVector>,
                  hydro::Tags::SpatialVelocity<DataVector, 3>,
                  hydro::Tags::LorentzFactor<DataVector>,
-                 hydro::Tags::MagneticField<DataVector, 3>>;
+                 hydro::Tags::MagneticField<DataVector, 3>,
+                 grmhd::ValenciaDivClean::Tags::BulkViscosity,
+                 grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   static void apply(
       gsl::not_null<tnsr::I<DataVector, 3, Frame::Inertial>*> tilde_d_flux,
@@ -141,7 +143,8 @@ struct ComputeFluxes {
       const Scalar<DataVector>& pressure,
       const tnsr::I<DataVector, 3, Frame::Inertial>& spatial_velocity,
       const Scalar<DataVector>& lorentz_factor,
-      const tnsr::I<DataVector, 3, Frame::Inertial>& magnetic_field);
+      const tnsr::I<DataVector, 3, Frame::Inertial>& magnetic_field,
+      const double bulk_viscosity, const double bulk_relaxation_time);
 };
 }  // namespace ValenciaDivClean
 }  // namespace grmhd

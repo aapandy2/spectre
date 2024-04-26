@@ -112,7 +112,8 @@ std::optional<std::string> DirichletAnalytic::dg_ghost(
     const tnsr::i<DataVector, 3, Frame::Inertial>& /*normal_covector*/,
     const tnsr::I<DataVector, 3, Frame::Inertial>& /*normal_vector*/,
     const tnsr::I<DataVector, 3, Frame::Inertial>& coords,
-    [[maybe_unused]] const double time) const {
+    [[maybe_unused]] const double time, const double bulk_viscosity,
+    const double bulk_relaxation_time) const {
   auto boundary_values = call_with_dynamic_type<
       tuples::TaggedTuple<hydro::Tags::RestMassDensity<DataVector>,
                           hydro::Tags::ElectronFraction<DataVector>,
@@ -201,7 +202,8 @@ std::optional<std::string> DirichletAnalytic::dg_ghost(
       get<hydro::Tags::Pressure<DataVector>>(boundary_values),
       get<hydro::Tags::SpatialVelocity<DataVector, 3>>(boundary_values),
       get<hydro::Tags::LorentzFactor<DataVector>>(boundary_values),
-      get<hydro::Tags::MagneticField<DataVector, 3>>(boundary_values));
+      get<hydro::Tags::MagneticField<DataVector, 3>>(boundary_values),
+      bulk_viscosity, bulk_relaxation_time);
 
   return {};
 }
@@ -235,7 +237,8 @@ void DirichletAnalytic::fd_ghost(
     const ElementMap<3, Frame::Grid>& logical_to_grid_map,
     const domain::CoordinateMapBase<Frame::Grid, Frame::Inertial, 3>&
         grid_to_inertial_map,
-    const fd::Reconstructor& reconstructor) const {
+    const fd::Reconstructor& reconstructor, const double bulk_viscosity,
+    const double bulk_relaxation_time) const {
   const size_t ghost_zone_size{reconstructor.ghost_zone_size()};
 
   const auto ghost_logical_coords =
@@ -382,7 +385,8 @@ void DirichletAnalytic::fd_ghost(
         get<hydro::Tags::Pressure<DataVector>>(boundary_values),
         get<hydro::Tags::SpatialVelocity<DataVector, 3>>(boundary_values),
         get<hydro::Tags::LorentzFactor<DataVector>>(boundary_values),
-        get<hydro::Tags::MagneticField<DataVector, 3>>(boundary_values));
+        get<hydro::Tags::MagneticField<DataVector, 3>>(boundary_values),
+        bulk_viscosity, bulk_relaxation_time);
   }
 }
 

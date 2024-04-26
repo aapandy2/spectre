@@ -142,7 +142,9 @@ class Reflective final : public BoundaryCondition {
                  hydro::Tags::LorentzFactor<DataVector>,
                  hydro::Tags::Pressure<DataVector>>;
   using dg_interior_temporary_tags = tmpl::list<Shift, Lapse, InvSpatialMetric>;
-  using dg_gridless_tags = tmpl::list<>;
+  using dg_gridless_tags =
+      tmpl::list<grmhd::ValenciaDivClean::Tags::BulkViscosity,
+                 grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   std::optional<std::string> dg_ghost(
       gsl::not_null<Scalar<DataVector>*> tilde_d,
@@ -185,7 +187,9 @@ class Reflective final : public BoundaryCondition {
       const tnsr::I<DataVector, 3, Frame::Inertial>& interior_shift,
       const Scalar<DataVector>& interior_lapse,
       const tnsr::II<DataVector, 3, Frame::Inertial>&
-          interior_inv_spatial_metric) const;
+          interior_inv_spatial_metric,
+
+      const double bulk_viscosity, const double bulk_relaxation_time) const;
 
   using fd_interior_evolved_variables_tags = tmpl::list<>;
   using fd_interior_temporary_tags =
@@ -199,7 +203,10 @@ class Reflective final : public BoundaryCondition {
                  hydro::Tags::LorentzFactor<DataVector>,
                  hydro::Tags::SpatialVelocity<DataVector, 3>, MagneticField>;
 
-  using fd_gridless_tags = tmpl::list<fd::Tags::Reconstructor>;
+  using fd_gridless_tags =
+      tmpl::list<fd::Tags::Reconstructor,
+                 grmhd::ValenciaDivClean::Tags::BulkViscosity,
+                 grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   void fd_ghost(
       gsl::not_null<Scalar<DataVector>*> rest_mass_density,
@@ -235,7 +242,8 @@ class Reflective final : public BoundaryCondition {
       const tnsr::I<DataVector, 3, Frame::Inertial>& interior_magnetic_field,
 
       // gridless tags
-      const fd::Reconstructor& reconstructor) const;
+      const fd::Reconstructor& reconstructor, const double bulk_viscosity,
+      const double bulk_relaxation_time) const;
 
   // have an impl to make sharing code with GH+GRMHD easy
   void fd_ghost_impl(

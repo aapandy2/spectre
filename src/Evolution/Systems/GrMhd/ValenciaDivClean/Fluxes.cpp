@@ -101,7 +101,8 @@ void ComputeFluxes::apply(
     const Scalar<DataVector>& pressure,
     const tnsr::I<DataVector, 3, Frame::Inertial>& spatial_velocity,
     const Scalar<DataVector>& lorentz_factor,
-    const tnsr::I<DataVector, 3, Frame::Inertial>& magnetic_field) {
+    const tnsr::I<DataVector, 3, Frame::Inertial>& magnetic_field,
+    const double bulk_viscosity, const double bulk_relaxation_time) {
   Variables<tmpl::list<hydro::Tags::SpatialVelocityOneForm<DataVector, 3>,
                        hydro::Tags::MagneticFieldOneForm<DataVector, 3>,
                        hydro::Tags::MagneticFieldDotSpatialVelocity<DataVector>,
@@ -134,8 +135,7 @@ void ComputeFluxes::apply(
 
   // p_star = p + p_m = p + b^2/2 = p + ((B^m v_m)^2 + (B^m B_m)/W^2)/2
   // NOTE: adding bulk here
-  // NOTE: HARDCODING PARAMETER XI
-  double xi = 1.0;
+  double xi = bulk_viscosity / bulk_relaxation_time;
   Scalar<DataVector>& pressure_star_with_bulk_lapse_sqrt_det_spatial_metric =
       get<::Tags::TempScalar<1>>(temp_tensors);
   get(pressure_star_with_bulk_lapse_sqrt_det_spatial_metric) =

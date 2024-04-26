@@ -95,7 +95,10 @@ class DemandOutgoingCharSpeeds final : public BoundaryCondition {
                  hydro::Tags::SpatialVelocity<DataVector, 3>,
                  hydro::Tags::MagneticField<DataVector, 3>,
                  hydro::Tags::DivergenceCleaningField<DataVector>>;
-  using fd_gridless_tags = tmpl::list<fd::Tags::Reconstructor>;
+  using fd_gridless_tags =
+      tmpl::list<fd::Tags::Reconstructor,
+                 grmhd::ValenciaDivClean::Tags::BulkViscosity,
+                 grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   static void fd_demand_outgoing_char_speeds(
       gsl::not_null<Scalar<DataVector>*> rest_mass_density,
@@ -136,6 +139,7 @@ class DemandOutgoingCharSpeeds final : public BoundaryCondition {
       const Scalar<DataVector>& interior_divergence_cleaning_field,
 
       // fd_gridless_tags
-      const fd::Reconstructor& reconstructor);
+      const fd::Reconstructor& reconstructor, const double bulk_viscosity,
+      const double bulk_relaxation_time);
 };
 }  // namespace grmhd::ValenciaDivClean::BoundaryConditions

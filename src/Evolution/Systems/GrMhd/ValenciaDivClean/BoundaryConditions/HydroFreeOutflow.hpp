@@ -126,7 +126,9 @@ class HydroFreeOutflow final : public BoundaryCondition {
                  hydro::Tags::LorentzFactor<DataVector>,
                  hydro::Tags::Pressure<DataVector>>;
   using dg_interior_temporary_tags = tmpl::list<Shift, Lapse, InvSpatialMetric>;
-  using dg_gridless_tags = tmpl::list<>;
+  using dg_gridless_tags =
+      tmpl::list<grmhd::ValenciaDivClean::Tags::BulkViscosity,
+                 grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   static std::optional<std::string> dg_ghost(
       const gsl::not_null<Scalar<DataVector>*> tilde_d,
@@ -176,7 +178,9 @@ class HydroFreeOutflow final : public BoundaryCondition {
       const tnsr::I<DataVector, 3, Frame::Inertial>& interior_shift,
       const Scalar<DataVector>& interior_lapse,
       const tnsr::II<DataVector, 3, Frame::Inertial>&
-          interior_inv_spatial_metric);
+          interior_inv_spatial_metric,
+
+      const double bulk_viscosity, const double bulk_relaxation_time);
 
   using fd_interior_evolved_variables_tags = tmpl::list<>;
   using fd_interior_temporary_tags =
@@ -189,7 +193,10 @@ class HydroFreeOutflow final : public BoundaryCondition {
                  hydro::Tags::LorentzFactor<DataVector>,
                  hydro::Tags::SpatialVelocity<DataVector, 3>, MagneticField>;
 
-  using fd_gridless_tags = tmpl::list<fd::Tags::Reconstructor>;
+  using fd_gridless_tags =
+      tmpl::list<fd::Tags::Reconstructor,
+                 grmhd::ValenciaDivClean::Tags::BulkViscosity,
+                 grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   static void fd_ghost(
       gsl::not_null<Scalar<DataVector>*> rest_mass_density,
@@ -225,7 +232,8 @@ class HydroFreeOutflow final : public BoundaryCondition {
       const tnsr::I<DataVector, 3, Frame::Inertial>& interior_magnetic_field,
 
       // gridless tags
-      const fd::Reconstructor& reconstructor);
+      const fd::Reconstructor& reconstructor, const double bulk_viscosity,
+      const double bulk_relaxation_time);
 
   // have an impl to make sharing code with GH+GRMHD easy
   static void fd_ghost_impl(

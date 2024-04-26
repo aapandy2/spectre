@@ -187,7 +187,7 @@ DirectionalIdMap<3, DataVector> NeighborPackagedData::apply(
         }
 
         grmhd::ValenciaDivClean::subcell::compute_fluxes(
-            make_not_null(&vars_on_face));
+            make_not_null(&vars_on_face), box);
 
         if (mesh_velocity_on_subcell_face.has_value()) {
           tmpl::for_each<evolved_vars_tags>(

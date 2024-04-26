@@ -120,7 +120,8 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
     const Scalar<DataVector>& interior_divergence_cleaning_field,
 
     // fd_gridless_tags
-    const fd::Reconstructor& reconstructor) {
+    const fd::Reconstructor& reconstructor, const double bulk_viscosity,
+    const double bulk_relaxation_time) {
   double min_char_speed = std::numeric_limits<double>::signaling_NaN();
 
   const size_t ghost_zone_size{reconstructor.ghost_zone_size()};
@@ -359,9 +360,9 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
           get<SqrtDetSpatialMetric>(ghost_fluxes_vars),
           get<SpatialMetric>(ghost_fluxes_vars),
           get<InvSpatialMetric>(ghost_fluxes_vars), *transformed_bulk_scalar,
-          *pressure,
-          get<SpatialVelocity>(ghost_fluxes_vars),
-          get<LorentzFactor>(ghost_fluxes_vars), *magnetic_field);
+          *pressure, get<SpatialVelocity>(ghost_fluxes_vars),
+          get<LorentzFactor>(ghost_fluxes_vars), *magnetic_field,
+          bulk_viscosity, bulk_relaxation_time);
     }
   }
 }
