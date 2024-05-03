@@ -58,6 +58,7 @@ class NewmanHamlin {
       double momentum_density_dot_magnetic_field, double magnetic_field_squared,
       double rest_mass_density_times_lorentz_factor,
       double transformed_bulk_scalar_times_lorentz_factor,
+      double bulk_viscosity_over_relaxation_time,
       double electron_fraction,
       const EosType& equation_of_state,
       const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&

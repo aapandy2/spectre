@@ -160,6 +160,12 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
   transformed_bulk_scalar_times_lorentz_factor =
       get(tilde_vb) / get(sqrt_det_spatial_metric);
 
+  //define bulk_viscosity_over_relaxation_time
+  //const double bulk_viscosity_over_relaxation_time =
+  //    bulk_viscosity/bulk_relaxation_time;
+  //TODO: uncomment above
+  const double bulk_viscosity_over_relaxation_time = 1.0;
+
   // Parameters for quick exit from inversion
   const double cutoffD =
       primitive_from_conservative_options.cutoff_d_for_inversion();
@@ -212,6 +218,7 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
                            &magnetic_field_squared,
                            &rest_mass_density_times_lorentz_factor,
                            &transformed_bulk_scalar_times_lorentz_factor,
+                           &bulk_viscosity_over_relaxation_time,
                            &equation_of_state, &s, &electron_fraction,
                            &primitive_from_conservative_options](auto scheme) {
         using primitive_recovery_scheme = tmpl::type_from<decltype(scheme)>;
@@ -223,6 +230,7 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
                   get(magnetic_field_squared)[s],
                   rest_mass_density_times_lorentz_factor[s],
                   transformed_bulk_scalar_times_lorentz_factor[s],
+                  bulk_viscosity_over_relaxation_time,
                   get(*electron_fraction)[s], equation_of_state,
                   primitive_from_conservative_options);
         }

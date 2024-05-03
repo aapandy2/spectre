@@ -38,6 +38,7 @@ class FunctionOfZ {
               const double /* magnetic_field_squared */,
               const double rest_mass_density_times_lorentz_factor,
               const double transformed_bulk_scalar_times_lorentz_factor,
+              const double bulk_viscosity_over_relaxation_time,
               const double electron_fraction, const EosType& equation_of_state,
               const double lorentz_max)
       : q_(tau / rest_mass_density_times_lorentz_factor),
@@ -48,6 +49,8 @@ class FunctionOfZ {
             rest_mass_density_times_lorentz_factor),
         transformed_bulk_scalar_times_lorentz_factor_(
             transformed_bulk_scalar_times_lorentz_factor),
+        bulk_viscosity_over_relaxation_time_(
+            bulk_viscosity_over_relaxation_time),
         electron_fraction_(electron_fraction),
         equation_of_state_(equation_of_state) {
     // Internal consistency check
@@ -91,6 +94,7 @@ class FunctionOfZ {
   bool state_is_unphysical_ = false;
   const double rest_mass_density_times_lorentz_factor_;
   const double transformed_bulk_scalar_times_lorentz_factor_;
+  const double bulk_viscosity_over_relaxation_time_;
   const double electron_fraction_;
   const EosType& equation_of_state_;
 };
@@ -135,7 +139,8 @@ Primitives FunctionOfZ<EosType, EnforcePhysicality>::primitives(
       transformed_bulk_scalar_times_lorentz_factor_ / w_hat;
 
   // Compute bulk scalar hat; TODO: hardcoding xi
-  const double xi = 1.0;
+  //const double xi = 1.0;
+  const double xi = bulk_viscosity_over_relaxation_time_;
   const double bulk_scalar_hat =
       xi * std::log(transformed_bulk_scalar_hat);
 
@@ -198,6 +203,7 @@ std::optional<PrimitiveRecoveryData> KastaunEtAlHydro::apply(
     const double magnetic_field_squared,
     const double rest_mass_density_times_lorentz_factor,
     const double transformed_bulk_scalar_times_lorentz_factor,
+    const double bulk_viscosity_over_relaxation_time,
     const double electron_fraction, const EosType& equation_of_state,
     const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
         primitive_from_conservative_options) {
@@ -210,6 +216,7 @@ std::optional<PrimitiveRecoveryData> KastaunEtAlHydro::apply(
           magnetic_field_squared,
           rest_mass_density_times_lorentz_factor,
           transformed_bulk_scalar_times_lorentz_factor,
+          bulk_viscosity_over_relaxation_time,
           electron_fraction,
           equation_of_state,
           primitive_from_conservative_options.kastaun_max_lorentz_factor()};
