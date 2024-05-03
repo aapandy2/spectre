@@ -35,7 +35,8 @@ void PrimsAfterRollback<OrderedListOfRecoverySchemes>::apply(
     const Scalar<DataVector>& sqrt_det_spatial_metric,
     const EquationsOfState::EquationOfState<true, 3>& eos,
     const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
-        primitive_from_conservative_options) {
+        primitive_from_conservative_options,
+    const double bulk_viscosity, const double bulk_relaxation_time) {
   if (did_rollback) {
     const size_t num_grid_points = subcell_mesh.number_of_grid_points();
     ASSERT(prim_vars->number_of_grid_points() != num_grid_points,
@@ -75,7 +76,8 @@ void PrimsAfterRollback<OrderedListOfRecoverySchemes>::apply(
                 &get<hydro::Tags::Temperature<DataVector>>(*prim_vars)),
             tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
             spatial_metric, inv_spatial_metric, sqrt_det_spatial_metric, eos,
-            primitive_from_conservative_options);
+            primitive_from_conservative_options, bulk_viscosity,
+            bulk_relaxation_time);
   }
 }
 
@@ -105,7 +107,8 @@ using KastaunThenNewmanThenPalenzuela =
       const Scalar<DataVector>& sqrt_det_spatial_metric,                      \
       const EquationsOfState::EquationOfState<true, 3>& eos,                  \
       const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&        \
-          primitive_from_conservative_options);
+          primitive_from_conservative_options, const double bulk_viscosity,   \
+      const double bulk_relaxation_time);
 GENERATE_INSTANTIATIONS(INSTANTIATION,
                         (tmpl::list<PrimitiveRecoverySchemes::KastaunEtAl>,
                          tmpl::list<PrimitiveRecoverySchemes::NewmanHamlin>,

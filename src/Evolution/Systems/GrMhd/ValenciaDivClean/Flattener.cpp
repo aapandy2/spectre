@@ -61,7 +61,8 @@ void Flattener<RecoverySchemesList>::operator()(
     const Scalar<DataVector>& det_logical_to_inertial_inv_jacobian,
     const EquationsOfState::EquationOfState<true, 3>& eos,
     const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
-        primitive_from_conservative_options) const {
+        primitive_from_conservative_options,
+    const double bulk_viscosity, const double bulk_relaxation_time) const {
   // Create a temporary variable for each field's cell average.
   // These temporaries live on the stack and should have minimal cost.
   double mean_tilde_d = std::numeric_limits<double>::signaling_NaN();
@@ -219,7 +220,8 @@ void Flattener<RecoverySchemesList>::operator()(
               *tilde_d, *tilde_ye, *tilde_vb, *tilde_tau, *tilde_s, tilde_b,
               tilde_phi, spatial_metric, inv_spatial_metric,
               sqrt_det_spatial_metric, eos,
-              primitive_from_conservative_options)) {
+              primitive_from_conservative_options, bulk_viscosity,
+              bulk_relaxation_time)) {
     compute_means();
 
     get(*tilde_d) = mean_tilde_d;
@@ -258,7 +260,8 @@ void Flattener<RecoverySchemesList>::operator()(
               *tilde_d, *tilde_ye, *tilde_vb, *tilde_tau, *tilde_s, tilde_b,
               tilde_phi, spatial_metric, inv_spatial_metric,
               sqrt_det_spatial_metric, eos,
-              primitive_from_conservative_options);
+              primitive_from_conservative_options, bulk_viscosity,
+              bulk_relaxation_time);
     }
   }
   if (recover_primitives_) {

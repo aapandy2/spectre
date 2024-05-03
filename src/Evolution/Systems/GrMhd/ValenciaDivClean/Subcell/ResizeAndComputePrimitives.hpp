@@ -71,7 +71,9 @@ struct ResizeAndComputePrims {
       gr::Tags::InverseSpatialMetric<DataVector, 3>,
       gr::Tags::SqrtDetSpatialMetric<DataVector>,
       hydro::Tags::GrmhdEquationOfState,
-      grmhd::ValenciaDivClean::Tags::PrimitiveFromConservativeOptions>;
+      grmhd::ValenciaDivClean::Tags::PrimitiveFromConservativeOptions,
+      grmhd::ValenciaDivClean::Tags::BulkViscosity,
+      grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   static void apply(
       gsl::not_null<Variables<hydro::grmhd_tags<DataVector>>*> prim_vars,
@@ -87,6 +89,7 @@ struct ResizeAndComputePrims {
       const Scalar<DataVector>& sqrt_det_spatial_metric,
       const EquationsOfState::EquationOfState<true, 3>& eos,
       const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
-          primitive_from_conservative_options);
+          primitive_from_conservative_options,
+      const double bulk_viscosity, const double bulk_relaxation_time);
 };
 }  // namespace grmhd::ValenciaDivClean::subcell

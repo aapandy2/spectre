@@ -150,7 +150,9 @@ class TciOnDgGrid {
       evolution::dg::subcell::Tags::Mesh<3>,
       evolution::dg::subcell::Tags::DataForRdmpTci, Tags::TciOptions,
       evolution::dg::subcell::Tags::SubcellOptions<3>,
-      grmhd::ValenciaDivClean::Tags::PrimitiveFromConservativeOptions>;
+      grmhd::ValenciaDivClean::Tags::PrimitiveFromConservativeOptions,
+      grmhd::ValenciaDivClean::Tags::BulkViscosity,
+      grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   static std::tuple<int, evolution::dg::subcell::RdmpTciData> apply(
       gsl::not_null<Variables<hydro::grmhd_tags<DataVector>>*> dg_prim_vars,
@@ -170,6 +172,7 @@ class TciOnDgGrid {
       const evolution::dg::subcell::SubcellOptions& subcell_options,
       const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
           primitive_from_conservative_options,
+      const double bulk_viscosity, const double bulk_relaxation_time,
       double persson_exponent, bool element_stays_on_dg);
 };
 }  // namespace grmhd::ValenciaDivClean::subcell

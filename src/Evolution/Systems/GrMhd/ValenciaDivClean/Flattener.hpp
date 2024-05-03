@@ -127,7 +127,9 @@ class Flattener {
       gr::Tags::InverseSpatialMetric<DataVector, 3>, domain::Tags::Mesh<3>,
       domain::Tags::DetInvJacobian<Frame::ElementLogical, Frame::Inertial>,
       hydro::Tags::GrmhdEquationOfState,
-      grmhd::ValenciaDivClean::Tags::PrimitiveFromConservativeOptions>;
+      grmhd::ValenciaDivClean::Tags::PrimitiveFromConservativeOptions,
+      grmhd::ValenciaDivClean::Tags::BulkViscosity,
+      grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   void operator()(
       gsl::not_null<Scalar<DataVector>*> tilde_d,
@@ -145,7 +147,8 @@ class Flattener {
       const Scalar<DataVector>& det_logical_to_inertial_inv_jacobian,
       const EquationsOfState::EquationOfState<true, 3>& eos,
       const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
-          primitive_from_conservative_options) const;
+          primitive_from_conservative_options,
+      const double bulk_viscosity, const double bulk_relaxation_time) const;
 
  private:
   template <typename LocalRecoverySchemesList>

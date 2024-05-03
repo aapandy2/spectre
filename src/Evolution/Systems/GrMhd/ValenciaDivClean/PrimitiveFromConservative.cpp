@@ -63,7 +63,8 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
           const Scalar<DataVector>& sqrt_det_spatial_metric,
           const EquationsOfState::EquationOfState<true, 3>& equation_of_state,
           const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
-              primitive_from_conservative_options) {
+              primitive_from_conservative_options,
+          const double bulk_viscosity, const double bulk_relaxation_time) {
   return call_with_dynamic_type<
       bool, typename EquationsOfState::detail::DerivedClasses<true, 3>::type>(
       &equation_of_state, [&](const auto* const derived_eos) {
@@ -73,7 +74,8 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
             divergence_cleaning_field, lorentz_factor, pressure, temperature,
             tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
             spatial_metric, inv_spatial_metric, sqrt_det_spatial_metric,
-            *derived_eos, primitive_from_conservative_options);
+            *derived_eos, primitive_from_conservative_options, bulk_viscosity,
+            bulk_relaxation_time);
       });
 }
 
@@ -106,7 +108,8 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
          const Scalar<DataVector>& sqrt_det_spatial_metric,
          const EosType& equation_of_state,
          const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
-             primitive_from_conservative_options) {
+             primitive_from_conservative_options,
+         const double bulk_viscosity, const double bulk_relaxation_time) {
   static_assert(EosType::thermodynamic_dim == 3);
   static_assert(EosType::is_relativistic);
   constexpr bool eos_is_barotropic =
@@ -161,10 +164,8 @@ bool PrimitiveFromConservative<OrderedListOfPrimitiveRecoverySchemes,
       get(tilde_vb) / get(sqrt_det_spatial_metric);
 
   //define bulk_viscosity_over_relaxation_time
-  //const double bulk_viscosity_over_relaxation_time =
-  //    bulk_viscosity/bulk_relaxation_time;
-  //TODO: uncomment above
-  const double bulk_viscosity_over_relaxation_time = 1.0;
+  const double bulk_viscosity_over_relaxation_time =
+      bulk_viscosity/bulk_relaxation_time;
 
   // Parameters for quick exit from inversion
   const double cutoffD =
@@ -374,7 +375,8 @@ GENERATE_INSTANTIATIONS(
           const Scalar<DataVector>& sqrt_det_spatial_metric,                   \
           const EquationsOfState::EquationOfState<true, 3>& equation_of_state, \
           const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&     \
-              primitive_from_conservative_options);
+              primitive_from_conservative_options, const double bulk_viscosity,\
+          const double bulk_relaxation_time);
 
 GENERATE_INSTANTIATIONS(
     INSTANTIATION,

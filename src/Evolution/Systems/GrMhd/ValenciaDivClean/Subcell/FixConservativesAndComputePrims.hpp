@@ -46,7 +46,9 @@ struct FixConservativesAndComputePrims {
       hydro::Tags::GrmhdEquationOfState, gr::Tags::SpatialMetric<DataVector, 3>,
       gr::Tags::InverseSpatialMetric<DataVector, 3>,
       gr::Tags::SqrtDetSpatialMetric<DataVector>,
-      grmhd::ValenciaDivClean::Tags::PrimitiveFromConservativeOptions>;
+      grmhd::ValenciaDivClean::Tags::PrimitiveFromConservativeOptions,
+      grmhd::ValenciaDivClean::Tags::BulkViscosity,
+      grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   static void apply(
       gsl::not_null<bool*> needed_fixing,
@@ -59,6 +61,7 @@ struct FixConservativesAndComputePrims {
       const tnsr::II<DataVector, 3, Frame::Inertial>& inv_spatial_metric,
       const Scalar<DataVector>& sqrt_det_spatial_metric,
       const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
-          primitive_from_conservative_options);
+          primitive_from_conservative_options,
+      const double bulk_viscosity, const double bulk_relaxation_time);
 };
 }  // namespace grmhd::ValenciaDivClean::subcell

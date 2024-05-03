@@ -72,7 +72,9 @@ struct PrimitiveFromConservative {
       gr::Tags::InverseSpatialMetric<DataVector, 3>,
       gr::Tags::SqrtDetSpatialMetric<DataVector>,
       hydro::Tags::GrmhdEquationOfState,
-      grmhd::ValenciaDivClean::Tags::PrimitiveFromConservativeOptions>;
+      grmhd::ValenciaDivClean::Tags::PrimitiveFromConservativeOptions,
+      grmhd::ValenciaDivClean::Tags::BulkViscosity,
+      grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   template <bool EnforcePhysicality = true>
   static bool apply(
@@ -96,7 +98,8 @@ struct PrimitiveFromConservative {
       const Scalar<DataVector>& sqrt_det_spatial_metric,
       const EquationsOfState::EquationOfState<true, 3>& equation_of_state,
       const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
-          primitive_from_conservative_options);
+          primitive_from_conservative_options,
+      const double bulk_viscosity, const double bulk_relaxation_time);
 
  private:
   template <bool EnforcePhysicality, typename EosType>
@@ -121,7 +124,8 @@ struct PrimitiveFromConservative {
       const Scalar<DataVector>& sqrt_det_spatial_metric,
       const EosType& equation_of_state,
       const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
-          primitive_from_conservative_options);
+          primitive_from_conservative_options,
+      const double bulk_viscosity, const double bulk_relaxation_time);
 
   // Use Kastaun hydro inversion if B is dynamically unimportant
   static constexpr bool use_hydro_optimization = true;

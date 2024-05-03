@@ -48,6 +48,7 @@ TciOnDgGrid<RecoveryScheme>::apply(
     const evolution::dg::subcell::SubcellOptions& subcell_options,
     const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
         primitive_from_conservative_options,
+    const double bulk_viscosity, const double bulk_relaxation_time,
     const double persson_exponent, const bool element_stays_on_dg) {
   evolution::dg::subcell::RdmpTciData rdmp_tci_data{};
 
@@ -147,7 +148,8 @@ TciOnDgGrid<RecoveryScheme>::apply(
               tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b,
               tilde_phi, spatial_metric, inv_spatial_metric,
               sqrt_det_spatial_metric, eos,
-              primitive_from_conservative_options);
+              primitive_from_conservative_options, bulk_viscosity,
+              bulk_relaxation_time);
 
   // This lambda is called before every TCI failure
   // in order to allow primitives to be updated, rather

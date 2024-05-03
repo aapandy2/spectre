@@ -39,7 +39,8 @@ void ResizeAndComputePrims<OrderedListOfRecoverySchemes>::apply(
     const Scalar<DataVector>& sqrt_det_spatial_metric,
     const EquationsOfState::EquationOfState<true, 3>& eos,
     const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
-        primitive_from_conservative_options) {
+        primitive_from_conservative_options,
+    const double bulk_viscosity, const double bulk_relaxation_time) {
   if (active_grid == evolution::dg::subcell::ActiveGrid::Dg) {
     const size_t num_grid_points = dg_mesh.number_of_grid_points();
     // Reconstruct a copy of the pressure from the FD grid to the DG grid to
@@ -83,7 +84,8 @@ void ResizeAndComputePrims<OrderedListOfRecoverySchemes>::apply(
                 &get<hydro::Tags::Temperature<DataVector>>(*prim_vars)),
             tilde_d, tilde_ye, tilde_vb, tilde_tau, tilde_s, tilde_b, tilde_phi,
             spatial_metric, inv_spatial_metric, sqrt_det_spatial_metric, eos,
-            primitive_from_conservative_options);
+            primitive_from_conservative_options, bulk_viscosity,
+            bulk_relaxation_time);
   }
 }
 

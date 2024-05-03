@@ -138,8 +138,7 @@ Primitives FunctionOfZ<EosType, EnforcePhysicality>::primitives(
   const double transformed_bulk_scalar_hat =
       transformed_bulk_scalar_times_lorentz_factor_ / w_hat;
 
-  // Compute bulk scalar hat; TODO: hardcoding xi
-  //const double xi = 1.0;
+  // Compute bulk scalar hat
   const double xi = bulk_viscosity_over_relaxation_time_;
   const double bulk_scalar_hat =
       xi * std::log(transformed_bulk_scalar_hat);
