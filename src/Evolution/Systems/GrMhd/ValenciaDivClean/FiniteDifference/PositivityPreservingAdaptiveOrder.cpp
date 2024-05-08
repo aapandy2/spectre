@@ -106,7 +106,8 @@ void PositivityPreservingAdaptiveOrderPrim::reconstruct(
     const EquationsOfState::EquationOfState<true, ThermodynamicDim>& eos,
     const Element<3>& element,
     const DirectionalIdMap<3, evolution::dg::subcell::GhostData>& ghost_data,
-    const Mesh<3>& subcell_mesh) const {
+    const Mesh<3>& subcell_mesh, const double bulk_viscosity,
+    const double bulk_relaxation_time) const {
   DirectionalIdMap<dim, Variables<prims_to_reconstruct_tags>>
       neighbor_variables_data{};
   ::fd::neighbor_data_as_variables<dim>(make_not_null(&neighbor_variables_data),
@@ -129,7 +130,7 @@ void PositivityPreservingAdaptiveOrderPrim::reconstruct(
                             std::numeric_limits<double>::signaling_NaN()));
       },
       volume_prims, eos, element, neighbor_variables_data, subcell_mesh,
-      ghost_zone_size(), false);
+      ghost_zone_size(), false, bulk_viscosity, bulk_relaxation_time);
   reconstruct_prims_work<non_positive_tags>(
       vars_on_lower_face, vars_on_upper_face,
       [this](auto upper_face_vars_ptr, auto lower_face_vars_ptr,
@@ -144,7 +145,7 @@ void PositivityPreservingAdaptiveOrderPrim::reconstruct(
                          std::numeric_limits<double>::signaling_NaN()));
       },
       volume_prims, eos, element, neighbor_variables_data, subcell_mesh,
-      ghost_zone_size(), true);
+      ghost_zone_size(), true, bulk_viscosity, bulk_relaxation_time);
 }
 
 template <size_t ThermodynamicDim>
@@ -154,8 +155,8 @@ void PositivityPreservingAdaptiveOrderPrim::reconstruct_fd_neighbor(
     const EquationsOfState::EquationOfState<true, ThermodynamicDim>& eos,
     const Element<3>& element,
     const DirectionalIdMap<3, evolution::dg::subcell::GhostData>& ghost_data,
-    const Mesh<3>& subcell_mesh,
-    const Direction<3> direction_to_reconstruct) const {
+    const Mesh<3>& subcell_mesh, const Direction<3> direction_to_reconstruct,
+    const double bulk_viscosity, const double bulk_relaxation_time) const {
   reconstruct_fd_neighbor_work<positivity_preserving_tags,
                                prims_to_reconstruct_tags>(
       vars_on_face,
@@ -190,7 +191,8 @@ void PositivityPreservingAdaptiveOrderPrim::reconstruct_fd_neighbor(
                 std::numeric_limits<double>::signaling_NaN()));
       },
       subcell_volume_prims, eos, element, ghost_data, subcell_mesh,
-      direction_to_reconstruct, ghost_zone_size(), false);
+      direction_to_reconstruct, ghost_zone_size(), false, bulk_viscosity,
+      bulk_relaxation_time);
   reconstruct_fd_neighbor_work<non_positive_tags, prims_to_reconstruct_tags>(
       vars_on_face,
       [this](const auto tensor_component_on_face_ptr,
@@ -224,7 +226,8 @@ void PositivityPreservingAdaptiveOrderPrim::reconstruct_fd_neighbor(
                 std::numeric_limits<double>::signaling_NaN()));
       },
       subcell_volume_prims, eos, element, ghost_data, subcell_mesh,
-      direction_to_reconstruct, ghost_zone_size(), true);
+      direction_to_reconstruct, ghost_zone_size(), true, bulk_viscosity,
+      bulk_relaxation_time);
 }
 
 bool operator==(const PositivityPreservingAdaptiveOrderPrim& lhs,
@@ -258,7 +261,8 @@ bool operator!=(const PositivityPreservingAdaptiveOrderPrim& lhs,
       const Element<3>& element,                                            \
       const DirectionalIdMap<3, evolution::dg::subcell::GhostData>&         \
           ghost_data,                                                       \
-      const Mesh<3>& subcell_mesh) const;                                   \
+      const Mesh<3>& subcell_mesh, const double bulk_viscosity,             \
+      const double bulk_relaxation_time) const;                             \
   template void                                                             \
   PositivityPreservingAdaptiveOrderPrim::reconstruct_fd_neighbor(           \
       gsl::not_null<Variables<tags_list_for_reconstruct>*> vars_on_face,    \
@@ -268,7 +272,8 @@ bool operator!=(const PositivityPreservingAdaptiveOrderPrim& lhs,
       const DirectionalIdMap<3, evolution::dg::subcell::GhostData>&         \
           ghost_data,                                                       \
       const Mesh<3>& subcell_mesh,                                          \
-      const Direction<3> direction_to_reconstruct) const;
+      const Direction<3> direction_to_reconstruct,                          \
+      const double bulk_viscosity, const double bulk_relaxation_time) const;
 
 GENERATE_INSTANTIATIONS(INSTANTIATION, (1, 2, 3))
 

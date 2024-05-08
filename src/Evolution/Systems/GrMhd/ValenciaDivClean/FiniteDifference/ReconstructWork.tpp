@@ -36,7 +36,8 @@ namespace grmhd::ValenciaDivClean::fd {
 template <typename TagsList, size_t ThermodynamicDim>
 void compute_conservatives_for_reconstruction(
     const gsl::not_null<Variables<TagsList>*> vars_on_face,
-    const EquationsOfState::EquationOfState<true, ThermodynamicDim>& eos) {
+    const EquationsOfState::EquationOfState<true, ThermodynamicDim>& eos,
+    const double bulk_viscosity, const double bulk_relaxation_time) {
   // Computes:
   // 1. W v^i
   // 2. Lorentz factor as sqrt(1 + Wv^i Wv^j\gamma_{ij})
@@ -105,11 +106,6 @@ void compute_conservatives_for_reconstruction(
     ERROR("EOS Must be 1, 2, or 3d");
   }
 
-  //TODO: un-hardcode bulk_viscosity and bulk_relaxation_time here
-  //double xi = 1.0
-  const double bulk_viscosity = 1.0;
-  const double bulk_relaxation_time = 1.0;
-
   ConservativeFromPrimitive::apply(
       make_not_null(&get<ValenciaDivClean::Tags::TildeD>(*vars_on_face)),
       make_not_null(&get<ValenciaDivClean::Tags::TildeYe>(*vars_on_face)),
@@ -143,7 +139,8 @@ void reconstruct_prims_work(
     const DirectionalIdMap<3, Variables<PrimsTagsSentByNeighbor>>&
         neighbor_data,
     const Mesh<3>& subcell_mesh, const size_t ghost_zone_size,
-    const bool compute_conservatives) {
+    const bool compute_conservatives, const double bulk_viscosity,
+    const double bulk_relaxation_time) {
   ASSERT(Mesh<3>(subcell_mesh.extents(0), subcell_mesh.basis(0),
                  subcell_mesh.quadrature(0)) == subcell_mesh,
          "The subcell mesh should be isotropic but got " << subcell_mesh);
@@ -238,9 +235,11 @@ void reconstruct_prims_work(
 
   for (size_t i = 0; compute_conservatives and i < 3; ++i) {
     compute_conservatives_for_reconstruction(
-        make_not_null(&gsl::at(*vars_on_lower_face, i)), eos);
+        make_not_null(&gsl::at(*vars_on_lower_face, i)), eos,
+        bulk_viscosity, bulk_relaxation_time);
     compute_conservatives_for_reconstruction(
-        make_not_null(&gsl::at(*vars_on_upper_face, i)), eos);
+        make_not_null(&gsl::at(*vars_on_upper_face, i)), eos,
+        bulk_viscosity, bulk_relaxation_time);
   }
 }
 
@@ -254,7 +253,8 @@ void reconstruct_fd_neighbor_work(
     const Element<3>& element,
     const DirectionalIdMap<3, evolution::dg::subcell::GhostData>& ghost_data,
     const Mesh<3>& subcell_mesh, const Direction<3>& direction_to_reconstruct,
-    const size_t ghost_zone_size, const bool compute_conservatives) {
+    const size_t ghost_zone_size, const bool compute_conservatives,
+    const double bulk_viscosity, const double bulk_relaxation_time) {
   const DirectionalId<3> mortar_id{
       direction_to_reconstruct,
       *element.neighbors().at(direction_to_reconstruct).begin()};
@@ -324,7 +324,8 @@ void reconstruct_fd_neighbor_work(
       });
 
   if (compute_conservatives) {
-    compute_conservatives_for_reconstruction(vars_on_face, eos);
+    compute_conservatives_for_reconstruction(vars_on_face, eos,
+            bulk_viscosity, bulk_relaxation_time);
   }
 }
 }  // namespace grmhd::ValenciaDivClean::fd

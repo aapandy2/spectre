@@ -154,12 +154,15 @@ DirectionalIdMap<3, DataVector> NeighborPackagedData::apply(
 
         call_with_dynamic_type<void, typename grmhd::ValenciaDivClean::fd::
                                          Reconstructor::creatable_classes>(
-            &recons,
-            [&element, &eos, &mortar_id, &ghost_subcell_data, &subcell_mesh,
-             &vars_on_face, &volume_prims](const auto& reconstructor) {
+            &recons, [&box, &element, &eos, &mortar_id, &ghost_subcell_data,
+                      &subcell_mesh, &vars_on_face,
+                      &volume_prims](const auto& reconstructor) {
               reconstructor->reconstruct_fd_neighbor(
                   make_not_null(&vars_on_face), volume_prims, eos, element,
-                  ghost_subcell_data, subcell_mesh, mortar_id.direction);
+                  ghost_subcell_data, subcell_mesh, mortar_id.direction,
+                  db::get<grmhd::ValenciaDivClean::Tags::BulkViscosity>(box),
+                  db::get<grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>(
+                      box));
             });
 
         // Get the mesh velocity if needed

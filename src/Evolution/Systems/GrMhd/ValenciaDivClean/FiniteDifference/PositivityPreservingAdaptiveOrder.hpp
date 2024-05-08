@@ -159,7 +159,9 @@ class PositivityPreservingAdaptiveOrderPrim : public Reconstructor {
       tmpl::list<::Tags::Variables<hydro::grmhd_tags<DataVector>>,
                  hydro::Tags::GrmhdEquationOfState, domain::Tags::Element<dim>,
                  evolution::dg::subcell::Tags::GhostDataForReconstruction<dim>,
-                 evolution::dg::subcell::Tags::Mesh<dim>>;
+                 evolution::dg::subcell::Tags::Mesh<dim>,
+                 grmhd::ValenciaDivClean::Tags::BulkViscosity,
+                 grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   template <size_t ThermodynamicDim>
   void reconstruct(
@@ -174,7 +176,8 @@ class PositivityPreservingAdaptiveOrderPrim : public Reconstructor {
       const Element<dim>& element,
       const DirectionalIdMap<dim, evolution::dg::subcell::GhostData>&
           ghost_data,
-      const Mesh<dim>& subcell_mesh) const;
+      const Mesh<dim>& subcell_mesh, const double bulk_viscosity,
+      const double bulk_relaxation_time) const;
 
   template <size_t ThermodynamicDim>
   void reconstruct_fd_neighbor(
@@ -185,7 +188,8 @@ class PositivityPreservingAdaptiveOrderPrim : public Reconstructor {
       const DirectionalIdMap<dim, evolution::dg::subcell::GhostData>&
           ghost_data,
       const Mesh<dim>& subcell_mesh,
-      const Direction<dim> direction_to_reconstruct) const;
+      const Direction<dim> direction_to_reconstruct,
+      const double bulk_viscosity, const double bulk_relaxation_time) const;
 
  private:
   // NOLINTNEXTLINE(readability-redundant-declaration)

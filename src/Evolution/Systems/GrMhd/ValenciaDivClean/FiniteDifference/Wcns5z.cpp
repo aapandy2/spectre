@@ -84,7 +84,8 @@ void Wcns5zPrim::reconstruct(
     const EquationsOfState::EquationOfState<true, ThermodynamicDim>& eos,
     const Element<3>& element,
     const DirectionalIdMap<3, evolution::dg::subcell::GhostData>& ghost_data,
-    const Mesh<3>& subcell_mesh) const {
+    const Mesh<3>& subcell_mesh, const double bulk_viscosity,
+    const double bulk_relaxation_time) const {
   DirectionalIdMap<dim, Variables<prims_to_reconstruct_tags>>
       neighbor_variables_data{};
   ::fd::neighbor_data_as_variables<dim>(make_not_null(&neighbor_variables_data),
@@ -101,7 +102,7 @@ void Wcns5zPrim::reconstruct(
                      epsilon_, max_number_of_extrema_);
       },
       volume_prims, eos, element, neighbor_variables_data, subcell_mesh,
-      ghost_zone_size(), true);
+      ghost_zone_size(), true, bulk_viscosity, bulk_relaxation_time);
 }
 
 template <size_t ThermodynamicDim>
@@ -111,8 +112,8 @@ void Wcns5zPrim::reconstruct_fd_neighbor(
     const EquationsOfState::EquationOfState<true, ThermodynamicDim>& eos,
     const Element<3>& element,
     const DirectionalIdMap<3, evolution::dg::subcell::GhostData>& ghost_data,
-    const Mesh<3>& subcell_mesh,
-    const Direction<3> direction_to_reconstruct) const {
+    const Mesh<3>& subcell_mesh, const Direction<3> direction_to_reconstruct,
+    const double bulk_viscosity, const double bulk_relaxation_time) const {
   reconstruct_fd_neighbor_work<prims_to_reconstruct_tags,
                                prims_to_reconstruct_tags>(
       vars_on_face,
@@ -139,7 +140,8 @@ void Wcns5zPrim::reconstruct_fd_neighbor(
             local_direction_to_reconstruct, epsilon_, max_number_of_extrema_);
       },
       subcell_volume_prims, eos, element, ghost_data, subcell_mesh,
-      direction_to_reconstruct, ghost_zone_size(), true);
+      direction_to_reconstruct, ghost_zone_size(), true, bulk_viscosity,
+      bulk_relaxation_time);
 }
 
 bool operator==(const Wcns5zPrim& lhs, const Wcns5zPrim& rhs) {
@@ -168,7 +170,8 @@ bool operator!=(const Wcns5zPrim& lhs, const Wcns5zPrim& rhs) {
       const Element<3>& element,                                            \
       const DirectionalIdMap<3, evolution::dg::subcell::GhostData>&         \
           ghost_data,                                                       \
-      const Mesh<3>& subcell_mesh) const;                                   \
+      const Mesh<3>& subcell_mesh, const double bulk_viscosity,             \
+      const double bulk_relaxation_time) const;                             \
   template void Wcns5zPrim::reconstruct_fd_neighbor(                        \
       gsl::not_null<Variables<tags_list_for_reconstruct>*> vars_on_face,    \
       const Variables<hydro::grmhd_tags<DataVector>>& subcell_volume_prims, \
@@ -177,7 +180,8 @@ bool operator!=(const Wcns5zPrim& lhs, const Wcns5zPrim& rhs) {
       const DirectionalIdMap<3, evolution::dg::subcell::GhostData>&         \
           ghost_data,                                                       \
       const Mesh<3>& subcell_mesh,                                          \
-      const Direction<3> direction_to_reconstruct) const;
+      const Direction<3> direction_to_reconstruct,                          \
+      const double bulk_viscosity, const double bulk_relaxation_time) const;
 
 GENERATE_INSTANTIATIONS(INSTANTIATION, (1, 2, 3))
 
