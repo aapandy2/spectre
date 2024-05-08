@@ -151,16 +151,19 @@ void sources_impl(
     }
   }
 
-  //TODO: currently hardcoding parameters for bulk EOM source
-  double xi       = bulk_viscosity/bulk_relaxation_time;
-  double script_W = 0.0;
+  //Compute the source for the bulk scalar evolution equation. Notice
+  //that the explicit plus zero in the last line assumes that the
+  //ratio bulk_viscosity / bulk_relaxation_time is a spacetime constant;
+  //if it isn't, the zero gets replaced with a derivative term which
+  //breaks conservation-law form of the bulk evolution equation
   get(*source_tilde_vb) = -get(lapse) * get(sqrt_det_spatial_metric) *
                           get(transformed_bulk_scalar)
                           * log(get(transformed_bulk_scalar)) *
-                          (1.0/bulk_relaxation_time*(1.0
-                           + bulk_nonlinear_coupling*xi
-                             *log(get(transformed_bulk_scalar))) +
-                           script_W);
+                          (1.0/bulk_relaxation_time *
+                           (1.0 + bulk_nonlinear_coupling *
+                                  bulk_viscosity / bulk_relaxation_time *
+                                  log(get(transformed_bulk_scalar))) +
+                           0.0);
 
   for (size_t i = 0; i < 3; ++i) {
     source_tilde_s->get(i) = -(get(tilde_d) + get(tilde_tau)) * d_lapse.get(i);

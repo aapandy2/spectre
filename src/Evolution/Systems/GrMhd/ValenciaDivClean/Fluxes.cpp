@@ -135,13 +135,12 @@ void ComputeFluxes::apply(
 
   // p_star = p + p_m = p + b^2/2 = p + ((B^m v_m)^2 + (B^m B_m)/W^2)/2
   // NOTE: adding bulk here
-  double xi = bulk_viscosity / bulk_relaxation_time;
   Scalar<DataVector>& pressure_star_with_bulk_lapse_sqrt_det_spatial_metric =
       get<::Tags::TempScalar<1>>(temp_tensors);
   get(pressure_star_with_bulk_lapse_sqrt_det_spatial_metric) =
       get(sqrt_det_spatial_metric) * get(lapse) *
       (get(pressure) +
-       xi*log(get(transformed_bulk_scalar)) +
+       bulk_viscosity / bulk_relaxation_time*log(get(transformed_bulk_scalar)) +
        0.5 * square(get(magnetic_field_dot_spatial_velocity)) +
        0.5 * get(magnetic_field_squared) * one_over_w_squared);
 
