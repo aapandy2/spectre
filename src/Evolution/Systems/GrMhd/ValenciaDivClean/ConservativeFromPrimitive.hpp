@@ -80,7 +80,9 @@ struct ConservativeFromPrimitive {
                  hydro::Tags::MagneticField<DataVector, 3>,
                  gr::Tags::SqrtDetSpatialMetric<DataVector>,
                  gr::Tags::SpatialMetric<DataVector, 3>,
-                 hydro::Tags::DivergenceCleaningField<DataVector>>;
+                 hydro::Tags::DivergenceCleaningField<DataVector>,
+                 grmhd::ValenciaDivClean::Tags::BulkViscosity,
+                 grmhd::ValenciaDivClean::Tags::BulkRelaxationTime>;
 
   static void apply(
       gsl::not_null<Scalar<DataVector>*> tilde_d,
@@ -100,7 +102,8 @@ struct ConservativeFromPrimitive {
       const tnsr::I<DataVector, 3, Frame::Inertial>& magnetic_field,
       const Scalar<DataVector>& sqrt_det_spatial_metric,
       const tnsr::ii<DataVector, 3, Frame::Inertial>& spatial_metric,
-      const Scalar<DataVector>& divergence_cleaning_field);
+      const Scalar<DataVector>& divergence_cleaning_field,
+      const double bulk_viscosity, const double bulk_relaxation_time);
 };
 }  // namespace ValenciaDivClean
 }  // namespace grmhd

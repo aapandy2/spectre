@@ -105,6 +105,11 @@ void compute_conservatives_for_reconstruction(
     ERROR("EOS Must be 1, 2, or 3d");
   }
 
+  //TODO: un-hardcode bulk_viscosity and bulk_relaxation_time here
+  //double xi = 1.0
+  const double bulk_viscosity = 1.0;
+  const double bulk_relaxation_time = 1.0;
+
   ConservativeFromPrimitive::apply(
       make_not_null(&get<ValenciaDivClean::Tags::TildeD>(*vars_on_face)),
       make_not_null(&get<ValenciaDivClean::Tags::TildeYe>(*vars_on_face)),
@@ -121,7 +126,8 @@ void compute_conservatives_for_reconstruction(
           *vars_on_face),
       get<gr::Tags::SqrtDetSpatialMetric<DataVector>>(*vars_on_face),
       get<gr::Tags::SpatialMetric<DataVector, 3>>(*vars_on_face),
-      get<hydro::Tags::DivergenceCleaningField<DataVector>>(*vars_on_face));
+      get<hydro::Tags::DivergenceCleaningField<DataVector>>(*vars_on_face),
+      bulk_viscosity, bulk_relaxation_time);
 }
 
 template <typename PrimTagsForReconstruction, typename PrimsTags,

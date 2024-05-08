@@ -228,7 +228,8 @@ std::optional<std::string> Reflective::dg_ghost(
       interior_specific_internal_energy, interior_pressure,
       exterior_spatial_velocity, interior_lorentz_factor,
       exterior_magnetic_field, interior_sqrt_det_spatial_metric,
-      interior_spatial_metric, exterior_divergence_cleaning_field);
+      interior_spatial_metric, exterior_divergence_cleaning_field,
+      bulk_viscosity, bulk_relaxation_time);
 
   ComputeFluxes::apply(
       tilde_d_flux, tilde_ye_flux, tilde_vb_flux, tilde_tau_flux, tilde_s_flux,
@@ -331,7 +332,7 @@ void Reflective::fd_ghost(
         *magnetic_field,
 
         get<SqrtDetSpatialMetric>(temp_vars), get<SpatialMetric>(temp_vars),
-        *divergence_cleaning_field);
+        *divergence_cleaning_field, bulk_viscosity, bulk_relaxation_time);
 
     ComputeFluxes::apply(
         make_not_null(

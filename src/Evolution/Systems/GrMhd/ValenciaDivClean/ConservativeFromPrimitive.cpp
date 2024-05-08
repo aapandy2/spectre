@@ -40,7 +40,8 @@ void ConservativeFromPrimitive::apply(
     const tnsr::I<DataVector, 3, Frame::Inertial>& magnetic_field,
     const Scalar<DataVector>& sqrt_det_spatial_metric,
     const tnsr::ii<DataVector, 3, Frame::Inertial>& spatial_metric,
-    const Scalar<DataVector>& divergence_cleaning_field) {
+    const Scalar<DataVector>& divergence_cleaning_field,
+    const double bulk_viscosity, const double bulk_relaxation_time) {
   Variables<tmpl::list<hydro::Tags::SpatialVelocityOneForm<DataVector, 3>,
                        hydro::Tags::SpatialVelocitySquared<DataVector>,
                        hydro::Tags::MagneticFieldOneForm<DataVector, 3>,
@@ -79,8 +80,6 @@ void ConservativeFromPrimitive::apply(
                    get(transformed_bulk_scalar) *
                    get(lorentz_factor);
 
-  //NOTE: including bulk, but with HARDCODED parameter xi = 1
-  double xi = 1.0;
   get(*tilde_tau) = get(sqrt_det_spatial_metric) *
                       (square(get(lorentz_factor)) *
                         (get(rest_mass_density) *
@@ -88,7 +87,8 @@ void ConservativeFromPrimitive::apply(
                            get(spatial_velocity_squared) * get(lorentz_factor) /
                               (get(lorentz_factor) + 1.)) +
                          (get(pressure)
-                          + xi*log(get(transformed_bulk_scalar))) *
+                          + bulk_viscosity / bulk_relaxation_time *
+                          log(get(transformed_bulk_scalar))) *
                          get(spatial_velocity_squared)) +
                        0.5 * get(magnetic_field_squared) *
                         (1.0 + get(spatial_velocity_squared)) -
@@ -97,10 +97,10 @@ void ConservativeFromPrimitive::apply(
   // Reuse allocation
   Scalar<DataVector>& common_factor =
       get<hydro::Tags::MagneticFieldSquared<DataVector>>(temp_tensors);
-  //NOTE: using bulk again here, with xi hardcoded above
   get(common_factor) +=
       (get(rest_mass_density) * (1.0 + get(specific_internal_energy)) +
-       ( get(pressure) + xi*log(get(transformed_bulk_scalar)) ) ) *
+       ( get(pressure) + bulk_viscosity / bulk_relaxation_time *
+         log(get(transformed_bulk_scalar)) ) ) *
       square(get(lorentz_factor));
   get(common_factor) *= get(sqrt_det_spatial_metric);
 

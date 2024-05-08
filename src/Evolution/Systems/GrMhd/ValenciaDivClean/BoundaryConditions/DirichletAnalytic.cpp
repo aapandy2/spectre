@@ -189,7 +189,8 @@ std::optional<std::string> DirichletAnalytic::dg_ghost(
       get<hydro::Tags::MagneticField<DataVector, 3>>(boundary_values),
       get<gr::Tags::SqrtDetSpatialMetric<DataVector>>(boundary_values),
       get<gr::Tags::SpatialMetric<DataVector, 3>>(boundary_values),
-      get<hydro::Tags::DivergenceCleaningField<DataVector>>(boundary_values));
+      get<hydro::Tags::DivergenceCleaningField<DataVector>>(boundary_values),
+      bulk_viscosity, bulk_relaxation_time);
 
   ComputeFluxes::apply(
       tilde_d_flux, tilde_ye_flux, tilde_vb_flux, tilde_tau_flux, tilde_s_flux,
@@ -352,7 +353,8 @@ void DirichletAnalytic::fd_ghost(
         get<hydro::Tags::MagneticField<DataVector, 3>>(boundary_values),
         sqrt_det_spatial_metric,
         get<gr::Tags::SpatialMetric<DataVector, 3>>(metric_boundary_values),
-        get<hydro::Tags::DivergenceCleaningField<DataVector>>(boundary_values));
+        get<hydro::Tags::DivergenceCleaningField<DataVector>>(boundary_values),
+        bulk_viscosity, bulk_relaxation_time);
 
     ComputeFluxes::apply(
         make_not_null(

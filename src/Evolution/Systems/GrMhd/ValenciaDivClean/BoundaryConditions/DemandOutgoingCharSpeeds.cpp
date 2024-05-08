@@ -333,7 +333,8 @@ void DemandOutgoingCharSpeeds::fd_demand_outgoing_char_speeds(
           get<LorentzFactor>(ghost_fluxes_vars), *magnetic_field,
 
           get<SqrtDetSpatialMetric>(ghost_fluxes_vars),
-          get<SpatialMetric>(ghost_fluxes_vars), *divergence_cleaning_field);
+          get<SpatialMetric>(ghost_fluxes_vars), *divergence_cleaning_field,
+          bulk_viscosity, bulk_relaxation_time);
 
       ComputeFluxes::apply(
           make_not_null(
