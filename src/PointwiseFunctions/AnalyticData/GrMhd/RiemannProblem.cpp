@@ -90,15 +90,6 @@ RiemannProblem::variables(
 }
 
 template <typename DataType>
-tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>>
-RiemannProblem::variables(
-    const tnsr::I<DataType, 3>& x,
-    tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>> /*meta*/) const {
-
-    return {make_with_value<Scalar<DataType>>(x, 1.0)};
-}
-
-template <typename DataType>
 tuples::TaggedTuple<hydro::Tags::SpatialVelocity<DataType, 3>>
 RiemannProblem::variables(
     const tnsr::I<DataType, 3>& x,

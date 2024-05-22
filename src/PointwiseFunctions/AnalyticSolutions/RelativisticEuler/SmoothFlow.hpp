@@ -16,6 +16,7 @@
 #include "PointwiseFunctions/Hydro/EquationsOfState/IdealFluid.hpp"
 #include "PointwiseFunctions/Hydro/TagsDeclarations.hpp"
 #include "PointwiseFunctions/Hydro/Temperature.hpp"
+#include "PointwiseFunctions/Hydro/TransformedBulkScalar.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/InitialData.hpp"
 #include "Utilities/MakeArray.hpp"
 #include "Utilities/Serialization/CharmPupable.hpp"
@@ -59,6 +60,7 @@ class SmoothFlow : public evolution::initial_data::InitialData,
                    virtual public MarkAsAnalyticSolution,
                    public AnalyticSolution<Dim>,
                    public hydro::TemperatureInitialization<SmoothFlow<Dim>>,
+                   public hydro::TransformedBulkScalarInitialization,
                    private hydro::Solutions::SmoothFlow<Dim, true> {
   using smooth_flow = hydro::Solutions::SmoothFlow<Dim, true>;
 
@@ -108,11 +110,13 @@ class SmoothFlow : public evolution::initial_data::InitialData,
       const -> tuples::TaggedTuple<hydro::Tags::ElectronFraction<DataType>>;
 
   template <typename DataType>
-  auto variables(const tnsr::I<DataType, Dim>& x, double /*t*/,
+  auto variables(const tnsr::I<DataType, Dim>& x, double t,
                  tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>>
-                /*meta*/)
-      const
-      -> tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>>;
+                 /*meta*/) const
+      -> tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>> {
+    return hydro::TransformedBulkScalarInitialization::variables(
+        x, t, tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>>{});
+  }
 
   /// Retrieve a collection of hydro variables at `(x, t)`
   template <typename DataType, typename... Tags>
