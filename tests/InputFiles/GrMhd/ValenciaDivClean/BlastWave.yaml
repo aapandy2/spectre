@@ -97,6 +97,9 @@ EquationOfState:
 EvolutionSystem:
   ValenciaDivClean:
     DampingParameter: 1.0
+    BulkViscosity: 0.0
+    BulkRelaxationTime: 1.0
+    BulkNonlinearCoupling: 0.0
 
 VariableFixing:
   FixConservatives:

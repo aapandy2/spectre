@@ -220,6 +220,7 @@ bool operator!=(const BlastWave& lhs, const BlastWave& rhs) {
 GENERATE_INSTANTIATIONS(
     INSTANTIATE_SCALARS, (double, DataVector),
     (hydro::Tags::RestMassDensity, hydro::Tags::ElectronFraction,
+     hydro::Tags::TransformedBulkScalar,
      hydro::Tags::SpecificInternalEnergy, hydro::Tags::Pressure,
      hydro::Tags::DivergenceCleaningField, hydro::Tags::LorentzFactor,
      hydro::Tags::SpecificEnthalpy))
