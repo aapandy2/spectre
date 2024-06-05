@@ -15,6 +15,7 @@
 #include "PointwiseFunctions/Hydro/Tags.hpp"
 #include "PointwiseFunctions/Hydro/TagsDeclarations.hpp"
 #include "PointwiseFunctions/Hydro/Temperature.hpp"
+#include "PointwiseFunctions/Hydro/TransformedBulkScalar.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/InitialData.hpp"
 #include "Utilities/ForceInline.hpp"
 #include "Utilities/Requires.hpp"
@@ -167,7 +168,8 @@ class FishboneMoncriefDisk
     : public virtual evolution::initial_data::InitialData,
       public MarkAsAnalyticSolution,
       public AnalyticSolution<3>,
-      public hydro::TemperatureInitialization<FishboneMoncriefDisk> {
+      public hydro::TemperatureInitialization<FishboneMoncriefDisk>,
+      public hydro::TransformedBulkScalarInitialization {
  protected:
   template <typename DataType>
   struct IntermediateVariables;
@@ -314,6 +316,16 @@ class FishboneMoncriefDisk
                  tmpl::list<hydro::Tags::ElectronFraction<DataType>> /*meta*/,
                  gsl::not_null<IntermediateVariables<DataType>*> vars) const
       -> tuples::TaggedTuple<hydro::Tags::ElectronFraction<DataType>>;
+
+  template <typename DataType>
+  auto variables(
+      const tnsr::I<DataType, 3>& x,
+      tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>> /*meta*/,
+      gsl::not_null<IntermediateVariables<DataType>*> /*vars*/) const
+      -> tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>> {
+    return hydro::TransformedBulkScalarInitialization::variables(
+        x, tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>>{});
+  }
 
   template <typename DataType>
   auto variables(const tnsr::I<DataType, 3>& x,

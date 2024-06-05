@@ -960,9 +960,10 @@ GENERATE_INSTANTIATIONS(INSTANTIATE, (double, DataVector))
 GENERATE_INSTANTIATIONS(
     INSTANTIATE_SCALARS, (double, DataVector),
     (hydro::Tags::RestMassDensity, hydro::Tags::ElectronFraction,
-     hydro::Tags::SpecificInternalEnergy, hydro::Tags::Pressure,
-     hydro::Tags::Temperature, hydro::Tags::DivergenceCleaningField,
-     hydro::Tags::LorentzFactor, hydro::Tags::SpecificEnthalpy, gr::Tags::Lapse,
+     hydro::Tags::TransformedBulkScalar, hydro::Tags::SpecificInternalEnergy,
+     hydro::Tags::Pressure, hydro::Tags::Temperature,
+     hydro::Tags::DivergenceCleaningField, hydro::Tags::LorentzFactor,
+     hydro::Tags::SpecificEnthalpy, gr::Tags::Lapse,
      gr::Tags::SqrtDetSpatialMetric))
 
 #undef INSTANTIATE_SCALARS

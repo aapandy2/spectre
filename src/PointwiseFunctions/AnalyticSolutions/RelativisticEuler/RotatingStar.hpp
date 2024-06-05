@@ -15,6 +15,7 @@
 #include "PointwiseFunctions/AnalyticSolutions/RelativisticEuler/Solutions.hpp"
 #include "PointwiseFunctions/Hydro/EquationsOfState/PolytropicFluid.hpp"
 #include "PointwiseFunctions/Hydro/Temperature.hpp"
+#include "PointwiseFunctions/Hydro/TransformedBulkScalar.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/InitialData.hpp"
 #include "Utilities/TMPL.hpp"
 #include "Utilities/TaggedTuple.hpp"
@@ -305,7 +306,8 @@ class CstSolution {
 class RotatingStar : public virtual evolution::initial_data::InitialData,
                      public MarkAsAnalyticSolution,
                      public AnalyticSolution<3>,
-                     public hydro::TemperatureInitialization<RotatingStar> {
+                     public hydro::TemperatureInitialization<RotatingStar>,
+                     public hydro::TransformedBulkScalarInitialization {
   template <typename DataType>
   struct IntermediateVariables {
     IntermediateVariables(
@@ -479,6 +481,16 @@ class RotatingStar : public virtual evolution::initial_data::InitialData,
                  const tnsr::I<DataType, 3>& x,
                  tmpl::list<hydro::Tags::ElectronFraction<DataType>> /*meta*/)
       const -> tuples::TaggedTuple<hydro::Tags::ElectronFraction<DataType>>;
+
+  template <typename DataType>
+  auto variables(
+      gsl::not_null<IntermediateVariables<DataType>*> /*vars*/,
+      const tnsr::I<DataType, 3>& x,
+      tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>> /*meta*/) const
+      -> tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>> {
+    return hydro::TransformedBulkScalarInitialization::variables(
+        x, tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>>{});
+  }
 
   template <typename DataType>
   auto variables(gsl::not_null<IntermediateVariables<DataType>*> vars,

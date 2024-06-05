@@ -12,6 +12,7 @@
 #include "PointwiseFunctions/AnalyticSolutions/GrMhd/Solutions.hpp"
 #include "PointwiseFunctions/Hydro/EquationsOfState/PolytropicFluid.hpp"  // IWYU pragma: keep
 #include "PointwiseFunctions/Hydro/Tags.hpp"
+#include "PointwiseFunctions/Hydro/TransformedBulkScalar.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/InitialData.hpp"
 #include "Utilities/Requires.hpp"
 #include "Utilities/Serialization/CharmPupable.hpp"
@@ -163,6 +164,7 @@ namespace grmhd::Solutions {
  * The magnetic field \f$b^2\f$ is the same as the \f$\gamma\ne5/3\f$.
  */
 class BondiMichel : public virtual evolution::initial_data::InitialData,
+                    public hydro::TransformedBulkScalarInitialization,
                     public AnalyticSolution,
                     public MarkAsAnalyticSolution {
  protected:
@@ -296,6 +298,16 @@ class BondiMichel : public virtual evolution::initial_data::InitialData,
                  tmpl::list<hydro::Tags::ElectronFraction<DataType>> /*meta*/,
                  const IntermediateVars<DataType>& vars) const
       -> tuples::TaggedTuple<hydro::Tags::ElectronFraction<DataType>>;
+
+  template <typename DataType>
+  auto variables(
+      const tnsr::I<DataType, 3>& x,
+      tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>> /*meta*/,
+      const IntermediateVars<DataType>& /*vars*/) const
+      -> tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>> {
+    return hydro::TransformedBulkScalarInitialization::variables(
+        x, tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>>{});
+  }
 
   template <typename DataType>
   auto variables(

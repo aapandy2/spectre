@@ -28,18 +28,14 @@
 
 namespace grmhd::ValenciaDivClean::InitialData {
 using initial_data_list = tmpl::list<
-    AnalyticData::BlastWave,
-    // AnalyticData::BondiHoyleAccretion,
-    // AnalyticData::CcsnCollapse, AnalyticData::KhInstability,
-    // AnalyticData::MagneticFieldLoop, AnalyticData::MagneticRotor,
-    // AnalyticData::MagnetizedFmDisk, AnalyticData::MagnetizedTovStar,
-    // AnalyticData::OrszagTangVortex, AnalyticData::PolarMagnetizedFmDisk,
-    AnalyticData::RiemannProblem,
-    // AnalyticData::SlabJet, Solutions::AlfvenWave,
-    // grmhd::Solutions::BondiMichel, Solutions::KomissarovShock,
-    Solutions::SmoothFlow  //,
-    // RelativisticEuler::Solutions::FishboneMoncriefDisk,
-    // RelativisticEuler::Solutions::RotatingStar,
-    // RelativisticEuler::Solutions::TovStar
-    >;
+    AnalyticData::BlastWave, AnalyticData::BondiHoyleAccretion,
+    AnalyticData::CcsnCollapse, AnalyticData::KhInstability,
+    AnalyticData::MagneticFieldLoop, AnalyticData::MagneticRotor,
+    AnalyticData::MagnetizedFmDisk, AnalyticData::MagnetizedTovStar,
+    AnalyticData::OrszagTangVortex, AnalyticData::PolarMagnetizedFmDisk,
+    AnalyticData::RiemannProblem, AnalyticData::SlabJet, Solutions::AlfvenWave,
+    grmhd::Solutions::BondiMichel, Solutions::KomissarovShock,
+    Solutions::SmoothFlow, RelativisticEuler::Solutions::FishboneMoncriefDisk,
+    RelativisticEuler::Solutions::RotatingStar,
+    RelativisticEuler::Solutions::TovStar>;
 }  // namespace grmhd::ValenciaDivClean::InitialData

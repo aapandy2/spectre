@@ -14,6 +14,7 @@
 #include "PointwiseFunctions/AnalyticSolutions/GrMhd/Solutions.hpp"
 #include "PointwiseFunctions/Hydro/EquationsOfState/IdealFluid.hpp"  // IWYU pragma: keep
 #include "PointwiseFunctions/Hydro/TagsDeclarations.hpp"
+#include "PointwiseFunctions/Hydro/TransformedBulkScalar.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/InitialData.hpp"
 #include "Utilities/Serialization/CharmPupable.hpp"
 #include "Utilities/TMPL.hpp"
@@ -47,6 +48,7 @@ class KomissarovShock
     : public evolution::initial_data::InitialData,
       public AnalyticSolution,
       public hydro::TemperatureInitialization<KomissarovShock>,
+      public hydro::TransformedBulkScalarInitialization,
       public MarkAsAnalyticSolution {
  public:
   using equation_of_state_type = EquationsOfState::IdealFluid<true>;
@@ -175,6 +177,15 @@ class KomissarovShock
   auto variables(const tnsr::I<DataType, 3>& x, double t,
                  tmpl::list<hydro::Tags::ElectronFraction<DataType>> /*meta*/)
       const -> tuples::TaggedTuple<hydro::Tags::ElectronFraction<DataType>>;
+
+  template <typename DataType>
+  auto variables(const tnsr::I<DataType, 3>& x, double t,
+                 tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>>
+                 /*meta*/) const
+      -> tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>> {
+    return hydro::TransformedBulkScalarInitialization::variables(
+        x, t, tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>>{});
+  }
 
   template <typename DataType>
   auto variables(

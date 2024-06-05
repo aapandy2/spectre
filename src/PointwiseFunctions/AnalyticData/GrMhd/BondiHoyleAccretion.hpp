@@ -13,6 +13,7 @@
 #include "PointwiseFunctions/GeneralRelativity/KerrSchildCoords.hpp"
 #include "PointwiseFunctions/Hydro/EquationsOfState/PolytropicFluid.hpp"  // IWYU pragma: keep
 #include "PointwiseFunctions/Hydro/TagsDeclarations.hpp"
+#include "PointwiseFunctions/Hydro/TransformedBulkScalar.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/InitialData.hpp"
 #include "Utilities/Requires.hpp"
 #include "Utilities/Serialization/CharmPupable.hpp"
@@ -80,7 +81,8 @@ namespace grmhd::AnalyticData {
  */
 class BondiHoyleAccretion : public virtual evolution::initial_data::InitialData,
                             public MarkAsAnalyticData,
-                            public AnalyticDataBase {
+                            public AnalyticDataBase,
+                            public hydro::TransformedBulkScalarInitialization {
  public:
   using equation_of_state_type = EquationsOfState::PolytropicFluid<true>;
 
@@ -171,6 +173,15 @@ class BondiHoyleAccretion : public virtual evolution::initial_data::InitialData,
   auto variables(const tnsr::I<DataType, 3>& x,
                  tmpl::list<hydro::Tags::ElectronFraction<DataType>> /*meta*/)
       const -> tuples::TaggedTuple<hydro::Tags::ElectronFraction<DataType>>;
+
+  template <typename DataType>
+  auto variables(const tnsr::I<DataType, 3>& x,
+                 tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>>
+                 /*meta*/) const
+      -> tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>> {
+    return TransformedBulkScalarInitialization::variables(
+        x, tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>>{});
+  }
 
   template <typename DataType>
   auto variables(

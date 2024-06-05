@@ -235,6 +235,14 @@ void TovVariables<DataType, Region>::operator()(
 
 template <typename DataType, StarRegion Region>
 void TovVariables<DataType, Region>::operator()(
+    const gsl::not_null<Scalar<DataType>*> transformed_bulk_scalar,
+    [[maybe_unused]] const gsl::not_null<Cache*> cache,
+    hydro::Tags::TransformedBulkScalar<DataType> /*meta*/) const {
+  get(*transformed_bulk_scalar) = 1.0;
+}
+
+template <typename DataType, StarRegion Region>
+void TovVariables<DataType, Region>::operator()(
     const gsl::not_null<Scalar<DataType>*> pressure,
     [[maybe_unused]] const gsl::not_null<Cache*> cache,
     hydro::Tags::Pressure<DataType> /*meta*/) const {

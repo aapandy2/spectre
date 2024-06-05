@@ -15,6 +15,7 @@
 #include "PointwiseFunctions/AnalyticData/GrMhd/AnalyticData.hpp"
 #include "PointwiseFunctions/Hydro/EquationsOfState/PolytropicFluid.hpp"
 #include "PointwiseFunctions/Hydro/Temperature.hpp"
+#include "PointwiseFunctions/Hydro/TransformedBulkScalar.hpp"
 #include "PointwiseFunctions/Hydro/Units.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/InitialData.hpp"
 #include "Utilities/TMPL.hpp"
@@ -137,7 +138,8 @@ class ProgenitorProfile {
 class CcsnCollapse : public virtual evolution::initial_data::InitialData,
                      public MarkAsAnalyticData,
                      public AnalyticDataBase,
-                     public hydro::TemperatureInitialization<CcsnCollapse> {
+                     public hydro::TemperatureInitialization<CcsnCollapse>,
+                     public hydro::TransformedBulkScalarInitialization {
   template <typename DataType>
   struct IntermediateVariables {
     IntermediateVariables(
@@ -362,6 +364,16 @@ class CcsnCollapse : public virtual evolution::initial_data::InitialData,
                  const tnsr::I<DataType, 3>& x,
                  tmpl::list<hydro::Tags::ElectronFraction<DataType>> /*meta*/)
       const -> tuples::TaggedTuple<hydro::Tags::ElectronFraction<DataType>>;
+
+  template <typename DataType>
+  auto variables(
+      gsl::not_null<IntermediateVariables<DataType>*> /*vars*/,
+      const tnsr::I<DataType, 3>& x,
+      tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>> /*meta*/) const
+      -> tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>> {
+    return TransformedBulkScalarInitialization::variables(
+        x, tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>>{});
+  }
 
   template <typename DataType>
   auto variables(gsl::not_null<IntermediateVariables<DataType>*> vars,

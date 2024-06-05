@@ -14,6 +14,7 @@
 #include "PointwiseFunctions/AnalyticSolutions/GeneralRelativity/Minkowski.hpp"
 #include "PointwiseFunctions/Hydro/EquationsOfState/IdealFluid.hpp"  // IWYU pragma: keep
 #include "PointwiseFunctions/Hydro/TagsDeclarations.hpp"
+#include "PointwiseFunctions/Hydro/TransformedBulkScalar.hpp"
 #include "PointwiseFunctions/InitialDataUtilities/InitialData.hpp"
 #include "Utilities/Serialization/CharmPupable.hpp"
 #include "Utilities/TMPL.hpp"
@@ -62,7 +63,8 @@ class MagneticFieldLoop
     : public evolution::initial_data::InitialData,
       public MarkAsAnalyticData,
       public AnalyticDataBase,
-      public hydro::TemperatureInitialization<MagneticFieldLoop> {
+      public hydro::TemperatureInitialization<MagneticFieldLoop>,
+      public hydro::TransformedBulkScalarInitialization {
  public:
   using equation_of_state_type = EquationsOfState::IdealFluid<true>;
 
@@ -161,6 +163,15 @@ class MagneticFieldLoop
   auto variables(const tnsr::I<DataType, 3>& x,
                  tmpl::list<hydro::Tags::ElectronFraction<DataType>> /*meta*/)
       const -> tuples::TaggedTuple<hydro::Tags::ElectronFraction<DataType>>;
+
+  template <typename DataType>
+  auto variables(const tnsr::I<DataType, 3>& x,
+                 tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>>
+                 /*meta*/) const
+      -> tuples::TaggedTuple<hydro::Tags::TransformedBulkScalar<DataType>> {
+    return TransformedBulkScalarInitialization::variables(
+        x, tmpl::list<hydro::Tags::TransformedBulkScalar<DataType>>{});
+  }
 
   template <typename DataType>
   auto variables(

@@ -148,7 +148,7 @@ GENERATE_INSTANTIATIONS(
     (hydro::Tags::RestMassDensity, hydro::Tags::SpecificInternalEnergy,
      hydro::Tags::Pressure, hydro::Tags::DivergenceCleaningField,
      hydro::Tags::LorentzFactor, hydro::Tags::SpecificEnthalpy,
-     hydro::Tags::ElectronFraction))
+     hydro::Tags::ElectronFraction, hydro::Tags::TransformedBulkScalar))
 
 #define INSTANTIATE_VECTORS(_, data)                        \
   template tuples::TaggedTuple<TAG(data) < DTYPE(data), 3>> \

@@ -233,9 +233,9 @@ bool operator!=(const KhInstability& lhs, const KhInstability& rhs) {
 GENERATE_INSTANTIATIONS(
     INSTANTIATE_SCALARS, (double, DataVector),
     (hydro::Tags::RestMassDensity, hydro::Tags::ElectronFraction,
-     hydro::Tags::SpecificInternalEnergy, hydro::Tags::Pressure,
-     hydro::Tags::DivergenceCleaningField, hydro::Tags::SpecificEnthalpy,
-     hydro::Tags::LorentzFactor))
+     hydro::Tags::TransformedBulkScalar, hydro::Tags::SpecificInternalEnergy,
+     hydro::Tags::Pressure, hydro::Tags::DivergenceCleaningField,
+     hydro::Tags::SpecificEnthalpy, hydro::Tags::LorentzFactor))
 
 #define INSTANTIATE_VECTORS(_, data)                                         \
   template tuples::TaggedTuple<TAG(data) < DTYPE(data), 3, Frame::Inertial>> \

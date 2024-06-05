@@ -98,8 +98,9 @@ using TovVariablesCache = cached_temp_buffer_from_typelist<tmpl::list<
     Tags::ArealRadius<DataType>, Tags::DrArealRadius<DataType>,
     hydro::Tags::SpecificEnthalpy<DataType>,
     hydro::Tags::RestMassDensity<DataType>,
-    hydro::Tags::ElectronFraction<DataType>, hydro::Tags::Pressure<DataType>,
-    Tags::DrPressure<DataType>,
+    hydro::Tags::ElectronFraction<DataType>,
+    hydro::Tags::TransformedBulkScalar<DataType>,
+    hydro::Tags::Pressure<DataType>, Tags::DrPressure<DataType>,
     ::Tags::deriv<hydro::Tags::Pressure<DataType>, tmpl::size_t<3>,
                   Frame::Inertial>,
     hydro::Tags::SpecificInternalEnergy<DataType>,
@@ -180,6 +181,9 @@ struct TovVariables {
   void operator()(gsl::not_null<Scalar<DataType>*> electron_fraction,
                   gsl::not_null<Cache*> cache,
                   hydro::Tags::ElectronFraction<DataType> /*meta*/) const;
+  void operator()(gsl::not_null<Scalar<DataType>*> transformed_bulk_scalar,
+                  gsl::not_null<Cache*> cache,
+                  hydro::Tags::TransformedBulkScalar<DataType> /*meta*/) const;
   void operator()(gsl::not_null<Scalar<DataType>*> pressure,
                   gsl::not_null<Cache*> cache,
                   hydro::Tags::Pressure<DataType> /*meta*/) const;

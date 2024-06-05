@@ -250,9 +250,10 @@ bool operator!=(const BondiHoyleAccretion& lhs,
 GENERATE_INSTANTIATIONS(
     INSTANTIATE_SCALARS, (double, DataVector),
     (hydro::Tags::RestMassDensity, hydro::Tags::ElectronFraction,
-     hydro::Tags::SpecificInternalEnergy, hydro::Tags::Pressure,
-     hydro::Tags::DivergenceCleaningField, hydro::Tags::LorentzFactor,
-     hydro::Tags::SpecificEnthalpy, hydro::Tags::Temperature))
+     hydro::Tags::TransformedBulkScalar, hydro::Tags::SpecificInternalEnergy,
+     hydro::Tags::Pressure, hydro::Tags::DivergenceCleaningField,
+     hydro::Tags::LorentzFactor, hydro::Tags::SpecificEnthalpy,
+     hydro::Tags::Temperature))
 
 #define INSTANTIATE_VECTORS(_, data)                        \
   template tuples::TaggedTuple<TAG(data) < DTYPE(data), 3>> \
