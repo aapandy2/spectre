@@ -105,8 +105,8 @@ std::optional<PrimitiveRecoveryData> PalenzuelaEtAl::apply(
     const double momentum_density_dot_magnetic_field,
     const double magnetic_field_squared,
     const double rest_mass_density_times_lorentz_factor,
-    const double transformed_bulk_scalar_times_lorentz_factor,
-    const double bulk_viscosity_over_relaxation_time,
+    const double /* transformed_bulk_scalar_times_lorentz_factor */,
+    const double /* bulk_viscosity_over_relaxation_time */,
     const double electron_fraction, const EosType& equation_of_state,
     const grmhd::ValenciaDivClean::PrimitiveFromConservativeOptions&
     /*primitive_from_conservative_options*/) {
