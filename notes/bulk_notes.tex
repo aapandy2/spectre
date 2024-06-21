@@ -1,0 +1,577 @@
+%// Distributed under the MIT License.
+%// See LICENSE.txt for details.
+
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{braket}
+\usepackage{bm}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{listings}
+
+\allowdisplaybreaks
+\numberwithin{equation}{section}
+
+\interfootnotelinepenalty=10000
+
+\usepackage{calligra}
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=violet}
+
+\DeclareMathAlphabet{\mathcalligra}{T1}{calligra}{m}{n}
+\DeclareFontShape{T1}{calligra}{m}{n}{<->s*[2.2]callig15}{}
+\newcommand{\scriptr}{\mathcalligra{r}\,}
+\newcommand{\boldscriptr}{\pmb{\mathcalligra{r}}\,}
+
+\newcommand{\Lagr}{\mathcal{L}}
+\newcommand{\Hami}{\mathcal{H}}
+\newcommand{\reals}{\rm I\!R}
+\newcommand{\order}{\mathcal{O}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bp}{\mathbf{p}}
+\newcommand{\bq}{\mathbf{q}}
+\newcommand{\redtext}[1]{\textcolor{red}{#1}}
+\newcommand{\pvec}[1]{\vec{#1}\mkern2mu\vphantom{#1}}
+\newcommand{\mA}{\mathcal{A}}
+
+%\setcounter{section}{-1}
+
+\begin{document}
+\title{Eckart-frame MIS theory with only bulk viscosity}
+\author{Alex Pandya}
+\date{\today}
+\maketitle
+%\tableofcontents
+%\clearpage
+
+\section{Covariant EOM and general properties}
+
+\subsection{Covariant EOM}
+
+The covariant EOM can be found in \cite{Bemfica19}; note that they neglect electromagnetic fields.
+They are:
+\begin{align}
+0 &= \nabla_{a} T^{ab} \label{eq:Tab_cons_law} \\
+0 &= \nabla_{a} J^{a} \label{eq:Ja_cons_law} \\
+u^a \nabla_a \Pi_B &= \frac{1}{\tau_{\Pi}} \Big( [- \zeta \nabla_a u^a] - \Pi_B \Big) - \frac{\lambda}{\tau_{\Pi}} \Pi_B^2 \label{eq:Pi_cov_EOM}
+\end{align}
+where
+\begin{align}
+T^{ab} &= e u^a u^b + (p + \Pi_B) \Delta^{ab} \label{eq:Tab} \\
+J^{a}  &= \rho u^a \label{eq:Ja}
+\end{align}
+and we have defined
+\begin{equation}
+\begin{aligned}
+\Delta^{ab} &\equiv g^{ab} + u^a u^b. \\
+\end{aligned}
+\end{equation}
+
+
+\section{Coordinate EOM}
+
+We now adopt the standard ADM metric ansatz
+\begin{equation} \label{eq:metric}
+ds^2 = - \alpha^2 dt^2 + \gamma_{ij} (dx^i + \beta^i dt) (dx^j + \beta^j dt)
+\end{equation}
+and we split the four-velocity into timelike and spacelike pieces via
+\begin{equation}
+u^a = W (n^a + v^a),
+\end{equation}
+where $n^a$ is the timelike normal vector, $v^a$ is the spatial velocity, and $W \equiv (1-v_c v^c)^{-1/2}$ is the Lorentz factor.
+
+In the case with bulk viscosity, the Faraday tensor is unchanged and the only change in the stress-energy tensor is that
+\begin{equation}
+\begin{aligned}
+p &\to p_B \equiv p + \Pi_B \\
+h &\to h_B \equiv \frac{e + p_B}{\rho} \\
+p^* &\to p_B^* = p_B + \frac{b^2}{2} \\
+(\rho h)^* &\to (\rho h_B)^* = \rho h_B + b^2
+\end{aligned}
+\end{equation}
+where the latter two quantities will appear in the equations of motion. 
+
+The equations of motion including the bulk viscous term are
+\begin{equation}
+\partial_t U + \partial_i F^i(U) = S(U),
+\end{equation}
+where
+\begin{equation}
+U = \sqrt{\gamma}
+\begin{bmatrix}
+D \\
+D Y_e \\
+V_B \\
+S_j \\
+\tau \\
+B^j \\
+\Phi
+\end{bmatrix}
+\equiv
+\begin{bmatrix}
+\tilde{D} \\
+\tilde{Y}_e \\
+\tilde{V}_B \\
+\tilde{S}_j \\
+\tilde{\tau} \\
+\tilde{B}^j \\
+\tilde{\Phi}
+\end{bmatrix}
+=
+\sqrt{\gamma}
+\begin{bmatrix}
+\rho W \\
+\rho W Y_e \\
+\hat{\Pi}_B W \\
+(\rho h_B)^* W^2 v_j - \alpha b^0 b_j \\
+(\rho h_B)^* W^2 - p_B^* - (\alpha b^0)^2 - \rho W \\
+B^j \\
+\Phi
+\end{bmatrix},
+\end{equation}
+where we have defined densitized versions of the conserved variables, denoted with tildes, by absorbing the factor of the root of the spatial metric's determinant.
+The fluxes are
+\begin{equation}
+F^i(U) =
+\begin{bmatrix}
+\tilde{D} v^i_{tr} \\
+\tilde{Y}_e v^i_{tr} \\
+\tilde{V}_B v^i_{tr} \\
+\tilde{S}_j v^i_{tr} + \alpha \sqrt{\gamma} p^*_B \delta^i_j - \alpha b_j \tilde{B}^i/W \\
+\tilde{\tau} v^i_{tr} + \alpha \sqrt{\gamma} p^*_B v^i - \alpha^2 b^0 \tilde{B}^i/W \\
+\tilde{B}^j v^i_{tr} - \alpha v^j \tilde{B}^i + \alpha \gamma^{ij} \tilde{\Phi} \\
+\alpha \tilde{B}^i - \tilde{\Phi} \beta^i
+\end{bmatrix},
+\end{equation}
+and the sources are
+\begin{equation}
+S(U) =
+\begin{bmatrix}
+0 \\
+0 \\
+- \alpha \sqrt{\gamma} \hat{\Pi}_B \ln(\hat{\Pi}_B) \Big[ \frac{1}{\tau_\Pi} \Big( 1 + \lambda \xi \ln(\hat{\Pi}_B) \Big) + \mathcal{W} \Big] \\
+\frac{\alpha}{2} \tilde{S}^{mn} \partial_j \gamma_{mn} + \tilde{S}_k \partial_j \beta^k - (\tilde{D} + \tilde{\tau}) \partial_j \alpha \\
+\alpha \tilde{S}^{mn} K_{mn} - \tilde{S}^m \partial_m \alpha \\
+-\tilde{B}^m \partial_m \beta^j + \Phi \partial_k (\alpha \sqrt{\gamma} \gamma^{jk}) \\
+\tilde{B}^k \partial_k \alpha - \alpha K \tilde{\Phi} - \alpha \kappa \tilde{\Phi}
+\end{bmatrix},
+\end{equation}
+where
+\begin{equation}
+\begin{aligned}
+\tilde{S}^{ij} &= \sqrt{\gamma} \big[ (\rho h_B)^* W^2 v^i v^j + p^*_B \gamma^{ij} - \gamma^{ik} \gamma^{jl} b_k b_l \big] \\
+\xi &\equiv \frac{\zeta}{\tau_\Pi} \\
+\Pi_B &\equiv \xi \ln(\hat{\Pi}_B) \\
+\mathcal{W} &\equiv u^a \nabla_a \ln (\xi) \underset{\textnormal{restrict}}{\to} 0 \\
+\end{aligned}
+\end{equation}
+where the last line implies that we restrict to the case where $\xi$ is a spacetime constant, so $\mathcal{W} = 0$.
+Ultimately this is a restriction on the class of hydrodynamic frames we can consider, since $\xi \propto \tau_{\Pi}$ which we are free to choose; \textit{I think it shouldn't limit the physics we can model with these equations.}
+
+Note that since the stress-energy tensor includes the change $p \to p_B$, the terms $S^i, S^{ij}, \tau$ are modified from the case without bulk viscosity.
+
+\subsection{Primitive solve}
+
+\textbf{NOTE:} for now we're restricting to the case where the magnetic field is zero, and specializing to the Kastaun hydro inversion.
+
+The primitive solve used in {\tt SpECTRE} only needs a minor modification to work for this system.
+Assume that the conserved variables $D, S_j, \tau, V_B$ are all known.
+We then compute (cf. \cite{Galeazzi13}):
+\begin{equation}
+	q \equiv \frac{\tau}{D}, ~~~ r \equiv \frac{\sqrt{\gamma^{ij} S_i S_j}}{D}, ~~~ k \equiv \frac{r}{1 + q}.
+\end{equation}
+We will now define $\rho, \epsilon, \hat{\Pi}_B, v^j$ to be functions of the variable $z \equiv W v$ using the following definitions:
+\begin{equation}
+\begin{aligned}
+W(z) &= \sqrt{1 + z^2} \\
+\rho(z) &= \frac{D}{W(z)} \\
+\hat{\Pi}_B(z) &= \frac{V_B}{W(z)} \\
+\Pi_B(z) &= \xi \ln(\hat{\Pi}_B) \\
+\epsilon(z) &= W(z) q - z r + W(z) - 1 \\
+p(z) &= \mathrm{EOS}\big[ \epsilon(z), \rho(z) \big] \\
+a(z) &= \frac{p(z) + \Pi_B(z)}{\rho(z) [1 + \epsilon(z)]} &&\leftarrow (\textnormal{modified by } \Pi_B) \\
+h(z) &= (1 + \epsilon(z))(1 + a(z)) \\
+v^j(z) &= \frac{S^j}{D W(z) h(z)}.
+\end{aligned}
+\end{equation}
+\textit{Note that the quantity $a$ is modified due to the presence of bulk viscosity, and that change is then inherited by $h$ and $v^j$}.
+All of the assignments can be made in the order above (from top to bottom) given a value of $z$.
+
+The value of $z$ is obtained by applying a root-finding algorithm to the function (so, starting with a guess $z_0$ and then iteratively refining)
+\begin{equation}
+f(z) = z - \frac{r}{h(z)},
+\end{equation}
+which is zero when evaluated on physical solutions to the MIS-bulk system.
+
+\begin{thebibliography}{10}
+\bibitem{Deppe22} Deppe, N., et al. \url{https://arxiv.org/abs/2109.12033}
+\bibitem{BaumgarteShapiro} Baumgarte, T. \& Shapiro, S., ``Numerical Relativity: Solving Einstein's Equations on the Computer''
+\bibitem{RezzollaZanotti} Rezzolla, L. \& Zanotti, O., ``Relativistic Hydrodynamics''
+\bibitem{Bemfica19} Bemfica, F., Disconzi, M., \& Noronha, J. \url{https://arxiv.org/abs/1901.06701}
+\bibitem{Gourgoulhon07} Gourgoulhon, E. \url{https://arxiv.org/abs/gr-qc/0703035}
+\bibitem{Galeazzi13} Galeazzi, F., et al. \url{https://journals.aps.org/prd/abstract/10.1103/PhysRevD.88.064009}
+\bibitem{Chabanov23a} Chabanov, M. \& Rezzolla, L., \url{https://arxiv.org/abs/2307.10464}
+\bibitem{Chabanov23b} Chabanov, M., \& Rezzolla, L., \url{https://arxiv.org/abs/2311.13027}
+\bibitem{PMP22b} Pandya, Most, Pretorius 22b \url{https://arxiv.org/abs/2209.09265}
+\end{thebibliography}
+
+\clearpage
+
+\appendix
+
+\clearpage
+
+\section{Steady-state shockwave solutions}
+
+In this section we will consider solutions to the system with zero magnetic field in flat spacetime.
+We will further assume that $\zeta/\tau_{\Pi}$ is a spacetime constant, so the bulk evolution equation takes the form of a conservation law.
+
+Under these constraints, the equations of motion are
+\begin{align}
+\nabla_a T^{ab} &= 0 \\
+\nabla_a J^a &= 0\\
+\nabla_a (\hat{\Pi}_B u^a) &= \mathcal{S}_\Pi,
+\end{align}
+where
+\begin{align}
+T^{ab} &= e u^a u^b + (p + \Pi_B) \Delta^{ab} \\
+J^a &= \rho u^a \\
+\Pi_B &= \frac{\zeta}{\tau_{\Pi}} \ln(\hat{\Pi}_B) \\
+\mathcal{S}_\Pi &\equiv - \frac{1}{\tau_\Pi} \hat{\Pi}_B \ln(\hat{\Pi}_B) \Big( 1 + \frac{\zeta \lambda}{\tau_\Pi} \ln(\hat{\Pi}_B) \Big)
+\end{align}
+For now we'll leave the EOS implicit, $p = p(e, \rho)$.
+
+We'll now further restrict to solutions which vary only in one spatial coordinate, which we will take (WLOG) to be $x$, and we write the four velocity in terms of the Lorentz factor $W$ and the $x$-direction coordinate velocity $v$ as
+\begin{equation}
+u^a = (W, W v, 0, 0)^T.
+\end{equation}
+
+Under these restrictions, the particle current equation becomes
+\begin{equation} \label{eq:J_eqn}
+\begin{aligned}
+0 &= \partial_a J^{a} \\
+&= \partial_x J^x \\
+\implies J^x &\equiv \rho W v = \mathrm{const.}
+\end{aligned}
+\end{equation}
+The stress-energy conservation laws imply
+\begin{equation} \label{eq:T_eqns}
+\begin{aligned}
+0 &= \partial_a T^{ab} \\
+&= \partial_x T^{xb} \\
+\implies T^{tx} &\equiv (e + p + \Pi) W^2 v = \mathrm{const.} \\
+\implies T^{xx} &\equiv (e + p + \Pi) W^2 v^2 + p + \Pi = \mathrm{const.}
+\end{aligned}
+\end{equation}
+Finally, the bulk scalar equation implies
+\begin{equation} \label{eq:intermediate_Pi_ODE}
+\begin{aligned}
+\mathcal{S}_\Pi &= \partial_a (\hat{\Pi}_B u^a) \\
+&= (\hat{\Pi}_B u^x)' \\
+&= (\hat{\Pi}_B W v)' \\
+&= W v \hat{\Pi}_B' + \hat{\Pi}_B v W' + \hat{\Pi}_B W  v' \\
+\mathcal{S}_\Pi &= W v \hat{\Pi}_B' + \hat{\Pi}_B W^3 v' \\
+\implies \hat{\Pi}_B' &= \frac{\mathcal{S}_\Pi}{W v} - \hat{\Pi}_B W^2 \frac{v'}{v}. \\
+\end{aligned}
+\end{equation}
+
+We can now use (\ref{eq:J_eqn}) to solve for $\rho$
+\begin{equation}
+\rho = \frac{J^x}{W v}
+\end{equation}
+and the first result (after the first ``implies'' arrow) from (\ref{eq:T_eqns}) gives us
+\begin{equation}
+\begin{aligned}
+e + p + \Pi &= \frac{T^{tx}}{W^2 v} \\
+\end{aligned}
+\end{equation}
+which can be inserted into the second result from (\ref{eq:T_eqns}) to give us
+\begin{equation} \label{eq:intermediate_p}
+\begin{aligned}
+T^{xx} &= \frac{T^{tx}}{W^2 v} W^2 v^2 + p + \Pi \\
+T^{xx} &= T^{tx} v + p + \Pi \\
+\implies p &= T^{xx} - T^{tx} v - \Pi. \\
+\end{aligned}
+\end{equation}
+We can now get $e$ using this in the first result from (\ref{eq:T_eqns}):
+\begin{equation}
+\begin{aligned}
+\frac{T^{tx}}{W^2 v} &= e + (T^{xx} - T^{tx} v - \Pi) + \Pi \\
+\implies e &= \frac{T^{tx}}{v} - T^{xx}. \\
+\end{aligned}
+\end{equation}
+
+At this stage we can recognize that we have $e = e(v), \rho = \rho(v)$, and through the EOS we have $p(e, \rho) = p(e(v), \rho(v)) = p(v)$; these facts imply that we should be able to write (\ref{eq:intermediate_Pi_ODE}) as an ODE for $v$.
+We start by noting that since $\hat{\Pi} = \exp(\Pi \, \tau_{\Pi}/\zeta)$,
+\begin{equation}
+\begin{aligned}
+\hat{\Pi}' &= \frac{\partial \hat{\Pi}}{\partial \Pi} \frac{\partial \Pi}{\partial x} \\
+&= \frac{\tau_{\Pi}}{\zeta} e^{\Pi \, \tau_{\Pi}/\zeta} \Pi' \\
+&= \frac{\tau_{\Pi}}{\zeta} \hat{\Pi} \Pi'
+\end{aligned}
+\end{equation}
+so differentiating (\ref{eq:intermediate_p}) with respect to $x$ gives us
+\begin{equation}
+\begin{aligned}
+- T^{tx} v' - \Pi' &= p' \\
+&= \frac{\partial p}{\partial e} e' + \frac{\partial p}{\partial \rho} \rho' \\
+&= \frac{\partial p}{\partial e} \Big[ - \frac{T^{tx}}{v^2} v' \Big] + \frac{\partial p}{\partial \rho} \Big[ - \frac{J^x W}{v^2} v' \Big] \\
+\implies \Pi' &= \Big[ T^{tx} \Big( \frac{\partial p}{\partial e} \frac{1}{v^2} - 1 \Big) + \frac{\partial p}{\partial \rho} \frac{J^x W}{v^2} \Big] v'
+\end{aligned}
+\end{equation}
+thus
+\begin{equation}
+\hat{\Pi}' = \frac{\tau_{\Pi}}{\zeta} \hat{\Pi} \Big[ T^{tx} \Big( \frac{\partial p}{\partial e} \frac{1}{v^2} - 1 \Big) + \frac{\partial p}{\partial \rho} \frac{J^x W}{v^2} \Big] v'.
+\end{equation}
+Inserting this result into (\ref{eq:intermediate_Pi_ODE}) gives us
+\begin{equation}
+\begin{aligned}
+\hat{\Pi}' &= \frac{\mathcal{S}_\Pi}{W v} - \hat{\Pi} W^2 \frac{v'}{v} \\
+\implies \frac{\tau_{\Pi}}{\zeta} \hat{\Pi} \Big[ T^{tx} \Big( \frac{\partial p}{\partial e} \frac{1}{v^2} - 1 \Big) + \frac{\partial p}{\partial \rho} \frac{J^x W}{v^2} \Big] v' &= \frac{\mathcal{S}_\Pi}{W v} - \hat{\Pi} W^2 \frac{v'}{v} \\
+\frac{\tau_{\Pi}}{\zeta} \hat{\Pi} \Big[ T^{tx} \Big( \frac{\partial p}{\partial e} \frac{1}{v^2} - 1 \Big) + \frac{\partial p}{\partial \rho} \frac{J^x W}{v^2} \Big] v' &= \frac{- \frac{1}{\tau_\Pi} \hat{\Pi} \ln(\hat{\Pi}) \Big( 1 + \frac{\zeta \lambda}{\tau_\Pi} \ln(\hat{\Pi}) \Big)}{W v} - \hat{\Pi} W^2 \frac{v'}{v} \\
+\frac{\tau_{\Pi}}{\zeta} \Big[ T^{tx} \Big( \frac{\partial p}{\partial e} \frac{1}{v^2} - 1 \Big) + \frac{\partial p}{\partial \rho} \frac{J^x W}{v^2} \Big] v' &= \frac{- \frac{1}{\tau_\Pi} \ln(\hat{\Pi}) \Big( 1 + \frac{\zeta \lambda}{\tau_\Pi} \ln(\hat{\Pi}) \Big)}{W v} - W^2 \frac{v'}{v} \\
+\end{aligned}
+\end{equation}
+where we have cancelled a factor of $\hat{\Pi}$ from the fourth line (which is fine because $\hat{\Pi} > 0$).
+We can now see that we have a couple factors of $\hat{\Pi}$ hanging around, and we'd like to express them in terms of $v$; this can be done using the EOS and (\ref{eq:intermediate_p}), via
+\begin{equation}
+\Pi = T^{xx} - T^{tx} v - p \implies \hat{\Pi} = \exp\Big[ \frac{\tau_{\Pi}}{\zeta} (T^{xx} - T^{tx} v - p) \Big]
+\end{equation}
+so our ODE can be written
+\begin{equation}
+\begin{aligned}
+v' &= \frac{(-T^{xx} + T^{tx} v + p) \Big( 1 - \lambda (-T^{xx} + T^{tx} v + p) \Big)}{W v \Big[ \tau_{\Pi} T^{tx} ( p_{,e} v^{-2} - 1) + \tau_{\Pi} p_{,\rho} J^x W v^{-2} + \zeta W^2 v^{-1} \Big]}, \\
+\end{aligned}
+\end{equation}
+where the RHS is entirely a function of $v$ after using the EOS to express $p = p(v)$.
+
+\subsubsection{Rewriting the ODE in clearer form}
+
+Recall that the bulk viscous characteristic speed is \cite{Bemfica19}
+\begin{equation}
+\mathfrak{c}^2 = \frac{\zeta}{\tau_{\Pi} (e + p + \Pi)} + p_{,e} + \frac{\rho \, p_{,\rho}}{e + p + \Pi}.
+\end{equation}
+With this in mind, we can rewrite the ODE for $v$ as
+\begin{equation}
+v' = \mathcal{N} \Big[ \tau_{\Pi} T^{tx} ( p_{,e} v^{-2} - 1) + \tau_{\Pi} p_{,\rho} J^x W v^{-2} + \zeta W^2 v^{-1} \Big]^{-1}
+\end{equation}
+where we have defined shorthand
+\begin{equation}
+\mathcal{N} \equiv \frac{(-T^{xx} + T^{tx} v + p) \Big( 1 - \lambda (-T^{xx} + T^{tx} v + p) \Big)}{W v}.
+\end{equation}
+We can now manipulate the equation for $v'$:
+\begin{equation}
+\begin{aligned}
+v' &= \mathcal{N} \tau_{\Pi}^{-1} \Big[ T^{tx} ( p_{,e} v^{-2} - 1) + p_{,\rho} J^x W v^{-2} + \frac{\zeta}{\tau_{\Pi}} W^2 v^{-1} \Big]^{-1} \\
+&= \mathcal{N} \tau_{\Pi}^{-1} \Big[ (e + p + \Pi) W^2 v ( p_{,e} v^{-2} - 1) + p_{,\rho} (\rho W v) W v^{-2} + \frac{\zeta}{\tau_{\Pi}} W^2 v^{-1} \Big]^{-1} \\
+&= \mathcal{N} \tau_{\Pi}^{-1} W^{-2} v \Big[ (e + p + \Pi) v^2 ( p_{,e} v^{-2} - 1) + p_{,\rho} \rho + \frac{\zeta}{\tau_{\Pi}} \Big]^{-1} \\
+&= \mathcal{N} \tau_{\Pi}^{-1} W^{-2} v (e + p + \Pi)^{-1} \Big[ p_{,e} + \frac{p_{,\rho} \rho}{e + p + \Pi} + \frac{\zeta}{\tau_{\Pi} (e + p + \Pi)} - v^2 \Big]^{-1} \\
+&= \mathcal{N} \tau_{\Pi}^{-1} W^{-2} v (e + p + \Pi)^{-1} \Big[ \mathfrak{c}^2 - v^2 \Big]^{-1} \\
+\end{aligned}
+\end{equation}
+which we can finally rewrite as
+\begin{equation}
+v' = \frac{v (-T^{xx} + T^{tx} v + p) \Big( 1 - \lambda (-T^{xx} + T^{tx} v + p) \Big)}{W \tau_{\Pi} T^{tx} [ \mathfrak{c}^2 - v^2 ]} \\
+\end{equation}
+where we have exchanged the $(e + p + \Pi)^{-1}$ factor for $T^{tx}$ in the denominator.
+
+Written in this form, it is clear that the system fails to possess steady-state shockwave solutions (the denominator vanishes) if we ever have $v^2 = \mathfrak{c}^2$, in other words when the flow velocity crosses the local bulk viscous characteristic speed.
+
+\textbf{TODO: check this equation in Mathematica}
+
+\section{Deriving the $\hat{\Pi}$ evolution equation} \label{sec:Pi_hat_deriv}
+
+Substituting (\ref{eq:Pi_E}) into the $\Pi$ evolution equation (\ref{eq:Pi_cov_EOM}) and rearranging yields:
+\begin{equation}
+\begin{aligned}
+u^a \nabla_a \Pi &= \frac{1}{\tau_{\Pi}} (- \zeta \nabla_a u^a - \Pi) - \frac{\lambda}{\tau_{\Pi}} \Pi^2 \\
+u^a \nabla_a \Pi + \frac{\zeta}{\tau_{\Pi}} \nabla_a u^a &= - \frac{1}{\tau_{\Pi}} \Pi ( 1 + \lambda \Pi ). \\
+\end{aligned}
+\end{equation}
+We now define
+\begin{equation} \label{eq:Pi_hat_defn}
+\Pi = \frac{\zeta}{\tau_\Pi} \ln(\hat{\Pi}),
+\end{equation}
+in terms of which the above equation becomes
+\begin{equation}
+\begin{aligned}
+u^a \nabla_a \Big[ \frac{\zeta}{\tau_\Pi} \ln(\hat{\Pi}) \Big] + \frac{\zeta}{\tau_{\Pi}} \nabla_a u^a &= - \frac{1}{\tau_{\Pi}} \Pi ( 1 + \lambda \Pi ) \\
+\frac{\zeta}{\tau_\Pi} u^a \nabla_a \ln(\hat{\Pi}) + \ln(\hat{\Pi}) u^a \nabla_a \Big[ \frac{\zeta}{\tau_\Pi} \Big] + \frac{\zeta}{\tau_{\Pi}} \nabla_a u^a &= - \frac{1}{\tau_{\Pi}} \Pi ( 1 + \lambda \Pi ) \\
+\frac{\zeta}{\tau_\Pi} u^a \nabla_a \ln(\hat{\Pi}) + \frac{\zeta}{\tau_{\Pi}} \nabla_a u^a &= - \frac{1}{\tau_{\Pi}} \Pi ( 1 + \lambda \Pi ) - \ln(\hat{\Pi}) u^a \nabla_a \Big[ \frac{\zeta}{\tau_\Pi} \Big] \\
+\frac{\zeta}{\tau_\Pi} \frac{1}{\hat{\Pi}} u^a \nabla_a \hat{\Pi} + \frac{\zeta}{\tau_{\Pi}} \nabla_a u^a &= - \frac{1}{\tau_{\Pi}} \Pi ( 1 + \lambda \Pi ) - \ln(\hat{\Pi}) u^a \nabla_a \Big[ \frac{\zeta}{\tau_\Pi} \Big]\\
+u^a \nabla_a \hat{\Pi} + \hat{\Pi} \nabla_a u^a &= - \frac{\hat{\Pi}}{\zeta} \Pi ( 1 + \lambda \Pi ) -  \hat{\Pi} \ln(\hat{\Pi}) u^a \nabla_a \ln \Big( \frac{\zeta}{\tau_\Pi} \Big) \\
+\nabla_a (\hat{\Pi} u^a) &= - \frac{\hat{\Pi}}{\zeta} \Pi ( 1 + \lambda \Pi ) -  \hat{\Pi} \ln(\hat{\Pi}) u^a \nabla_a \ln \Big( \frac{\zeta}{\tau_\Pi} \Big). \\
+\end{aligned}
+\end{equation}
+Expressing the right-hand side completely in terms of $\hat{\Pi}$ yields
+\begin{equation} \label{eq:Pi_hat_eqn}
+\nabla_a (\hat{\Pi} u^a) = - \hat{\Pi} \ln(\hat{\Pi}) \Big[ \frac{1}{\tau_\Pi} \Big( 1 + \frac{\zeta \lambda}{\tau_\Pi} \ln(\hat{\Pi}) \Big) + u^a \nabla_a \ln \Big( \frac{\zeta}{\tau_\Pi} \Big) \Big].
+\end{equation}
+Notice that in the case where $\zeta/\tau_\Pi$ is constant, the above equation is a conservation law.
+
+\section{Entropy equation}
+
+It may be useful to re-express the energy equation as an evolution equation for the entropy density.
+We will need a couple of equations from thermodynamics, namely
+\begin{align}
+d e &= T ds + \mu \, d n \implies \frac{\partial e}{\partial s} \Big|_n = T, ~~~ \frac{\partial e}{\partial n} \Big|_s = \mu \label{eq:first_law} \\
+e &= T s - p + \mu n \label{eq:Euler_relation}
+\end{align}
+which are the first law of thermodynamics and the Euler relation respectively, both in intrinsic form.
+Going back to the energy equation, we have:
+\begin{equation}
+\begin{aligned}
+0 &= u_b \nabla_{a} T^{ab} \\
+&= u_b \nabla_{a} \Big[ e(s, n) u^a u^b + \tilde{p}(s, n, \Pi) \Delta^{ab} \Big] \\
+&= u_b u^a u^b \nabla_{a} e + u_b e u^b \nabla_{a} u^a + u_b e u^a \nabla_{a} u^b + u_b \Delta^{ab} \nabla_{a} \tilde{p} + u_b \tilde{p} \nabla_{a} \Delta^{ab} \\
+&= - u^a \nabla_{a} e - e \nabla_{a} u^a + u_b \tilde{p} \nabla_{a} (g^{ab} + u^a u^b) \\
+&= - u^a \nabla_{a} e - e \nabla_{a} u^a - \tilde{p} \nabla_{a} u^a \\
+&= u^a \nabla_{a} e  + (e + \tilde{p}) \nabla_{a} u^a \\
+&= u^a \Big[ \frac{\partial e}{\partial s} \Big|_n \nabla_{a} s + \frac{\partial e}{\partial n} \Big|_s \nabla_a n \Big]  + (e + \tilde{p}) \nabla_{a} u^a \\
+&= T u^a \nabla_{a} s + \mu u^a \nabla_a n  + (e + \tilde{p}) \nabla_{a} u^a \\
+&= T \big[ \nabla_a (s u^a) - s \nabla_a u^a \big] + \mu \big[ \nabla_a (n u^a) - n \nabla_a u^a \big]  + (e + \tilde{p}) \nabla_{a} u^a \\
+&= T \nabla_a (s u^a) + (e + \tilde{p} - T s - \mu n) \nabla_{a} u^a \\
+&= T \nabla_a (s u^a) + (e + p - T s - \mu n) \nabla_{a} u^a + \Pi \nabla_a u^a \\
+&= T \nabla_a (s u^a) + \Pi \nabla_a u^a, \\
+\end{aligned}
+\end{equation}
+so rearranging slightly yields
+\begin{equation} \label{eq:entropy_eqn}
+\boxed{ \nabla_a (s u^a) = - \frac{\Pi}{T} \nabla_a u^a. }
+\end{equation}
+
+\section{Re-expressing $\mathcal{W}$ from the $\Pi$ equation} \label{sec:W_term}
+
+The $\hat{\Pi}$ equation (\ref{eq:Pi_hat_eqn}) has an extra term, $\mathcal{W}$, which keeps it from being a conservation law.
+We can manipulate that term a bit to express it as a coefficient times the divergence of the flow velocity; to do so, we first define
+\begin{equation}
+\xi(s, \rho) \equiv \frac{\zeta}{\tau_{\Pi}}
+\end{equation}
+which we have taken $\xi$ (WLOG) to be a function of the entropy density $s$ and the particle density $\rho$.
+In terms of $\xi$, $\mathcal{W}$ can be written
+\begin{equation}
+\begin{aligned}
+\mathcal{W} &\equiv u^a \nabla_a \ln \big[ \xi(s, \rho) \big] \\
+&= u^a \Big[ \frac{\partial \ln(\xi)}{\partial \xi} \frac{\partial \xi}{\partial s} \Big|_{\rho} \nabla_a s + \frac{\partial \ln(\xi)}{\partial \xi} \frac{\partial \xi}{\partial \rho} \Big|_{s} \nabla_a \rho \Big] \\
+&= \xi^{-1} \frac{\partial \xi}{\partial s} \Big|_{\rho} u^a \nabla_a s + \xi^{-1} \frac{\partial \xi}{\partial \rho} \Big|_{s} u^a \nabla_a \rho \\
+&= \xi^{-1} \frac{\partial \xi}{\partial s} \Big|_{\rho} [\nabla_a (s u^a) - s \nabla_a u^a] + \xi^{-1} \frac{\partial \xi}{\partial \rho} \Big|_{s} [\nabla_a (\rho u^a) - \rho \nabla_a u^a] \\
+&= \xi^{-1} \frac{\partial \xi}{\partial s} \Big|_{\rho} [- \frac{\Pi}{T} \nabla_a u^a - s \nabla_a u^a] - \xi^{-1} \frac{\partial \xi}{\partial \rho} \Big|_{s} \rho \nabla_a u^a \\
+&= - \xi^{-1} \Big[ \frac{\partial \xi}{\partial s} \Big|_{\rho} \Big( \frac{\Pi}{T} + s \Big) + \frac{\partial \xi}{\partial \rho} \Big|_{s} \rho \Big] \nabla_a u^a, \\
+\end{aligned}
+\end{equation}
+where we have used the entropy equation, (\ref{eq:entropy_eqn}), and the particle current conservation law, (\ref{eq:Ja_cons_law}), to arrive at the fifth line. 
+Note that the result is now proportional to $\nabla_a u^a$.
+
+\section{Identities from working out the $\Pi$ equation}
+
+In working out the $\Pi$ equation we have used
+\begin{equation}
+\begin{aligned}
+D_\Pi &= \mathcal{L}_\beta \Pi - \alpha v^a D_a \Pi \\
+&= \beta^i \partial_i \Pi - \alpha v^i \partial_i \Pi \\
+&= - \frac{u^i}{u^t} \partial_i \Pi \\
+\end{aligned}
+\end{equation}
+and
+\begin{equation}
+\begin{aligned}
+D_p &= - \frac{\zeta}{W \tau_{\Pi}} \Big[ \alpha v^a D_a W + \alpha W D_a v^a + W v^a D_a \alpha - \mathcal{L}_\beta W \Big] \\
+&= - \frac{\zeta}{W \tau_{\Pi}} \Big[ D_a (\alpha W v^a) - \mathcal{L}_\beta W \Big] \\
+&= - \frac{\zeta}{W \tau_{\Pi}} \Big[ \frac{1}{\sqrt{\gamma}} \partial_i (\sqrt{\gamma} \alpha W v^i) - \beta^i \partial_i W \Big]. \\
+\end{aligned}
+\end{equation}
+
+\section{Transport coefficients \& constraints}
+
+The system (\ref{eq:Tab_cons_law}-\ref{eq:Pi_E}) can be written as a first-order symmetric hyperbolic (FOSH) system, which immediately implies existence and uniqueness of solutions.
+The equations are causal so long as the local characteristic speeds $\mathfrak{c} \leq 1$, where
+\begin{equation}
+\mathfrak{c}^2 = \frac{\zeta}{\tau_{\Pi} (e + \tilde{p})} + \frac{1}{\tilde{h}} \Big[ \frac{\tilde{p}}{\rho^2} \frac{\partial p}{\partial \epsilon} \Big|_\rho + \frac{\partial p}{\partial \rho} \Big|_\epsilon \Big];
+\end{equation}
+note the similarity between the second term and the characteristic speed (squared) for the relativistic Euler equations,
+\begin{equation}
+c_s^2 = \frac{1}{h} \Big[ \frac{p}{\rho^2} \frac{\partial p}{\partial \epsilon} \Big|_\rho + \frac{\partial p}{\partial \rho} \Big|_\epsilon \Big],
+\end{equation}
+which is also known as the sound speed (squared).
+Written in this form, it is clear that we have $\mathfrak{c}^2 \to c_s^2$ in the limit where bulk viscosity vanishes, $\zeta/\tau_{\Pi}, \Pi \to 0 \implies \tilde{p} \to p, \tilde{h} \to h$.
+
+The authors of \cite{Bemfica19} also state that in the ``near equilibrium'' regime $\Pi/(e+p) \ll 1$, solutions to the equations of motion are linearly stable about thermodynamic equilibrium and are consistent with the second law of thermodynamics (divergence of the entropy current is non-negative).
+
+The quantities $\zeta, \tau_{\Pi}, \lambda$ are known as \textit{transport coefficients} and are functions of $\epsilon, \rho$; $\zeta$ is the bulk viscous coefficient, $\tau_{\Pi}$ is a relaxation time that controls how quickly bulk viscosity acts on the solution, and $\lambda$ is the magnitude of a ``higher order'' term which was included in \cite{Bemfica19} because it did not impact the proofs of the statements mentioned in the previous paragraph.
+
+\section{Rewriting the characteristic speed}
+
+Bemfica et al. \cite{Bemfica19} take the pressure to be $p(e,n)$ rather than our choice of variables $p(\epsilon, \rho)$.
+For this reason, they give the sound speed to be
+\begin{equation} \label{eq:BDN_csSq}
+c_s^2 = \frac{\partial p}{\partial e} \Big|_n + \frac{n}{e+p} \frac{\partial p}{\partial n} \Big|_e.
+\end{equation}
+
+The thermodynamic variables are related by
+\begin{align}
+\rho &= m n \\
+e    &= \rho (1 + \epsilon),
+\end{align}
+where $m$ is the particle mass and is taken to be constant.
+Taking a total derivative of the second equation yields
+\begin{equation}
+\begin{aligned}
+de &= (1 + \epsilon) d \rho + \rho d \epsilon \\
+\implies \frac{\partial \epsilon}{\partial e} \Big|_\rho &= \frac{1}{\rho} \\
+\implies \frac{\partial \epsilon}{\partial \rho} \Big|_e &= -\frac{(1+\epsilon)}{\rho} = - \frac{e}{\rho^2} \\
+\implies \frac{\partial \rho}{\partial e} \Big|_\rho &= 0. \\
+\end{aligned}
+\end{equation}
+So we can now express the derivatives in (\ref{eq:BDN_csSq}) as
+\begin{equation} \label{eq:dpde_n}
+\begin{aligned}
+\frac{\partial p}{\partial e} \Big|_n &= \frac{\partial p(\epsilon, \rho)}{\partial e} \Big|_\rho \\
+&= \frac{\partial p}{\partial \epsilon} \Big|_\rho \frac{\partial \epsilon}{\partial e} \Big|_\rho + \frac{\partial p}{\partial \rho} \Big|_\epsilon \frac{\partial \rho}{\partial e} \Big|_\rho \\
+&= \frac{\partial p}{\partial \epsilon} \Big|_\rho \cdot \frac{1}{\rho} + \frac{\partial p}{\partial \rho} \Big|_\epsilon \cdot 0 \\
+&= \frac{1}{\rho} \frac{\partial p}{\partial \epsilon} \Big|_\rho \\
+\end{aligned}
+\end{equation}
+and
+\begin{equation} \label{eq:dpdn_e}
+\begin{aligned}
+\frac{\partial p}{\partial n} \Big|_e &= m \frac{\partial p(\epsilon, \rho)}{\partial \rho} \Big|_e \\
+&= m \frac{\partial p}{\partial \epsilon} \Big|_\rho \frac{\partial \epsilon}{\partial \rho} \Big|_e + m \frac{\partial p}{\partial \rho} \Big|_\epsilon \frac{\partial \rho}{\partial \rho} \Big|_e \\
+&= m \frac{\partial p}{\partial \epsilon} \Big|_\rho \Big( -\frac{e}{\rho^2} \Big) + m \frac{\partial p}{\partial \rho} \Big|_\epsilon \\
+&= -\frac{m e}{\rho^2} \frac{\partial p}{\partial \epsilon} \Big|_\rho + m \frac{\partial p}{\partial \rho} \Big|_\epsilon. \\
+\end{aligned}
+\end{equation}
+
+Inserting these pressure derivatives into the sound speed (\ref{eq:BDN_csSq}) yields
+\begin{equation} \label{eq:csSq_eps_rho}
+\begin{aligned}
+c_s^2 &= \frac{1}{\rho} \frac{\partial p}{\partial \epsilon} \Big|_\rho + \frac{n}{e+p} \Big[ -\frac{m e}{\rho^2} \frac{\partial p}{\partial \epsilon} \Big|_\rho + m \frac{\partial p}{\partial \rho} \Big|_\epsilon \Big] \\
+&= \frac{1}{\rho} \frac{\partial p}{\partial \epsilon} \Big|_\rho - \frac{e}{\rho (e+p)} \frac{\partial p}{\partial \epsilon} \Big|_\rho + \frac{\rho}{e+p} \frac{\partial p}{\partial \rho} \Big|_\epsilon \\
+&= \frac{p}{\rho^2 h} \frac{\partial p}{\partial \epsilon} \Big|_\rho + \frac{1}{h} \frac{\partial p}{\partial \rho} \Big|_\epsilon \\
+&= \frac{1}{h} \Big[ \frac{p}{\rho^2} \frac{\partial p}{\partial \epsilon} \Big|_\rho + \frac{\partial p}{\partial \rho} \Big|_\epsilon \Big] \\
+\end{aligned}
+\end{equation}
+where we have used the definition of the specific enthalpy, $h \equiv (e+p)/\rho$, and this result agrees with \cite{RezzollaZanotti,Deppe22}.
+
+We can now use the pressure derivatives (\ref{eq:dpde_n}-\ref{eq:dpdn_e}) to rewrite the bulk-only MIS system's characteristic speed \cite{Bemfica19}:
+\begin{equation}
+\begin{aligned}
+\mathfrak{c}^2 &= \frac{\zeta}{\tau_{\Pi} (e + p + \Pi)} + \Big( \frac{\partial p}{\partial e} \Big)_n + \frac{n}{e+p+\Pi} \Big( \frac{\partial p}{\partial n} \Big)_e \\
+&= \frac{\zeta}{\tau_{\Pi} (e + p + \Pi)} + \frac{1}{\rho} \frac{\partial p}{\partial \epsilon} \Big|_\rho + \frac{n}{e+p+\Pi} \Big( -\frac{m e}{\rho^2} \frac{\partial p}{\partial \epsilon} \Big|_\rho + m \frac{\partial p}{\partial \rho} \Big|_\epsilon \Big) \\
+&= \frac{\zeta}{\tau_{\Pi} (e + p + \Pi)} + \Big[ \frac{1}{\rho} - \frac{e}{\rho (e+p+\Pi)} \Big] \frac{\partial p}{\partial \epsilon} \Big|_\rho + \frac{\rho}{e+p+\Pi} \frac{\partial p}{\partial \rho} \Big|_\epsilon \\
+&= \frac{\zeta}{\tau_{\Pi} (e + p + \Pi)} + \Big[ \frac{p + \Pi}{\rho (e+p+\Pi)} \Big] \frac{\partial p}{\partial \epsilon} \Big|_\rho + \frac{\rho}{e+p+\Pi} \frac{\partial p}{\partial \rho} \Big|_\epsilon \\
+&= \frac{\zeta}{\tau_{\Pi} (e + p + \Pi)} + \frac{\rho}{e+p+\Pi} \Big[ \frac{p + \Pi}{\rho^2} \frac{\partial p}{\partial \epsilon} \Big|_\rho + \frac{\partial p}{\partial \rho} \Big|_\epsilon \Big] \\
+&= \frac{\zeta}{\tau_{\Pi} (e + \tilde{p})} + \frac{1}{\tilde{h}} \Big[ \frac{\tilde{p}}{\rho^2} \frac{\partial p}{\partial \epsilon} \Big|_\rho + \frac{\partial p}{\partial \rho} \Big|_\epsilon \Big] \\
+\end{aligned}
+\end{equation}
+where we have defined
+\begin{equation}
+\tilde{p} = p + \Pi, ~~~ \tilde{h} = \frac{e + \tilde{p}}{\rho}
+\end{equation}
+Note the similarity between the second term in the last line for $\mathfrak{c}^2$ and the relativistic Euler sound speed (\ref{eq:csSq_eps_rho}).
+
+\end{document}
